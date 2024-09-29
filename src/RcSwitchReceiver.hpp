@@ -35,7 +35,7 @@ public:
 	/**
 	 * Sets up the receiver to receive interrupts from the IOPIN.
 	 */
-	void setup() {
+	void begin() {
 	  pinMode(IOPIN, INPUT_PULLUP);
 		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
 	}

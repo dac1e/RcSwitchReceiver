@@ -9,7 +9,7 @@ static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 void setup()
 {
 	Serial.begin(115200);
-	rcSwitchReceiver.setup();
+	rcSwitchReceiver.begin();
 }
 
 // The loop function is called in an endless loop
