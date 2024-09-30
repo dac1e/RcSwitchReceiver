@@ -394,8 +394,8 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 				}
 				break;
 			case DATA_STATE:
-				if(++mReceivedDataModePulseCount == 2) {
-					mReceivedDataModePulseCount = 0;
+				if(++mDataModePulseCount == 2) {
+					mDataModePulseCount = 0;
 					const Pulse& firstPulse  = at(size()-2);
 					const Pulse& secondPulse = at(size()-1);
 					const PULSE_TYPE pulseType = analyzePulsePair(firstPulse, secondPulse);

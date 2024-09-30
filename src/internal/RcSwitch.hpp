@@ -536,7 +536,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	volatile bool mSuspended;
 
 	ProtocolCandidates mProtocolCandidates;
-	size_t mReceivedDataModePulseCount;
+	size_t mDataModePulseCount;
 	uint32_t mMicrosecLastInterruptTime;
 
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
@@ -555,7 +555,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	 */
 	Receiver()
 			: mMessageAvailable(false), mSuspended(false)
-			, mReceivedDataModePulseCount(0), mMicrosecLastInterruptTime(0)
+			, mDataModePulseCount(0), mMicrosecLastInterruptTime(0)
 			{
 			/* Initialize pulse elements. */
 			Array::init();
