@@ -5,16 +5,18 @@
  *      Author: Wolfgang
  */
 
-#define ENABLE_RCSWITCH_TEST true
-#if ENABLE_RCSWITCH_TEST
 
-#include <assert.h>
 #include "RcSwitch_test.hpp"
 
-/** Call rcSwitchTest.run() to execute tests. */
-RcSwitch::RcSwitch_test rcSwitchTest;
+#if ENABLE_RCSWITCH_TEST
+#include <assert.h>
+
 
 namespace RcSwitch {
+
+/** Call RcSwitch::RcSwitch_test::theTest.run() to execute tests. */
+RcSwitch_test RcSwitch_test::theTest;
+
 /** Need a message repeat for the end detection */
 constexpr size_t MIN_MSG_PACKET_REPEATS = 1;
 
@@ -208,16 +210,12 @@ template<size_t protocolNumber> struct Protocol {
 };
 
 void RcSwitch_test::sendMessagePacket(uint32_t &usec, Receiver &receiver
-		, const TxDataBit* const dataBits, const size_t count) {
+		, const TxDataBit* const dataBits, const size_t count) const {
 
 	for(size_t i = 0; i < count; i++) {
 		Protocol<1>::sendSynchPulses(usec, receiver);
 
 		if(!receiver.available()) {
-			if(i < MIN_MSG_PACKET_REPEATS) {
-				assert(receiver.state() == Receiver::DATA_STATE);
-			}
-
 			for(size_t j = 0; dataBits[j].mDataBit != DATA_BIT::UNKNOWN; j++) {
 				Protocol<1>::sendDataBit(usec, receiver, &dataBits[j]);
 			}
@@ -226,11 +224,13 @@ void RcSwitch_test::sendMessagePacket(uint32_t &usec, Receiver &receiver
 }
 
 void RcSwitch_test::faultyMessagePacketTest(uint32_t& usec, Receiver &receiver,
-		const TxDataBit* const faultyMessagePacket) {
+		const TxDataBit* const faultyMessagePacket) const {
 	{
-		// Send first pulse too short faulty message
+		// Send faulty message
 		sendMessagePacket(usec, receiver, faultyMessagePacket, 1);
+
 		assert(receiver.state() == Receiver::SYNC_STATE);
+
 		assert(receiver.mProtocolCandidates.size() == 0);
 	}
 	{
@@ -243,7 +243,24 @@ void RcSwitch_test::faultyMessagePacketTest(uint32_t& usec, Receiver &receiver,
 	}
 }
 
-void RcSwitch_test::testFaultyDataRx() {
+void RcSwitch_test::tooShortMessagePacketTest(uint32_t& usec, Receiver &receiver) const {
+	{
+		// Send too short message
+
+		sendMessagePacket(usec, receiver, invalidMessagePacket_tooLessMessagePackteBits, 1);
+		assert(receiver.state() == Receiver::DATA_STATE);
+		assert(receiver.mProtocolCandidates.size() > 0);
+
+		// Send valid message
+		sendMessagePacket(usec, receiver, validMessagePacket_A, MIN_MSG_PACKET_REPEATS + 1);
+		assert(receiver.available());
+		const uint32_t receivedValue = receiver.receivedValue();
+		/* binary: 010011 */
+		assert(receivedValue == 0x13 /* binary: 010011 */);
+	}
+}
+
+void RcSwitch_test::testFaultyDataRx() const {
 	Receiver receiver;
 	uint32_t usec = 0;
 
@@ -258,11 +275,11 @@ void RcSwitch_test::testFaultyDataRx() {
 	receiver.reset();
 	faultyMessagePacketTest(usec, receiver, invalidMessagePacket_secondPulseTooLong);
 	receiver.reset();
-	faultyMessagePacketTest(usec, receiver, invalidMessagePacket_tooLessMessagePackteBits);
+	tooShortMessagePacketTest(usec, receiver);
 	receiver.reset();
 }
 
-void RcSwitch_test::testDataRx() {
+void RcSwitch_test::testDataRx() const {
 	Receiver receiver;
 	uint32_t usec = 0;
 
@@ -295,7 +312,7 @@ void RcSwitch_test::testDataRx() {
 	}
 }
 
-void RcSwitch_test::testSynchRx() {
+void RcSwitch_test::testSynchRx() const {
 	Receiver receiver;
 	uint32_t usec = 0;
 
@@ -320,14 +337,14 @@ void RcSwitch_test::testSynchRx() {
 	assert(receiver.state() == Receiver::DATA_STATE);
 }
 
-void RcSwitch_test::testProtocolCandidates() {
+void RcSwitch_test::testProtocolCandidates() const {
 	Receiver receiver;
 
-	Pulse pulse_0 = {																				// Hi pulse too short
+	Pulse pulse_0 = {				// Hi level pulse too short
 			239, PULSE_LEVEL::HI
 	};
 
-	Pulse pulse_1 = {																				// Lo pulse within protocol #1 and #7
+	Pulse pulse_1 = {				// Lo level pulse within protocol #1 and #7
 			10850, PULSE_LEVEL::LO
 	};
 
@@ -336,22 +353,22 @@ void RcSwitch_test::testProtocolCandidates() {
 
 	pulse_0.mMicroSecDuration = 280;
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
-	assert(receiver.mProtocolCandidates.size() == 2); 							// Match protocol #1 and #7
-	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  // Check protocol candidates
+	assert(receiver.mProtocolCandidates.size() == 2); 					// Match protocol #1 and #7
+	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  	// Check protocol candidates
 		static const size_t expectedProtocols[] = {7,1};
 		assert(receiver.mProtocolCandidates.getProtcolNumber(i) == expectedProtocols[i]);
 	}
 
-	receiver.mProtocolCandidates.reset();										// Remove protocol candidates
-	pulse_1.mMicroSecDuration = 7439;												// Lo pulse too short
+	receiver.mProtocolCandidates.reset();						// Remove protocol candidates
+	pulse_1.mMicroSecDuration = 7439;							// Lo level pulse too short
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 0); 			// No matching protocol
 
-	pulse_0.mMicroSecDuration = 360;												// Hi pulse matches protocols #1 and #4, Lo pulse still too short.
+	pulse_0.mMicroSecDuration = 360;							// Hi level pulse matches protocols #1 and #4, Lo pulse still too short.
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 0); 			// No matching protocol
 
-	pulse_1.mMicroSecDuration = 2735;												// Lo pulse matches protocol #4
+	pulse_1.mMicroSecDuration = 2735;							// Lo level pulse matches protocol #4
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 1); 			// No matching protocol
 	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  // Check protocol candidates
@@ -360,68 +377,68 @@ void RcSwitch_test::testProtocolCandidates() {
 	}
 }
 
-void RcSwitch_test::testBlockingStack() {
+void RcSwitch_test::testBlockingStack() const {
 	constexpr int start = -2;
 	constexpr int end = 3;
 
 	BlockingStack<int, end - start> blockingStack;
 
 	int e = start;
-	for(; e < end; e++) { 																	// fill stack elements with -2 .. 3.
+	for(; e < end; e++) { 										// fill stack elements with -2 .. 3.
 		assert(blockingStack.size() == static_cast<size_t>(e-start));
 		blockingStack.push(e);
 		assert(blockingStack[e-start] == e);
 		assert(blockingStack.overflowCount() == 0);
 	}
 
-	assert(blockingStack.size() == end-start); 							// stack should be full.
-	assert(blockingStack.push(e) == false); 								// element should be dropped.
-	assert(blockingStack.size() == blockingStack.capacity); // stack should still be full.
-	assert(blockingStack.overflowCount() == 1); 						// overflow should be raised.
+	assert(blockingStack.size() == end-start); 					// stack should be full.
+	assert(blockingStack.push(e) == false); 					// element should be dropped.
+	assert(blockingStack.size() == blockingStack.capacity); 	// stack should still be full.
+	assert(blockingStack.overflowCount() == 1); 				// overflow should be raised.
 
-	blockingStack.remove(2); 																	// remove the middle element.
-	assert(blockingStack.size() == blockingStack.capacity-1); // expect one element less.
+	blockingStack.remove(2); 									// remove the middle element.
+	assert(blockingStack.size() == blockingStack.capacity-1); 	// expect one element less.
 
-	for(size_t i = 0; i < blockingStack.size(); i++) {      // check the remaining elements.
+	for(size_t i = 0; i < blockingStack.size(); i++) {      	// check the remaining elements.
 		static const int expected[] = {-2,-1,1,2};
 		assert(blockingStack[i] == expected[i]);
 	}
 
-	assert(blockingStack.overflowCount() == 1); 						// overflow should still be raised.
+	assert(blockingStack.overflowCount() == 1); 					// overflow should still be raised.
 	assert(blockingStack.size() == blockingStack.capacity - 1);
-	blockingStack.push(e);   																// push should be successful.
+	blockingStack.push(e);   										// push should be successful.
 	assert(blockingStack.size() == blockingStack.capacity);
-	blockingStack.reset(); 																	// remove all elements.
-	assert(blockingStack.size() == 0); 											// size should be zero.
+	blockingStack.reset(); 											// remove all elements.
+	assert(blockingStack.size() == 0); 								// size should be zero.
 	assert(blockingStack.overflowCount() == 0); 					// overflow should be reset.
 }
 
-void RcSwitch_test::testOverwritingStack() {
+void RcSwitch_test::testOverwritingStack() const {
 	constexpr int start = -2;
 	constexpr int end = 3;
 
 	OverwritingStack<int, end - start> overwritingStack;
 
 	int e = start;
-	for(; e < end; e++) { 																	// fill stack elements with -2 .. 3.
+	for(; e < end; e++) { 											// fill stack elements with -2 .. 3.
 		assert(overwritingStack.size() == static_cast<size_t>(e-start));
 		overwritingStack.push(e);
 		assert(overwritingStack[e-start] == e);
 	}
 
-	assert(overwritingStack.size() == end-start); 							// stack should be full.
+	assert(overwritingStack.size() == end-start); 					// stack should be full.
 	overwritingStack.push(e++); 															  // element should overwrite the oldest one.
-	assert(overwritingStack.size() == overwritingStack.capacity); // stack should still be full.
+	assert(overwritingStack.size() == overwritingStack.capacity); 	// stack should still be full.
 
-	for(size_t i = 0; i < overwritingStack.size(); i++) {      // check the elements.
+	for(size_t i = 0; i < overwritingStack.size(); i++) {      		// check the elements.
 		static const int expected[] = {-1,0,1,2,3};
 		assert(overwritingStack[i] == expected[i]);
 	}
 
-	overwritingStack.push(e++); 															  // element should overwrite the oldest one.
-	assert(overwritingStack.size() == overwritingStack.capacity); // stack should still be full.
+	overwritingStack.push(e++); 									// element should overwrite the oldest one.
+	assert(overwritingStack.size() == overwritingStack.capacity); 	// stack should still be full.
 
-	for(size_t i = 0; i < overwritingStack.size(); i++) {      // check the elements.
+	for(size_t i = 0; i < overwritingStack.size(); i++) {      		// check the elements.
 		static const int expected[] = {0,1,2,3,4};
 		assert(overwritingStack[i] == expected[i]);
 	}

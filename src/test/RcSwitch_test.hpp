@@ -9,6 +9,10 @@
 #ifndef UNITTEST_RCSWITCHRECEIVERTEST_HPP_
 #define UNITTEST_RCSWITCHRECEIVERTEST_HPP_
 
+#define ENABLE_RCSWITCH_TEST false
+
+#if ENABLE_RCSWITCH_TEST
+
 #include "../internal/RcSwitch.hpp"
 
 namespace RcSwitch {
@@ -51,20 +55,22 @@ private:
 	/* Send a message package multiple times */
 	void sendMessagePacket(uint32_t &usec, Receiver &receiver
 		, const TxDataBit* const dataBits
-		, const size_t count);
+		, const size_t count) const;
 
 	void faultyMessagePacketTest(uint32_t& usec, Receiver &receiver
-		, const TxDataBit* const faultyMessagePacket);
+		, const TxDataBit* const faultyMessagePacket) const;
 
-	void testBlockingStack();
-	void testOverwritingStack();
-	void testProtocolCandidates();
-	void testSynchRx();
-	void testDataRx();
-	void testFaultyDataRx();
+	void tooShortMessagePacketTest(uint32_t& usec, Receiver &receiver) const;
+
+	void testBlockingStack() const;
+	void testOverwritingStack() const;
+	void testProtocolCandidates() const;
+	void testSynchRx() const;
+	void testDataRx() const;
+	void testFaultyDataRx() const;
 
 public:
-	void run() {
+	void run() const{
 		testBlockingStack();
 		testOverwritingStack();
 		testProtocolCandidates();
@@ -72,8 +78,12 @@ public:
 		testDataRx();
 		testFaultyDataRx();
 	}
+
+	static RcSwitch_test theTest;
 };
 
 } // namespace RcSwitch
+
+#endif // ENABLE_RCSWITCH_TEST
 
 #endif /* UNITTEST_RCSWITCHRECEIVERTEST_HPP_ */

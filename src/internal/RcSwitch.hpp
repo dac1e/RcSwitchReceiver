@@ -122,8 +122,8 @@ protected:
 	}
 
 	inline void reset() {
-		init();
 		mSize = 0;
+		init();
 	}
 
 	Array() : mSize(0) {
@@ -402,8 +402,8 @@ public:
 
 	/** Remove all protocol candidates from this container */
 	inline void reset() {
-		mProtocolGroupId = UNKNOWN_PROTOCOL;
 		baseClass::reset();
+		mProtocolGroupId = UNKNOWN_PROTOCOL;
 	}
 
 	/**

@@ -160,7 +160,7 @@ static inline void collectNormalLevelProtocolCandidates(
 	for(size_t i = 0; i < normalLevelProtocolsSize; i++) {
 		const Protocol& prot = normalLevelProtocols[i];
 		if(pulse_0.mMicroSecDuration <
-				normalLevelProtocols[i].synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
+			normalLevelProtocols[i].synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.lowTimeRange.microSecLowerBound
 			 * So further protocols will have even higher microSecLowerBound. Hence we can
 			 * break here immediately.
