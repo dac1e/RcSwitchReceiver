@@ -393,11 +393,11 @@ void RcSwitch_test::testProtocolCandidates() const {
 	}
 }
 
-void RcSwitch_test::testBlockingStack() const {
+void RcSwitch_test::testStackBuffer() const {
 	constexpr int start = -2;
 	constexpr int end = 3;
 
-	BlockingStack<int, end - start> blockingStack;
+	StackBuffer <int, end - start> blockingStack;
 
 	int e = start;
 	for(; e < end; e++) { 										// fill stack elements with -2 .. 3.
@@ -429,11 +429,11 @@ void RcSwitch_test::testBlockingStack() const {
 	assert(blockingStack.overflowCount() == 0); 					// overflow should be reset.
 }
 
-void RcSwitch_test::testOverwritingStack() const {
+void RcSwitch_test::testRingBuffer() const {
 	constexpr int start = -2;
 	constexpr int end = 3;
 
-	OverwritingStack<int, end - start> overwritingStack;
+	RingBuffer<int, end - start> overwritingStack;
 
 	int e = start;
 	for(; e < end; e++) { 											// fill stack elements with -2 .. 3.

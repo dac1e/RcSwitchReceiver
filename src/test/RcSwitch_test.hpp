@@ -80,8 +80,8 @@ private:
 
 	void tooShortMessagePacketTest(uint32_t& usec, Receiver &receiver) const;
 
-	void testBlockingStack() const;
-	void testOverwritingStack() const;
+	void testStackBuffer() const;
+	void testRingBuffer() const;
 	void testProtocolCandidates() const;
 	void testSynchRx() const;
 	void testDataRx() const;
@@ -89,8 +89,8 @@ private:
 
 public:
 	void run() const{
-		testBlockingStack();
-		testOverwritingStack();
+		testStackBuffer();
+		testRingBuffer();
 		testProtocolCandidates();
 		testSynchRx();
 		testDataRx();

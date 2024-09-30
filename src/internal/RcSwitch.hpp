@@ -159,7 +159,7 @@ public:
  * overflow counter is incremented.
  */
 template<typename ELEMENT_TYPE, size_t CAPACITY>
-class BlockingStack : public Array<ELEMENT_TYPE, CAPACITY> {
+class StackBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
 protected:
 	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
@@ -175,7 +175,7 @@ protected:
 	inline void reset() {baseClass::reset(), mOverflow = 0;}
 
 	/* Default constructor */
-	inline BlockingStack() : mOverflow(0) {}
+	inline StackBuffer() : mOverflow(0) {}
 public:
 	/** Make the capacity template argument available as const expression. */
 	static constexpr size_t capacity = CAPACITY;
@@ -262,7 +262,7 @@ public:
  * pushed element.
  */
 template<typename ELEMENT_TYPE, size_t CAPACITY>
-class OverwritingStack : public Array<ELEMENT_TYPE, CAPACITY> {
+class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
 	/**
 	 * The index of the bottom element of the stack.
@@ -277,7 +277,7 @@ protected:
 	inline void reset() {baseClass::reset(); mBegin = 0;}
 
 	/** Default constructor */
-	inline OverwritingStack() : mBegin(0) {}
+	inline RingBuffer() : mBegin(0) {}
 public:
 	static constexpr size_t capacity = CAPACITY;
 
@@ -415,8 +415,8 @@ template<> inline const PROTOCOL_CANDIDATE& INITIAL_VALUE<PROTOCOL_CANDIDATE>() 
  * This container stores the all the protocols that match the
  * synchronization pulses during the synchronization phase.
  */
-class ProtocolCandidates : public BlockingStack<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES> {
-	using baseClass = BlockingStack<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES>;
+class ProtocolCandidates : public StackBuffer<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES> {
+	using baseClass = StackBuffer<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES>;
 	PROTOCOL_GROUP_ID mProtocolGroupId;
 
 public:
@@ -447,8 +447,8 @@ public:
  * This container stores received pulses for debugging purpose. The
  * purpose is to view the pulses in a debugging session. */
 #if DEBUG_RCSWITCH
-class PulseTracer : public OverwritingStack<Pulse, MAX_PULSE_TRACES> {
-	using baseClass = OverwritingStack<Pulse, MAX_PULSE_TRACES>;
+class PulseTracer : public RingBuffer<Pulse, MAX_PULSE_TRACES> {
+	using baseClass = RingBuffer<Pulse, MAX_PULSE_TRACES>;
 public:
 
 	PulseTracer() {
@@ -472,8 +472,8 @@ public:
  * The MAX_MSG_PACKET_BITS constant can be increased and the code
  * can be re-compiled to avoid overflows.
  */
-class MessagePacket : public BlockingStack<DATA_BIT, MAX_MSG_PACKET_BITS> {
-	using baseClass = BlockingStack<DATA_BIT, MAX_MSG_PACKET_BITS>;
+class MessagePacket : public StackBuffer<DATA_BIT, MAX_MSG_PACKET_BITS> {
+	using baseClass = StackBuffer<DATA_BIT, MAX_MSG_PACKET_BITS>;
 
 public:
 	/** Default constructor */
@@ -508,10 +508,10 @@ template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
  * package has been received the state becomes AVAILABLE until the reset
  * function is called.
  */
-class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
+class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	/** =========================================================================== */
 	/** == Privately used types, enumerations, variables and methods ============== */
-	using baseClass = OverwritingStack<Pulse, DATA_PULSES_PER_BIT>;
+	using baseClass = RingBuffer<Pulse, DATA_PULSES_PER_BIT>;
 	friend class RcSwitch_test;
 
 	/** API class becomes friend. */
