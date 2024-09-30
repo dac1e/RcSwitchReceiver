@@ -1,9 +1,27 @@
 /*
- * RcSwtichReceiver.hpp
- *
- *  Created on: 11.09.2024
- *      Author: Wolfgang
- */
+  RcSwitchReceiver - Arduino libary for remote control receiver Copyright (c)
+  2024 Wolfgang Schmieder.  All right reserved.
+
+  Contributors:
+  - Wolfgang Schmieder
+
+  Project home: https://github.com/dac1e/RcSwitchReceiver/
+
+  This library is free software; you can redistribute it and/or modify it
+  the terms of the GNU Lesser General Public License as under published
+  by the Free Software Foundation; either version 3.0 of the License,
+  or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+*/
+
 #pragma once
 
 #ifndef _RCSWTICH_INTERNAL_HPP_
@@ -38,8 +56,7 @@ namespace RcSwitch {
  *
  * 2) Initialize elements of arrays within objects upon
  * reset() calls. This helps to quickly recognize
- * that an array element was explicitly set to a
- * valid value during the synch or data receive phase.
+ * that an array element was explicitly set.
  *
  * 3) Maps macro RCSWITCH_ASSERT to the system function
  * assert.
@@ -65,7 +82,7 @@ constexpr size_t MAX_PULSE_TRACES = 64;
  * policy of multiple protocols. All those protocols are collected
  * and further narrowed down during data phase. I.e. collected protocols
  * that do not match the received data pulses will be dropped.
- * Finally when a message has been received, there can be multiple
+ * Finally when a message packet has been received, there can be multiple
  * protocols left over. Those can be queried by an API function.
  */
 constexpr size_t MAX_PROTOCOL_CANDIDATES =  7;
@@ -395,8 +412,8 @@ template<> inline const PROTOCOL_CANDIDATE& INITIAL_VALUE<PROTOCOL_CANDIDATE>() 
 #endif
 
 /**
- * This container that stores the all the protocols that match
- * the synchronization pulses during the synchronization phase.
+ * This container stores the all the protocols that match the
+ * synchronization pulses during the synchronization phase.
  */
 class ProtocolCandidates : public BlockingStack<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES> {
 	using baseClass = BlockingStack<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES>;
@@ -408,7 +425,7 @@ public:
 		Array::init();
 	}
 
-	/** Remove all protocol candidates from this container */
+	/** Remove all protocol candidates from this container. */
 	inline void reset() {
 		baseClass::reset();
 		mProtocolGroupId = UNKNOWN_PROTOCOL;
@@ -448,10 +465,8 @@ public:
 #endif
 
 /**
- * This container stores the received data bits of just one single
- * message packet sent by the transmitter.
- * Note that the transmitter may send the same message packet
- * multiple times.
+ * This container stores the received data bits of a single message packet
+ * sent by the transmitter.
  * If the transmitter sends more data bits than MAX_MSG_PACKET_BITS,
  * the overflow counter of this container will be incremented.
  * The MAX_MSG_PACKET_BITS constant can be increased and the code
@@ -486,7 +501,7 @@ template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes
  * these last pulses, whenever a new pulse arrives by a new interrupt.
  * When detecting valid synchronization pulse pair the
- * receiver's state changes to DATA_STATE and  converts pulses into received
+ * receiver's state changes to DATA_STATE and converts subsequent pulses into
  * data bits that will be added to the message packet buffer.
  * In case of receiving unexpected pulses, the
  * receiver goes back to synch state. When a complete message

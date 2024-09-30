@@ -1,9 +1,27 @@
 /*
- * RcSwitchReceiver.hpp
- *
- *  Created on: 19.09.2024
- *      Author: Wolfgang
- */
+  RcSwitchReceiver - Arduino libary for remote control receiver Copyright (c)
+  2024 Wolfgang Schmieder.  All right reserved.
+
+  Contributors:
+  - Wolfgang Schmieder
+
+  Project home: https://github.com/dac1e/RcSwitchReceiver/
+
+  This library is free software; you can redistribute it and/or modify it
+  the terms of the GNU Lesser General Public License as under published
+  by the Free Software Foundation; either version 3.0 of the License,
+  or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+*/
+
 #pragma once
 
 #ifndef RCSWITCHRECEIVER_HPP_
@@ -13,14 +31,14 @@
 #include "internal/RcSwitch.hpp"
 
 /**
- * This is the library API class for receiving data from a remote control transmitter.
- * The IO pin to be used is defined at compile time by the template parameter
- * IOPIN.
+ * This is the library API class for receiving data from a remote control.
+ * The IO pin to be used is defined at compile time by the template
+ * parameter IOPIN.
  *
  * Multiple RcSwitchReceiver can be instantiated for different IO pins.
- * E.g. if you have a 433Mhz receiver hardware connected to pin 5 and a 315Mhz
- * receiver hardware to pin 6 you can create 2 RcSwitchReceiver instances as
- * follows:
+ * E.g. if you have a 433Mhz receiver hardware connected to pin 5 and a
+ * 315Mhz receiver hardware to pin 6 you can create 2 RcSwitchReceiver
+ * instances as follows:
  *
  * RcSwitchReceiver<5> rcSwitchReceiver433;
  * RcSwitchReceiver<6> rcSwitchReceiver315;

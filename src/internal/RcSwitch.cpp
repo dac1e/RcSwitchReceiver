@@ -1,9 +1,26 @@
 /*
- * RcSwtichReceiver.cpp
- *
- *  Created on: 11.09.2024
- *      Author: Wolfgang
- */
+  RcSwitchReceiver - Arduino libary for remote control receiver Copyright (c)
+  2024 Wolfgang Schmieder.  All right reserved.
+
+  Contributors:
+  - Wolfgang Schmieder
+
+  Project home: https://github.com/dac1e/RcSwitchReceiver/
+
+  This library is free software; you can redistribute it and/or modify it
+  the terms of the GNU Lesser General Public License as under published
+  by the Free Software Foundation; either version 3.0 of the License,
+  or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+*/
 
 #include "RcSwitch.hpp"
 
@@ -54,7 +71,7 @@ namespace RcSwitch {
  *     XXXX|________|  |XXXX
  *
  *
- * The pulse duration specification for the different protocols are stored in 2 arrays:
+ * The pulse duration specification for the different protocols are stored in 2 arrays
  *   normalLevelProtocolsTable[]
  *  inverseLevelProtocolsTable[]
  *
@@ -63,14 +80,19 @@ namespace RcSwitch {
  * recognized as a valid synch. or data pulse.
  *
  * Synch. pulses and data pulses are typically a multiple of a protocol specific clock
- * cycle. The specification tables contain already from the clock cycle pre-calculated
+ * cycle. The specification tables contain already pre-calculated
  * durations to keep the interrupt handler quick. The lower / upper boundary tolerance
  * is +- 20%.
  *
- * The protocols specs. are also sorted by a particular column within the table to
+ * The protocol specs. are also sorted by a particular column within the table to
  * speed up pulse validation. That helps to keep the interrupt handler quick.
+ *
+ * There is a decision to be made, when a the reception of data bits shall be stopped,
+ * because they constitute a completed message packet. Here is assumed, that the
+ * transmitter transmits the same message packets multiple times in a row. The
+ * completion of a message packet is noted, when new synch pulses from a subsequent
+ * transmission appear.
  */
-
 
 struct TimeRange {
 	uint32_t lowerBound;
@@ -137,7 +159,6 @@ static const Protocol inverseLevelProtocolsTable[] { // Sorted in ascending orde
         //      |low level pulse duration.. |high level pulse duration..  |low level pulse duration.. |high level pulse duration..  |low level pulse duration.. |high level pulse duration..
         //      |..is the first pulse       |..is the second pulse        |..is the first pulse       |..is the second pulse        |..is the first pulse       |..is the second pulse
 		//#p    |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound
-		//#p    |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound
 		{   13,{{         216,         324},{        7776,       11664}},{{         216,         324},{         432,         648}},{{         432,         648},{         216,         324}}},
 		{   11,{{         256,         384},{        9216,       13824}},{{         256,         384},{         512,         768}},{{         512,         768},{         256,         384}}},
 		{   10,{{         292,         438},{        5256,        7884}},{{         876,        1314},{         292,         438}},{{         292,         438},{         876,        1314}}},
@@ -146,8 +167,10 @@ static const Protocol inverseLevelProtocolsTable[] { // Sorted in ascending orde
 };
 
 /* The number of rows of the 2 above tables. */
-constexpr size_t  normalLevelProtocolsTableRowCount = sizeof( normalLevelProtocolsTable)/sizeof( normalLevelProtocolsTable[0]);
-constexpr size_t inverseLevelProtocolsTableRowCount = sizeof(inverseLevelProtocolsTable)/sizeof(inverseLevelProtocolsTable[0]);
+constexpr size_t  normalLevelProtocolsTableRowCount =
+		sizeof( normalLevelProtocolsTable)/sizeof( normalLevelProtocolsTable[0]);
+constexpr size_t inverseLevelProtocolsTableRowCount =
+		sizeof(inverseLevelProtocolsTable)/sizeof(inverseLevelProtocolsTable[0]);
 
 bool Protocol::isNormalLevelProtocol() const {
 	const bool result = (this < &normalLevelProtocolsTable[normalLevelProtocolsTableRowCount]) &&
