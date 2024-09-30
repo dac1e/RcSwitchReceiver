@@ -13,45 +13,45 @@ namespace RcSwitch {
  * The protocol is a stream of pulse pairs with different duration and pulse levels.
  *
  *   Normal level protocols start with a high level:
- *         ___________________
- *	   XXX|                   |____________________|XXXXX
+ *          ___________________
+ *	   XXXX|                   |____________________|XXXX
  *
  *   Inverse level protocols start with a low level:
- *                             ____________________
- *	   XXX|___________________|                    |XXXXX
+ *                              ____________________
+ *	   XXXX|___________________|                    |XXXX
  *
- *	      ^                   ^                    ^
- *        |1st pulse duration | 2nd pulse duration |
+ *	       ^                   ^                    ^
+ *         |1st pulse duration | 2nd pulse duration |
  *
  *
  *  In the synchronization phase there is a short pulse followed by a very long pulse:
  *     Normal level protocols:
- *         ____
- *     XXX|    |_____________________________________________________________|XXX
+ *          ____
+ *     XXXX|    |_____________________________________________________________|XXXX
  *
  *     Inverse level protocols:
- *              _____________________________________________________________
- *     XXX|____|                                                             |XXX
+ *               _____________________________________________________________
+ *     XXXX|____|                                                             |XXXX
  *
  *
  *  In the data phase there is
  *   a short pulse followed by a long pulse for a logical 0 data bit:
  *     Normal level protocols:
- *         __
- *     XXX|  |________|XXX
+ *           __
+ *     XXXXX|  |________|XXXX
  *
  *     Inverse level protocols:
- *            ________
- *     XXX|__|        |XXX
+ *             ________
+ *     XXXX|__|        |XXXX
  *
  *   a long pulse followed by a short pulse for a logical 1 data bit:
  *     Normal level protocols:
- *         ________
- *     XXX|        |__|XXX
+ *          ________
+ *     XXXX|        |__|XXXX
  *
  *     Inverse level protocols:
- *                  __
- *     XXX|________|  |XXX
+ *                   __
+ *     XXXX|________|  |XXXX
  *
  *
  * The pulse duration specification for the different protocols are stored in 2 arrays:
@@ -442,9 +442,12 @@ void Receiver::reset() {
 	mProtocolCandidates.reset();
 	mReceivedMessagePacket.reset();
 	baseClass::reset();
-	/* This message available reset must be the last action,
-	 * because it will change the mode. That must not happen
-	 * before all the above reset calls are done. */
+	/* Changing this flag must be the last action here,
+	 * because it will change the state. That must not
+	 * happen before all of the above reset calls are
+	 * finished.
+	 * Otherwise the interrupt handler may already work
+	 * with dirty class members. */
 	mMessageAvailable = false;
 }
 

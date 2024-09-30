@@ -112,7 +112,8 @@ protected:
   typedef ELEMENT_TYPE element_type;
   /** The array where data is stored. */
   element_type mData[CAPACITY];
-  /* A variable to store the actual size of the array. */
+
+  /** A variable to store the actual size of the array. */
   size_t mSize;
 
 	inline void init() {
@@ -126,6 +127,7 @@ protected:
 		init();
 	}
 
+	/** Default constructor */
 	Array() : mSize(0) {
 	}
 public:
@@ -137,7 +139,7 @@ public:
  * A container that encapsulates a fixed size stack. Elements can be
  * pushed onto the stack as long as the actual size is smaller than
  * the capacity. Otherwise, the pushed element is dropped, and an
- * overflow counter is increased.
+ * overflow counter is incremented.
  */
 template<typename ELEMENT_TYPE, size_t CAPACITY>
 class BlockingStack : public Array<ELEMENT_TYPE, CAPACITY> {
@@ -146,16 +148,19 @@ protected:
 	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
 	using element_type = typename baseClass::element_type;
 	/**
-	 * A flag that will be raised, when an element couldn't be pushed,
+	 * A counter that will be incremented, when an element couldn't be pushed,
 	 * because this stack was already full. */
 	uint32_t mOverflow;
 
-	/* Set the actual size of this stack to zero. */
+	/* Set the actual size of this stack to zero and clear
+	 * the overflow counter.
+	 */
 	inline void reset() {baseClass::reset(), mOverflow = 0;}
 
 	/* Default constructor */
 	inline BlockingStack() : mOverflow(0) {}
 public:
+	/** Make the capacity template argument available as const expression. */
 	static constexpr size_t capacity = CAPACITY;
 
 	/**
@@ -171,9 +176,10 @@ public:
 	}
 
 	/**
-	 * Make the beyond top stack element to the top one. if the
-	 * stack has still space to take new element. Otherwise
-	 * set the overflow flag.
+	 * Make the beyond top stack element to the top one, if the
+	 * stack has still space to take a new element. Otherwise
+	 * set increment the overflow counter.
+	 * Returns true if successful, otherwise false.
 	 */
 	inline bool selectNext() {
 		if (baseClass::mSize < CAPACITY) {
@@ -186,6 +192,7 @@ public:
 
 	/**
 	 * Push an element on top of the stack.
+	 * Returns true if successful, otherwise false.
 	 */
 	bool push(const element_type &value) {
 		element_type* const storage = beyondTop();
@@ -214,6 +221,7 @@ public:
 	 * Important: This method may invalidate the element that was
 	 * previously obtained by the at() function respectively the
 	 * operator[]. The function will alter the actual stack size.
+	 * The overflow counter stays untouched.
 	 */
 	void remove(const size_t index) {
 		if(index < baseClass::mSize) {
@@ -240,17 +248,18 @@ template<typename ELEMENT_TYPE, size_t CAPACITY>
 class OverwritingStack : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
 	/**
-	 * The index of the bottom element of the stack. Use mSize_TYPE
-	 * also for mBegin.
+	 * The index of the bottom element of the stack.
 	 */
 	size_t mBegin;
 	static size_t inline squashedIndex(const size_t i) {return (i + CAPACITY) % CAPACITY;}
 protected:
 	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
 	using element_type = typename baseClass::element_type;
-	/* Set the actual size of this stack to zero. */
+
+	/** Set the actual size of this stack to zero. */
 	inline void reset() {baseClass::reset(); mBegin = 0;}
-	/* Default constructor */
+
+	/** Default constructor */
 	inline OverwritingStack() : mBegin(0) {}
 public:
 	static constexpr size_t capacity = CAPACITY;
@@ -307,7 +316,7 @@ public:
 	}
 
 	/**
-	 * Refer to methon at()
+	 * Refer to method at()
 	 */
 	inline element_type& operator[](const size_t index) {
 		return at(index);
@@ -321,8 +330,8 @@ enum class DATA_BIT : ssize_t{
 	LOGICAL_1 = 1,
 };
 
-#if DEBUG_RCSWITCH
 /** Specialize INITIAL_VALUE for DATA_BIT */
+#if DEBUG_RCSWITCH
 template<> inline const DATA_BIT& INITIAL_VALUE<DATA_BIT>() {
 	static const DATA_BIT value = DATA_BIT::UNKNOWN;
 	return value;
@@ -354,8 +363,8 @@ struct Pulse {
 	PULSE_LEVEL mPulseLevel;
 };
 
-#if DEBUG_RCSWITCH
 /** Specialize INITIAL_VALUE for Pulse */
+#if DEBUG_RCSWITCH
 template<> inline const Pulse& INITIAL_VALUE<Pulse>() {
 	static const Pulse value = Pulse{
 		0, PULSE_LEVEL::UNKNOWN
@@ -369,7 +378,7 @@ enum PROTOCOL_GROUP_ID : ssize_t {
 	/* Don't change assigned values, because enumerations
 	 * are also used as an index into an array.
 	 */
-	UNKNOWN_PROTOCOL = -1,
+	UNKNOWN_PROTOCOL       = -1,
 	NORMAL_LEVEL_PROTOCOLS  = 0,
 	INVERSE_LEVEL_PROTOCOLS = 1,
 };
@@ -377,14 +386,13 @@ enum PROTOCOL_GROUP_ID : ssize_t {
 /** A protocol candidate is identified by an index. */
 typedef size_t PROTOCOL_CANDIDATE;
 
-#if DEBUG_RCSWITCH
 /** Specialize INITIAL_VALUE for PROTOCOL_CANDIDATE */
+#if DEBUG_RCSWITCH
 template<> inline const PROTOCOL_CANDIDATE& INITIAL_VALUE<PROTOCOL_CANDIDATE>() {
 	static const PROTOCOL_CANDIDATE value = std::numeric_limits<size_t>::max();
 	return value;
 }
 #endif
-
 
 /**
  * This container that stores the all the protocols that match
@@ -418,10 +426,10 @@ public:
 };
 
 
-#if DEBUG_RCSWITCH
 /**
  * This container stores received pulses for debugging purpose. The
  * purpose is to view the pulses in a debugging session. */
+#if DEBUG_RCSWITCH
 class PulseTracer : public OverwritingStack<Pulse, MAX_PULSE_TRACES> {
 	using baseClass = OverwritingStack<Pulse, MAX_PULSE_TRACES>;
 public:
@@ -466,6 +474,7 @@ public:
 	using baseClass::reset;
 };
 
+/** Specialize INITIAL_VALUE for MessagePacket */
 #if DEBUG_RCSWITCH
 template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
 	static const MessagePacket value;
@@ -474,33 +483,30 @@ template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
 #endif
 
 /**
- * The receiver is a buffer that holds the last 2 received pulses.
- * It analyzes these last pulses, whenever a new pulse arrives by
- * a new interrupt. When detecting synchronization pulses the
+ * The receiver is a buffer that holds the last 2 received pulses. It analyzes
+ * these last pulses, whenever a new pulse arrives by a new interrupt.
+ * When detecting valid synchronization pulse pair the
  * receiver's state changes to DATA_STATE and  converts pulses into received
- * data bits that will be added to the current selected message
- * packet buffer. In case of receiving unexpected pulsed, the
+ * data bits that will be added to the message packet buffer.
+ * In case of receiving unexpected pulses, the
  * receiver goes back to synch state. When a complete message
- * package has been received, and the message packet buffer is
- * still not full, the next message package buffer is
- * selected to receive the next subsequent message packet. Otherwise
- * the message reception is completed and the state becomes
- * AVAILABLE until the reset function is called.
+ * package has been received the state becomes AVAILABLE until the reset
+ * function is called.
  */
 class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	/** =========================================================================== */
-	/** == Privately used types, enumerations, variables and methods start here: == */
+	/** == Privately used types, enumerations, variables and methods ============== */
 	using baseClass = OverwritingStack<Pulse, DATA_PULSES_PER_BIT>;
 	friend class RcSwitch_test;
 
 	/** API class becomes friend. */
 	template<int IOPIN> friend class ::RcSwitchReceiver;
 
-#if DEBUG_RCSWITCH
 	/**
-	 * For each received message package, the first few received pulses
-	 * are stored here for debugging purpose.
+	 * The most recent received pulses are stored in the pulse tracer for
+	 * debugging purpose.
 	 */
+#if DEBUG_RCSWITCH
 	PulseTracer mPulseTracer;
 	/** Store a new pulse in the trace buffer of this message packet. */
 	inline void tracePulse(uint32_t microSecDuration, const int pinLevel) {
@@ -527,14 +533,15 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	void retry();
 
 	/** ========================================================================== */
-	/** ========= Methods used by API class RcSwitchReceiver start here: ========= */
+	/** ========= Methods used by API class RcSwitchReceiver ===================== */
 
 	/**
 	 * Constructor.
 	 */
 	Receiver()
-			: mReceivedDataModePulseCount(0), mMicrosecLastInterruptTime(0)
-			, mMessageAvailable(false), mSuspended(false) {
+			: mMessageAvailable(false), mSuspended(false)
+			, mReceivedDataModePulseCount(0), mMicrosecLastInterruptTime(0)
+			{
 			/* Initialize pulse elements. */
 			Array::init();
 	}
