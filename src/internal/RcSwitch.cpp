@@ -9,7 +9,6 @@
 
 namespace RcSwitch {
 
-static bool isInverseLevelProtocol(const size_t protocolGroupId);
 
 struct TimeRange {
 	uint32_t lowerBound;
@@ -41,12 +40,20 @@ struct Protocol {
 	PulsePairTiming  logical0PulsePair;
 	PulsePairTiming  logical1PulsePair;
 
+	/** Return true, if this protocol is an inverse level protocol.
+	 * Otherwise false. */
+	bool isInverseLevelProtocol() const;
+
+	/** Return true, if this protocol is a normal level protocol.
+	 * Otherwise false. */
+	bool isNormalLevelProtocol() const;
+
 	/** Return the pulse types that a pulse matches for this protocol */
-	PulseTypes pulseToPulseTypes(const Pulse &pulse, const size_t protocolGroupId) const;
+	PulseTypes pulseToPulseTypes(const Pulse &pulse) const;
 };
 
 /** Timings of the normal level protocols in microseconds: first synch pulse is high. */
-static const Protocol normalLevelProtocols[] { // Sorted in ascending order of lowTimeRange.msecLowerBound
+static const Protocol normalLevelProtocolsTable[] { // Sorted in ascending order of lowTimeRange.msecLowerBound
 		//     |synch                                                    |data
 		//#p    |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound
 		{    7,{{        7440,       11160},{         240,         360}},{{         720,        1080},{         120,         180}},{{         120,         180},{         720,        1080}}},
@@ -59,7 +66,7 @@ static const Protocol normalLevelProtocols[] { // Sorted in ascending order of l
 };
 
 /** Timings of the normal level protocols in microseconds: first synch pulse is low. */
-static const Protocol inverseLevelProtocols[] { // Sorted in ascending order of msecHighTimeLowerBound
+static const Protocol inverseLevelProtocolsTable[] { // Sorted in ascending order of msecHighTimeLowerBound
 		//     |synch                                                    |data
 		//#p    |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound
 		{   13,{{         216,         324},{        7776,       11664}},{{         216,         324},{         432,         648}},{{         432,         648},{         216,         324}}},
@@ -69,11 +76,26 @@ static const Protocol inverseLevelProtocols[] { // Sorted in ascending order of 
 		{    9,{{        1120,        1680},{       20800,       31200}},{{        2560,        3840},{        1120,        1680}},{{        2560,        3840},{         480,         720}}},
 };
 
-PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse, const size_t protocolGroupId) const {
+constexpr size_t  normalLevelProtocolsTableRowCount = sizeof( normalLevelProtocolsTable)/sizeof( normalLevelProtocolsTable[0]);
+constexpr size_t inverseLevelProtocolsTableRowCount = sizeof(inverseLevelProtocolsTable)/sizeof(inverseLevelProtocolsTable[0]);
+
+bool Protocol::isNormalLevelProtocol() const {
+	const bool result = (this < &normalLevelProtocolsTable[normalLevelProtocolsTableRowCount]) &&
+			(this >= &normalLevelProtocolsTable[0]);
+	return result;
+}
+
+bool Protocol::isInverseLevelProtocol() const {
+	const bool result = this < (&inverseLevelProtocolsTable[inverseLevelProtocolsTableRowCount]) &&
+			(this >= &inverseLevelProtocolsTable[0]);
+	return result;
+}
+
+PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse) const {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	switch (pulse.mPulseLevel) {
 		case PULSE_LEVEL::LO: {
-			const bool inverseLevel = isInverseLevelProtocol(protocolGroupId); // inversität sollte man aus dem protocol erkennen.
+			const bool inverseLevel = isInverseLevelProtocol();
 			const TimeRange::COMPARE_RESULT synchCompare =
 					synchronizationPulsePair.durationLowLevelPulse.compare(pulse.mMicroSecDuration);
 			if (inverseLevel) {
@@ -82,6 +104,7 @@ PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse, const size_t protocol
 					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
 				}
 			} else {
+				RCSWITCH_ASSERT(isNormalLevelProtocol());
 				if (synchCompare == TimeRange::IS_WITHIN) {
 					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
 				}
@@ -101,7 +124,7 @@ PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse, const size_t protocol
 			break;
 		}
 		case PULSE_LEVEL::HI: {
-			const bool inverseLevel = isInverseLevelProtocol(protocolGroupId);
+			const bool inverseLevel = isInverseLevelProtocol();
 			const TimeRange::COMPARE_RESULT synchCompare =
 					synchronizationPulsePair.durationHighLevelPulse.compare(pulse.mMicroSecDuration);
 			if (inverseLevel) {
@@ -109,6 +132,7 @@ PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse, const size_t protocol
 					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
 				}
 			} else {
+				RCSWITCH_ASSERT(isNormalLevelProtocol());
 				if (synchCompare == TimeRange::IS_WITHIN) {
 					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
 				}
@@ -135,32 +159,23 @@ PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse, const size_t protocol
 	return result;
 }
 
-constexpr size_t normalLevelProtocolsSize  = sizeof( normalLevelProtocols)/sizeof( normalLevelProtocols[0]);
-constexpr size_t inverseLevelProtocolsSize = sizeof(inverseLevelProtocols)/sizeof(inverseLevelProtocols[0]);
-
-const std::pair<const Protocol*, size_t> protocolGroups[] = {
-		{ normalLevelProtocols,  normalLevelProtocolsSize},
-		{inverseLevelProtocols, inverseLevelProtocolsSize},
+static const std::pair<const Protocol*, size_t> protocolGroups[] = {
+		{ normalLevelProtocolsTable,  normalLevelProtocolsTableRowCount},
+		{inverseLevelProtocolsTable, inverseLevelProtocolsTableRowCount},
 };
 
-static inline std::pair<const Protocol*, size_t> getProtocols(const PROTOCOL_GROUP_ID protocolGroupId) {
+/** Returns the array of protocols for a protocol group. */
+static inline std::pair<const Protocol*, size_t> getProtocolTable(const PROTOCOL_GROUP_ID protocolGroupId) {
 	return protocolGroups[protocolGroupId];
-}
-
-static inline bool isInverseLevelProtocol(const size_t protocolGroupId) {
-	RCSWITCH_ASSERT(protocolGroupId < sizeof(protocolGroups) / sizeof(protocolGroups[0]));
-	RCSWITCH_ASSERT(protocolGroups[0].first == normalLevelProtocols);
-	RCSWITCH_ASSERT(protocolGroups[1].first == inverseLevelProtocols);
-	return protocolGroupId > 0;
 }
 
 static inline void collectNormalLevelProtocolCandidates(
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulse_0, const Pulse&  pulse_1) {
 
-	for(size_t i = 0; i < normalLevelProtocolsSize; i++) {
-		const Protocol& prot = normalLevelProtocols[i];
+	for(size_t i = 0; i < normalLevelProtocolsTableRowCount; i++) {
+		const Protocol& prot = normalLevelProtocolsTable[i];
 		if(pulse_0.mMicroSecDuration <
-			normalLevelProtocols[i].synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
+				normalLevelProtocolsTable[i].synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.lowTimeRange.microSecLowerBound
 			 * So further protocols will have even higher microSecLowerBound. Hence we can
 			 * break here immediately.
@@ -184,10 +199,10 @@ static inline void collectNormalLevelProtocolCandidates(
 static inline void collectInverseLevelProtocolCandidates(
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulse_0, const Pulse&  pulse_1) {
 
-	for(size_t i = 0; i < inverseLevelProtocolsSize; i++) {
-		const Protocol& prot = inverseLevelProtocols[i];
+	for(size_t i = 0; i < inverseLevelProtocolsTableRowCount; i++) {
+		const Protocol& prot = inverseLevelProtocolsTable[i];
 		if(pulse_0.mMicroSecDuration <
-				inverseLevelProtocols[i].synchronizationPulsePair.durationLowLevelPulse.lowerBound) {
+				inverseLevelProtocolsTable[i].synchronizationPulsePair.durationLowLevelPulse.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.microSecHighTimeLowerBound
 			 * So further protocols will have even higher microSecHighTimeLowerBound. Hence
 			 * we can break here immediately. */
@@ -206,7 +221,7 @@ static inline void collectInverseLevelProtocolCandidates(
 
 // ======== ProtocolCandidates =========
 size_t ProtocolCandidates::getProtcolNumber(const size_t protocolCandidateIndex) const {
-	 std::pair<const Protocol*, size_t> protocol = getProtocols(mProtocolGroupId);
+	 std::pair<const Protocol*, size_t> protocol = getProtocolTable(mProtocolGroupId);
 	 RCSWITCH_ASSERT(protocolCandidateIndex < size());
 	 const size_t protocolIndex = at(protocolCandidateIndex);
 	 RCSWITCH_ASSERT(protocolIndex < protocol.second);
@@ -236,7 +251,7 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
 // inline attribute, because it is private and called once.
 inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse) {
 	PULSE_TYPE result = PULSE_TYPE::UNKNOWN;
-	const std::pair<const Protocol*, size_t> protocols = getProtocols(mProtocolCandidates.getProtocolGroup());
+	const std::pair<const Protocol*, size_t> protocols = getProtocolTable(mProtocolCandidates.getProtocolGroup());
 	size_t protocolCandidatesIndex = mProtocolCandidates.size();
 	while(protocolCandidatesIndex > 0) {
 		--protocolCandidatesIndex;
@@ -244,9 +259,9 @@ inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& firstPulse, const Puls
 		const Protocol& protocol = protocols.first[mProtocolCandidates[protocolCandidatesIndex]];
 
 		const PulseTypes& pulseTypesSecondPulse =
-				protocol.pulseToPulseTypes(secondPulse, mProtocolCandidates.getProtocolGroup());
+				protocol.pulseToPulseTypes(secondPulse);
 		const PulseTypes& pulseTypesFirstPulse =
-				protocol.pulseToPulseTypes(firstPulse, mProtocolCandidates.getProtocolGroup());
+				protocol.pulseToPulseTypes(firstPulse);
 
 		if(pulseTypesSecondPulse.mPulseTypeSynch == PULSE_TYPE::SYNCH_SECOND_PULSE
 				&& pulseTypesFirstPulse.mPulseTypeSynch == PULSE_TYPE::SYNCH_FIRST_PULSE) {
