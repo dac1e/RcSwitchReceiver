@@ -71,14 +71,6 @@ constexpr size_t MAX_PULSE_TRACES = 64;
 constexpr size_t MAX_PROTOCOL_CANDIDATES =  7;
 
 /**
- * The number of subsequent identical message packets that
- * need to be received for a message to be accepted as
- * valid.
- * Can be changed, but must be greater than 0.
- */
-constexpr size_t MIN_MSG_PACKET_REPEATS  =  2;
-
-/**
  * Minimum number of data bits for accepting a message packet
  * to be valid.
  * Can be changed, but must be greater than 0.
@@ -113,18 +105,15 @@ template<typename ELEMENT_TYPE> const ELEMENT_TYPE& INITIAL_VALUE();
 
 /**
  * A container that encapsulates fixed size arrays.
- * The type of the variable is passed as the
- * template parameter mSize_TYPE, which allows to
- * pass a type with a volatile qualifier.
  */
-template<typename ELEMENT_TYPE, size_t CAPACITY, typename mSize_TYPE>
+template<typename ELEMENT_TYPE, size_t CAPACITY>
 class Array {
 protected:
   typedef ELEMENT_TYPE element_type;
   /** The array where data is stored. */
   element_type mData[CAPACITY];
   /* A variable to store the actual size of the array. */
-  mSize_TYPE mSize;
+  size_t mSize;
 
 	inline void init() {
 #if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
@@ -150,11 +139,11 @@ public:
  * the capacity. Otherwise, the pushed element is dropped, and an
  * overflow counter is increased.
  */
-template<typename ELEMENT_TYPE, size_t CAPACITY, typename mSize_TYPE = size_t>
-class BlockingStack : public Array<ELEMENT_TYPE, CAPACITY, mSize_TYPE> {
+template<typename ELEMENT_TYPE, size_t CAPACITY>
+class BlockingStack : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
 protected:
-	using baseClass = Array<ELEMENT_TYPE, CAPACITY, mSize_TYPE>;
+	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
 	using element_type = typename baseClass::element_type;
 	/**
 	 * A flag that will be raised, when an element couldn't be pushed,
@@ -163,20 +152,6 @@ protected:
 
 	/* Set the actual size of this stack to zero. */
 	inline void reset() {baseClass::reset(), mOverflow = 0;}
-
-	/**
-	 * Compare the contents of this stack with another one.
-	 * Checks that the other stack has same number of elements
-	 * as this, and each element in this stack compares
-	 * equal with the element in other at the same position.
-	 */
-	bool equals(const BlockingStack& other) const {
-		if(baseClass::mSize == other.size() && mOverflow == other.mOverflow) {
-			return std::equal(&baseClass::mData[0],	&baseClass::mData[baseClass::mSize],
-					&other.baseClass::mData[0]);
-		}
-		return false;
-	}
 
 	/* Default constructor */
 	inline BlockingStack() : mOverflow(0) {}
@@ -261,17 +236,17 @@ public:
  * capacity, the bottom element will be dropped on cost of the new
  * pushed element.
  */
-template<typename ELEMENT_TYPE, size_t CAPACITY, typename mSize_TYPE = size_t>
-class OverwritingStack : public Array<ELEMENT_TYPE, CAPACITY, mSize_TYPE> {
+template<typename ELEMENT_TYPE, size_t CAPACITY>
+class OverwritingStack : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
 	/**
 	 * The index of the bottom element of the stack. Use mSize_TYPE
 	 * also for mBegin.
 	 */
-	mSize_TYPE mBegin;
+	size_t mBegin;
 	static size_t inline squashedIndex(const size_t i) {return (i + CAPACITY) % CAPACITY;}
 protected:
-	using baseClass = Array<ELEMENT_TYPE, CAPACITY, mSize_TYPE>;
+	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
 	using element_type = typename baseClass::element_type;
 	/* Set the actual size of this stack to zero. */
 	inline void reset() {baseClass::reset(); mBegin = 0;}
@@ -489,9 +464,6 @@ public:
 	 */
 	// Make the base class reset() method public.
 	using baseClass::reset;
-
-	/** Test equality of this message packet with another one. */
-	inline bool operator==(const MessagePacket& other) {return baseClass::equals(other);}
 };
 
 #if DEBUG_RCSWITCH
@@ -500,43 +472,6 @@ template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
 	return value;
 }
 #endif
-
-
-/**
- * This container stores multiple message packets that have been
- * subsequently sent by the transmitter. When the container has become
- * full and all contained message packets are all equal, the receive
- * process is assumed to be finished and the message is available
- * for the main program to be read.
- * The mSize member of this container decides on the availability
- * of a received message. So it is made volatile, because availability
- * is queried inside and outside of the interrupt context.
- */
-class ReceivedMessage : public OverwritingStack<MessagePacket, MIN_MSG_PACKET_REPEATS
-	, volatile size_t> {
-	using baseClass = OverwritingStack<MessagePacket, MIN_MSG_PACKET_REPEATS
-			, volatile size_t>;
-public:
-	/** Default constructor */
-	inline ReceivedMessage() {}
-
-	/**
-	 * Select the next message packet container
-	 */
-	// Make the base class selectNext() method public.
-	using baseClass::selectNext;
-
-	/**
-	 * Remove all received massage packets. This will clear
-	 * availability state of the message.
-	 */
-	void reset();
-
-	/**
-	 * Check if 2 specified message packets are equal.
-	 */
-	inline bool isEqual(const size_t index_a, const size_t index_b);
-};
 
 /**
  * The receiver is a buffer that holds the last 2 received pulses.
@@ -575,7 +510,8 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	}
 #endif
 
-	ReceivedMessage mReceivedMessage;
+	MessagePacket mReceivedMessagePacket;
+	volatile bool mMessageAvailable;
 	ProtocolCandidates mProtocolCandidates;
 	size_t mReceivedDataModePulseCount;
 	uint32_t mMicrosecLastInterruptTime;
@@ -595,7 +531,7 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	 * Constructor.
 	 */
 	Receiver()
-			: mReceivedDataModePulseCount(0), mMicrosecLastInterruptTime(0) {
+			: mReceivedDataModePulseCount(0), mMicrosecLastInterruptTime(0), mMessageAvailable(false) {
 			/* Initialize pulse elements. */
 			Array::init();
 	}
@@ -607,10 +543,10 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
 
 	/**
-	 * Remove all the received message packets from the
-	 * receive buffer. Remove protocol candidates
+	 * Remove protocol candidates
 	 * for the mProtocolCandidates buffer.
-	 * Remove the all data pulses form this container.
+	 * Remove the all data pulses from this container.
+	 * Reset the available flag.
 	 *
 	 * Will be called from inside and outside of the
 	 * interrupt handler context.

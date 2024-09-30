@@ -5,7 +5,7 @@
  *      Author: Wolfgang
  */
 
-#define ENABLE_RCSWITCH_TEST false
+#define ENABLE_RCSWITCH_TEST true
 #if ENABLE_RCSWITCH_TEST
 
 #include <assert.h>
@@ -15,6 +15,8 @@
 RcSwitch::RcSwitch_test rcSwitchTest;
 
 namespace RcSwitch {
+/** Need a message repeat for the end detection */
+constexpr size_t MIN_MSG_PACKET_REPEATS = 1;
 
 static const TxDataBit validMessagePacket_A[] = {
 		{DATA_BIT::LOGICAL_0},
@@ -43,8 +45,23 @@ static const TxDataBit validMessagePacket_B[] = {
 		{DATA_BIT::UNKNOWN},
 };
 
-static_assert( sizeof(validMessagePacket_B) / sizeof(validMessagePacket_B[0]) > MIN_MSG_PACKET_BITS,
-		"Insufficient data bits for a valid message packet.");
+static_assert( (sizeof(validMessagePacket_B) - 1 /* one less for the delimiter */) /
+			sizeof(validMessagePacket_B[0]) >= MIN_MSG_PACKET_BITS,
+		"Error: Insufficient data bits for a valid message packet.");
+
+static const TxDataBit invalidMessagePacket_tooLessMessagePackteBits[] = {
+		{DATA_BIT::LOGICAL_0},
+		{DATA_BIT::LOGICAL_0},
+		{DATA_BIT::LOGICAL_1},
+
+		// delimiter
+		{DATA_BIT::UNKNOWN},
+};
+
+static_assert( (sizeof(invalidMessagePacket_tooLessMessagePackteBits) - 1 /* one less for the delimiter */)/
+			sizeof(invalidMessagePacket_tooLessMessagePackteBits[0]) < MIN_MSG_PACKET_BITS,
+		"Error: Sufficient data bits has made the invalid message packet valid.");
+
 
 static const TxDataBit invalidMessagePacket_firstPulseTooShort[] = {
 		{DATA_BIT::LOGICAL_0},
@@ -241,6 +258,8 @@ void RcSwitch_test::testFaultyDataRx() {
 	receiver.reset();
 	faultyMessagePacketTest(usec, receiver, invalidMessagePacket_secondPulseTooLong);
 	receiver.reset();
+	faultyMessagePacketTest(usec, receiver, invalidMessagePacket_tooLessMessagePackteBits);
+	receiver.reset();
 }
 
 void RcSwitch_test::testDataRx() {
@@ -345,7 +364,7 @@ void RcSwitch_test::testBlockingStack() {
 	constexpr int start = -2;
 	constexpr int end = 3;
 
-	BlockingStack<int, end - start, volatile size_t> blockingStack;
+	BlockingStack<int, end - start> blockingStack;
 
 	int e = start;
 	for(; e < end; e++) { 																	// fill stack elements with -2 .. 3.
@@ -381,7 +400,7 @@ void RcSwitch_test::testOverwritingStack() {
 	constexpr int start = -2;
 	constexpr int end = 3;
 
-	OverwritingStack<int, end - start, volatile size_t> overwritingStack;
+	OverwritingStack<int, end - start> overwritingStack;
 
 	int e = start;
 	for(; e < end; e++) { 																	// fill stack elements with -2 .. 3.

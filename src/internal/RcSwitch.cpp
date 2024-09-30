@@ -135,8 +135,8 @@ PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse, const size_t protocol
 	return result;
 }
 
-constexpr size_t inverseLevelProtocolsSize = sizeof(inverseLevelProtocols)/sizeof(inverseLevelProtocols[0]);
 constexpr size_t normalLevelProtocolsSize  = sizeof( normalLevelProtocols)/sizeof( normalLevelProtocols[0]);
+constexpr size_t inverseLevelProtocolsSize = sizeof(inverseLevelProtocols)/sizeof(inverseLevelProtocols[0]);
 
 const std::pair<const Protocol*, size_t> protocolGroups[] = {
 		{ normalLevelProtocols,  normalLevelProtocolsSize},
@@ -213,22 +213,6 @@ size_t ProtocolCandidates::getProtcolNumber(const size_t protocolCandidateIndex)
 	 return protocol.first[protocolIndex].protocolNumber;
 }
 
-// ======== ReceivedMessage ============
-void ReceivedMessage::reset() {
-	baseClass::reset();
-	for (element_type &messagePacket : mData) {
-		messagePacket.reset();
-	}
-}
-
-bool ReceivedMessage::isEqual(const size_t index_a, const size_t index_b) {
-	RCSWITCH_ASSERT(index_a < mSize && index_b < mSize);
-	if (index_a != index_b) {
-		return at(index_a) == at(index_b);
-	}
-	return true;
-}
-
 // ======== Receiver ===================
 void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1) {
   if(pulse_0.mPulseLevel != pulse_1.mPulseLevel) {
@@ -243,8 +227,9 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
 			RCSWITCH_ASSERT(false);
 		}
   } else {
-  	/* Assert that no UNKNOWN pulse level given as argument */
-		RCSWITCH_ASSERT(pulse_0.mPulseLevel != PULSE_LEVEL::UNKNOWN);
+  	/* 2 subsequent pulses with same level don't make sense and will be ignored.
+  	 * However, assert that no UNKNOWN* pulse level given as argument. */
+	RCSWITCH_ASSERT(pulse_0.mPulseLevel != PULSE_LEVEL::UNKNOWN);
   }
 }
 
@@ -316,47 +301,24 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 					if(pulseType == PULSE_TYPE::SYCH_PULSE) {
 						/* The 2 pulses are a new sync start, we are finished
 						 * with the current message package */
-						const MessagePacket* const messagePacket = mReceivedMessage.beyondTop();
-						if(messagePacket->size() >=  MIN_MSG_PACKET_BITS) {
-							mReceivedMessage.selectNext();
-							if(mReceivedMessage.size() >= mReceivedMessage.capacity) {
-								// Enough message packets received.
-								if(mReceivedMessage.capacity > 1) {
-									if(!mReceivedMessage.isEqual(mReceivedMessage.capacity-2
-											, mReceivedMessage.capacity-1)) {
-										/* Received messages differs, hence start from scratch. */
-										/* Current pulses might be the synch start, but
-										 * for a different protocol.
-										 */
-										mProtocolCandidates.reset();
-										/* Check current pulses for being a synch of a different protocol. */
-										collectProtocolCandidates(firstPulse, secondPulse);
-										retry();
-									}
-								}
-							} /* else we have received sufficient consistent
-								 * message packages, so state has implicitly
-								 * become AVAILABLE_STATE. Refer to function state(). */
-#if false
-							else {
-								/* Just to set be able to set a breakpoint for the debugger here. */
-								const STATE currentState = state();
-							}
-#endif
+						if(mReceivedMessagePacket.size() >= MIN_MSG_PACKET_BITS) {
+							mMessageAvailable = true;
 						} else {
-							/* New synch start without sufficient less data bits received. */
+							/* Insufficient number of bits received, hence start from
+							 * scratch. Current pulses might be the synch start, but
+							 * for a different protocol. */
 							mProtocolCandidates.reset();
+							/* Check current pulses for being a synch of a different protocol. */
 							collectProtocolCandidates(firstPulse, secondPulse);
 							retry();
 						}
-
 					} else {
 						/* It is a sequence of 2 data pulses */
 						RCSWITCH_ASSERT(pulseType == PULSE_TYPE::DATA_LOGICAL_0
 								|| pulseType == PULSE_TYPE::DATA_LOGICAL_1);
 						const DATA_BIT dataBit = pulseType == PULSE_TYPE::DATA_LOGICAL_0 ?
 										DATA_BIT::LOGICAL_0 : DATA_BIT::LOGICAL_1;
-						mReceivedMessage.beyondTop()->push(dataBit);
+						mReceivedMessagePacket.push(dataBit);
 					}
 				}
 			}
@@ -378,7 +340,7 @@ inline void Receiver::push(uint32_t microSecDuration, const int pinLevel) {
 }
 
 Receiver::STATE Receiver::state() const {
-	if (!mReceivedMessage.canGrow()) {
+	if (mMessageAvailable) {
 		return AVAILABLE_STATE;
 	}
 	return mProtocolCandidates.size() ? DATA_STATE : SYNC_STATE;
@@ -386,19 +348,23 @@ Receiver::STATE Receiver::state() const {
 
 // inline attribute, because it is private and called once.
 inline void Receiver::retry() {
+	mReceivedMessagePacket.reset();
 	baseClass::reset();
-	/* This reset must be the last action, because it will change the mode */
-	mReceivedMessage.reset();
 }
 
 void Receiver::reset() {
 	mProtocolCandidates.reset();
-	retry();
+	mReceivedMessagePacket.reset();
+	baseClass::reset();
+	/* This message available reset must be the last action,
+	 * because it will change the mode. That must not happen
+	 * before all the above reset calls are done. */
+	mMessageAvailable = false;
 }
 
 bool Receiver::receivedBitsCount() const {
 	if(available()) {
-		const MessagePacket& messagePacket = mReceivedMessage[0];
+		const MessagePacket& messagePacket = mReceivedMessagePacket;
 		return messagePacket.size() + messagePacket.overflowCount();
 	}
 	return 0;
@@ -407,7 +373,7 @@ bool Receiver::receivedBitsCount() const {
 uint32_t Receiver::receivedValue() const {
 	uint32_t result = 0;
 	if(available()) {
-		const MessagePacket& messagePacket = mReceivedMessage[0];
+		const MessagePacket& messagePacket = mReceivedMessagePacket;
 		for(size_t i=0; i< messagePacket.size(); i++) {
 			result = result << 1;
 			RCSWITCH_ASSERT(messagePacket.at(i) != DATA_BIT::UNKNOWN);
