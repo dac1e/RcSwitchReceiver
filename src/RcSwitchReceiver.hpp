@@ -105,6 +105,17 @@ public:
 	 * Can be called at any time.
 	 */
 	inline void resetAvailable() {if(mReceiver.available()) {mReceiver.reset();}}
+
+	/**
+	 * Suspend receiving new message packets.
+	 */
+	void suspend() {mReceiver.suspend();}
+
+	/**
+	 * Resume receiving new message packets.
+	 */
+	void resume() {mReceiver.resume();}
+
 };
 
 /** The receiver instance for this IO pin. */

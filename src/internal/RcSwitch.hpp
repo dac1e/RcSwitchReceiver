@@ -512,6 +512,8 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 
 	MessagePacket mReceivedMessagePacket;
 	volatile bool mMessageAvailable;
+	volatile bool mSuspended;
+
 	ProtocolCandidates mProtocolCandidates;
 	size_t mReceivedDataModePulseCount;
 	uint32_t mMicrosecLastInterruptTime;
@@ -531,7 +533,8 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	 * Constructor.
 	 */
 	Receiver()
-			: mReceivedDataModePulseCount(0), mMicrosecLastInterruptTime(0), mMessageAvailable(false) {
+			: mReceivedDataModePulseCount(0), mMicrosecLastInterruptTime(0)
+			, mMessageAvailable(false), mSuspended(false) {
 			/* Initialize pulse elements. */
 			Array::init();
 	}
@@ -566,7 +569,7 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	/**
 	 * Refer to corresponding API class RcSwitchReceiver;
 	 */
-	bool receivedBitsCount() const;
+	size_t receivedBitsCount() const;
 
 	/**
 	 * Refer to corresponding API class RcSwitchReceiver;
@@ -579,6 +582,15 @@ class Receiver : public OverwritingStack<Pulse, DATA_PULSES_PER_BIT> {
 	 */
 	int receivedProtocol(const size_t index) const;
 
+	/**
+	 * Refer to corresponding API class RcSwitchReceiver;
+	 */
+	void suspend() {mSuspended = true;}
+
+	/**
+	 * Refer to corresponding API class RcSwitchReceiver;
+	 */
+	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
 };
 
 } /* namespace RcSwitch */

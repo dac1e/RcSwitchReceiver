@@ -354,65 +354,66 @@ inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& firstPulse, const Puls
 }
 
 void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
-	const uint32_t microSecDuration = microSecInterruptTime - mMicrosecLastInterruptTime;
+	if(!mSuspended) {
+		const uint32_t microSecDuration = microSecInterruptTime - mMicrosecLastInterruptTime;
 #if DEBUG_RCSWITCH
-	tracePulse(microSecDuration, pinLevel);
+		tracePulse(microSecDuration, pinLevel);
 #endif
-	push(microSecDuration, pinLevel);
+		push(microSecDuration, pinLevel);
 
-	switch(state()) {
-		case SYNC_STATE:
-			if(size() > 1) {
-				collectProtocolCandidates(at(size()-2), at(size()-1));
-				/* If the above call has identified any valid protocol
-				 * candidate, state has implicitly become DATA_STATE.
-				 * Refer to function state(). */
-			}
-			break;
-		case DATA_STATE:
-			if(++mReceivedDataModePulseCount == 2) {
-				mReceivedDataModePulseCount = 0;
-				const Pulse& firstPulse  = at(size()-2);
-				const Pulse& secondPulse = at(size()-1);
-				const PULSE_TYPE pulseType = analyzePulsePair(firstPulse, secondPulse);
-				if(pulseType == PULSE_TYPE::UNKNOWN) {
-					/* Unknown pulses received, hence start from scratch. Current pulses
-					 * might be the synch start, but for a different protocol. */
-					mProtocolCandidates.reset();
-					/* Check current pulses for being a synch of a different protocol. */
-					collectProtocolCandidates(firstPulse, secondPulse);
-					retry();
-				} else {
-					if(pulseType == PULSE_TYPE::SYCH_PULSE) {
-						/* The 2 pulses are a new sync start, we are finished
-						 * with the current message package */
-						if(mReceivedMessagePacket.size() >= MIN_MSG_PACKET_BITS) {
-							mMessageAvailable = true;
-						} else {
-							/* Insufficient number of bits received, hence start from
-							 * scratch. Current pulses might be the synch start, but
-							 * for a different protocol. */
-							mProtocolCandidates.reset();
-							/* Check current pulses for being a synch of a different protocol. */
-							collectProtocolCandidates(firstPulse, secondPulse);
-							retry();
-						}
+		switch(state()) {
+			case SYNC_STATE:
+				if(size() > 1) {
+					collectProtocolCandidates(at(size()-2), at(size()-1));
+					/* If the above call has identified any valid protocol
+					 * candidate, the state has implicitly become DATA_STATE.
+					 * Refer to function state(). */
+				}
+				break;
+			case DATA_STATE:
+				if(++mReceivedDataModePulseCount == 2) {
+					mReceivedDataModePulseCount = 0;
+					const Pulse& firstPulse  = at(size()-2);
+					const Pulse& secondPulse = at(size()-1);
+					const PULSE_TYPE pulseType = analyzePulsePair(firstPulse, secondPulse);
+					if(pulseType == PULSE_TYPE::UNKNOWN) {
+						/* Unknown pulses received, hence start from scratch. Current pulses
+						 * might be the synch start, but for a different protocol. */
+						mProtocolCandidates.reset();
+						/* Check current pulses for being a synch of a different protocol. */
+						collectProtocolCandidates(firstPulse, secondPulse);
+						retry();
 					} else {
-						/* It is a sequence of 2 data pulses */
-						RCSWITCH_ASSERT(pulseType == PULSE_TYPE::DATA_LOGICAL_0
-								|| pulseType == PULSE_TYPE::DATA_LOGICAL_1);
-						const DATA_BIT dataBit = pulseType == PULSE_TYPE::DATA_LOGICAL_0 ?
-										DATA_BIT::LOGICAL_0 : DATA_BIT::LOGICAL_1;
-						mReceivedMessagePacket.push(dataBit);
+						if(pulseType == PULSE_TYPE::SYCH_PULSE) {
+							/* The 2 pulses are a new sync start, we are finished
+							 * with the current message package */
+							if(mReceivedMessagePacket.size() >= MIN_MSG_PACKET_BITS) {
+								mMessageAvailable = true;
+							} else {
+								/* Insufficient number of bits received, hence start from
+								 * scratch. Current pulses might be the synch start, but
+								 * for a different protocol. */
+								mProtocolCandidates.reset();
+								/* Check current pulses for being a synch of a different protocol. */
+								collectProtocolCandidates(firstPulse, secondPulse);
+								retry();
+							}
+						} else {
+							/* It is a sequence of 2 data pulses */
+							RCSWITCH_ASSERT(pulseType == PULSE_TYPE::DATA_LOGICAL_0
+									|| pulseType == PULSE_TYPE::DATA_LOGICAL_1);
+							const DATA_BIT dataBit = pulseType == PULSE_TYPE::DATA_LOGICAL_0 ?
+											DATA_BIT::LOGICAL_0 : DATA_BIT::LOGICAL_1;
+							mReceivedMessagePacket.push(dataBit);
+						}
 					}
 				}
-			}
-			break;
-		case AVAILABLE_STATE:
-			/* Do nothing. */
-			break;
+				break;
+			case AVAILABLE_STATE:
+				/* Do nothing. */
+				break;
+		}
 	}
-
 	mMicrosecLastInterruptTime = microSecInterruptTime;
 }
 
@@ -447,7 +448,7 @@ void Receiver::reset() {
 	mMessageAvailable = false;
 }
 
-bool Receiver::receivedBitsCount() const {
+size_t Receiver::receivedBitsCount() const {
 	if(available()) {
 		const MessagePacket& messagePacket = mReceivedMessagePacket;
 		return messagePacket.size() + messagePacket.overflowCount();
