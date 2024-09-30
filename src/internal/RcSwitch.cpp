@@ -67,6 +67,8 @@ namespace RcSwitch {
  * durations to keep the interrupt handler quick. The lower / upper boundary tolerance
  * is +- 20%.
  *
+ * The protocols specs. are also sorted by a particular column within the table to
+ * speed up pulse validation. That helps to keep the interrupt handler quick.
  */
 
 
@@ -112,7 +114,7 @@ struct Protocol {
 	PulseTypes pulseToPulseTypes(const Pulse &pulse) const;
 };
 
-/** Timings of the normal level protocols in microseconds: */
+/** Normal level protocol group specification in microseconds: */
 static const Protocol normalLevelProtocolsTable[] { // Sorted in ascending order of lowTimeRange.msecLowerBound
 		//     |synch                                                    |data
 		//                                                                |logical 0 data bit pulse pair                            |logical 1 data bit pulse pair
@@ -128,7 +130,7 @@ static const Protocol normalLevelProtocolsTable[] { // Sorted in ascending order
 		{    3,{{        5680,        8520},{        2400,        3600}},{{         880,        1320},{         320,         480}},{{         480,         720},{         720,        1080}}},
 };
 
-/** Timings of the normal level protocols in microseconds: */
+/** Inverse level protocol group specification in microseconds: */
 static const Protocol inverseLevelProtocolsTable[] { // Sorted in ascending order of msecHighTimeLowerBound
 		//     |synch                                                    |data
 		//                                                                |logical 0 data bit pulse pair                            |logical 1 data bit pulse pair
@@ -143,6 +145,7 @@ static const Protocol inverseLevelProtocolsTable[] { // Sorted in ascending orde
 		{    9,{{        1120,        1680},{       20800,       31200}},{{        2560,        3840},{        1120,        1680}},{{        2560,        3840},{         480,         720}}},
 };
 
+/* The number of rows of the 2 above tables. */
 constexpr size_t  normalLevelProtocolsTableRowCount = sizeof( normalLevelProtocolsTable)/sizeof( normalLevelProtocolsTable[0]);
 constexpr size_t inverseLevelProtocolsTableRowCount = sizeof(inverseLevelProtocolsTable)/sizeof(inverseLevelProtocolsTable[0]);
 
@@ -226,13 +229,13 @@ PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse) const {
 	return result;
 }
 
-static const std::pair<const Protocol*, size_t> protocolGroups[] = {
-		{ normalLevelProtocolsTable,  normalLevelProtocolsTableRowCount},
-		{inverseLevelProtocolsTable, inverseLevelProtocolsTableRowCount},
-};
-
 /** Returns the array of protocols for a protocol group. */
 static inline std::pair<const Protocol*, size_t> getProtocolTable(const PROTOCOL_GROUP_ID protocolGroupId) {
+	static const std::pair<const Protocol*, size_t> protocolGroups[] = {
+			{ normalLevelProtocolsTable,  normalLevelProtocolsTableRowCount},
+			{inverseLevelProtocolsTable, inverseLevelProtocolsTableRowCount},
+	};
+
 	return protocolGroups[protocolGroupId];
 }
 
