@@ -5,10 +5,13 @@
 constexpr int RX433_DATA_PIN = 6;
 static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 
+// Reference to the serial to be used for printing.
+UARTClass& serial = Serial;
+
 //The setup function is called once at startup of the sketch
 void setup()
 {
-	Serial.begin(115200);
+	serial.begin(9600);
 	rcSwitchReceiver.begin();
 }
 
@@ -17,25 +20,25 @@ void loop()
 {
 	if (rcSwitchReceiver.available()) {
 		const uint32_t value = rcSwitchReceiver.receivedValue();
-		Serial.print("Received ");
-		Serial.print(value);
+		serial.print("Received ");
+		serial.print(value);
 
 
 		const size_t n = rcSwitchReceiver.receivedProtocolCount();
-		Serial.print(" / Protocol number");
+		serial.print(" / Protocol number");
 		if(n > 1) {
-			Serial.print("s:");
+			serial.print("s:");
 		} else {
-			Serial.print(':');
+			serial.print(':');
 		}
 
 		for(size_t i = 0; i < n; i++) {
 			const int protocolNumber = rcSwitchReceiver.receivedProtocol(i);
-			Serial.print(' ');
-			Serial.print(protocolNumber);
+			serial.print(' ');
+			serial.print(protocolNumber);
 		}
 
-		Serial.println();
+		serial.println();
 
 		rcSwitchReceiver.resetAvailable();
 	}
