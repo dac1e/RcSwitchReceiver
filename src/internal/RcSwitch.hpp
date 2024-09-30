@@ -390,9 +390,9 @@ template<> inline const Pulse& INITIAL_VALUE<Pulse>() {
 #endif
 
 
-enum PROTOCOL_GROUP : ssize_t {
+enum PROTOCOL_GROUP_ID : ssize_t {
 	/* Don't change assigned values, because enumerations
-	 * are also used as an index for an array.
+	 * are also used as an index into an array.
 	 */
 	UNKNOWN_PROTOCOL = -1,
 	NORMAL_LEVEL_PROTOCOLS  = 0,
@@ -417,17 +417,17 @@ template<> inline const PROTOCOL_CANDIDATE& INITIAL_VALUE<PROTOCOL_CANDIDATE>() 
  */
 class ProtocolCandidates : public BlockingStack<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES> {
 	using baseClass = BlockingStack<PROTOCOL_CANDIDATE, MAX_PROTOCOL_CANDIDATES>;
-	PROTOCOL_GROUP mProtocolGroup;
+	PROTOCOL_GROUP_ID mProtocolGroupId;
 
 public:
-	inline ProtocolCandidates() : mProtocolGroup(UNKNOWN_PROTOCOL) {
+	inline ProtocolCandidates() : mProtocolGroupId(UNKNOWN_PROTOCOL) {
 		/** Initialize protocol candidates elements. */
 		Array::init();
 	}
 
 	/** Remove all protocol candidates from this container */
 	inline void reset() {
-		mProtocolGroup = UNKNOWN_PROTOCOL;
+		mProtocolGroupId = UNKNOWN_PROTOCOL;
 		baseClass::reset();
 	}
 
@@ -437,8 +437,8 @@ public:
 	// Make the base class push() method public.
 	using baseClass::push;
 
-	void setProtocolGroup(const PROTOCOL_GROUP protocolGroup) {mProtocolGroup=protocolGroup;}
-	PROTOCOL_GROUP getProtocolGroup()const {return mProtocolGroup;}
+	void setProtocolGroup(const PROTOCOL_GROUP_ID protocolGroup) {mProtocolGroupId=protocolGroup;}
+	PROTOCOL_GROUP_ID getProtocolGroup()const {return mProtocolGroupId;}
 	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
 };
 

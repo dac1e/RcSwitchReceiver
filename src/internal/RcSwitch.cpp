@@ -11,105 +11,41 @@ namespace RcSwitch {
 
 static bool isInverseLevelProtocol(const size_t protocolGroupId);
 
-struct Protocol {
-	struct TimeRange{
-		enum COMPARE_RESULT {
-			IS_WITHIN =  0,
-			TOO_SHORT = -1,
-			TOO_LONG  = -1,
-		};
+struct TimeRange {
+	uint32_t lowerBound;
+	uint32_t upperBound;
 
-		uint32_t microSecLowerBound;
-		uint32_t microSecUpperBound;
-
-		inline COMPARE_RESULT compare(uint32_t value) const {
-			if(value < microSecLowerBound) {return TOO_SHORT;}
-			if(value >= microSecUpperBound) {return TOO_LONG;}
-			return IS_WITHIN;
-		}
+	enum COMPARE_RESULT {
+		IS_WITHIN =  0,
+		TOO_SHORT = -1,
+		TOO_LONG  = -1,
 	};
 
-	struct PulseTiming {
-		TimeRange durationLowLevel;
-		TimeRange durationHighLevel;
-	};
-
-	size_t   protocolNumber;
-	PulseTiming  pulseForSynch;
-	PulseTiming  pulseForLogical_0;
-	PulseTiming  pulseForLogical_1;
-
-	PulseTypes pulseToPulseTypes(const Pulse& pulse, const size_t protocolGroupId) const {
-		PulseTypes result = {PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN};
-		switch(pulse.mPulseLevel) {
-			case PULSE_LEVEL::LO:
-			{
-				const bool inverseLevel = isInverseLevelProtocol(protocolGroupId);
-				const TimeRange::COMPARE_RESULT synchCompare =
-						pulseForSynch.durationLowLevel.compare(pulse.mMicroSecDuration);
-
-				if(inverseLevel) {
-					/* First synch pulse might be longer, because level went from low to low */
-					if(synchCompare == TimeRange::IS_WITHIN || synchCompare == TimeRange::TOO_LONG) {
-						result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
-					}
-				} else {
-					if(synchCompare == TimeRange::IS_WITHIN) {
-						result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
-					}
-				}
-
-				const TimeRange::COMPARE_RESULT log0Compare =
-						pulseForLogical_0.durationLowLevel.compare(pulse.mMicroSecDuration);
-				if(log0Compare == TimeRange::IS_WITHIN) {
-					result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
-				} else {
-					const TimeRange::COMPARE_RESULT log1Compare =
-							pulseForLogical_1.durationLowLevel.compare(pulse.mMicroSecDuration);
-					if(log1Compare == TimeRange::IS_WITHIN) {
-						result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
-					}
-				}
-				break;
-			}
-			case PULSE_LEVEL::HI:
-			{
-				const bool inverseLevel = isInverseLevelProtocol(protocolGroupId);
-				const TimeRange::COMPARE_RESULT synchCompare =
-						pulseForSynch.durationHighLevel.compare(pulse.mMicroSecDuration);
-
-				if(inverseLevel) {
-					if(synchCompare == TimeRange::IS_WITHIN) {
-						result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
-					}
-				} else {
-					if(synchCompare == TimeRange::IS_WITHIN) {
-						result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
-					}
-				}
-
-				const TimeRange::COMPARE_RESULT log0Compare =
-						pulseForLogical_0.durationHighLevel.compare(pulse.mMicroSecDuration);
-				if(log0Compare == TimeRange::IS_WITHIN) {
-					result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
-				} else {
-					const TimeRange::COMPARE_RESULT log1Compare =
-							pulseForLogical_1.durationHighLevel.compare(pulse.mMicroSecDuration);
-					if(log1Compare == TimeRange::IS_WITHIN) {
-						result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
-					}
-				}
-				break;
-			}
-			case PULSE_LEVEL::UNKNOWN:
-				// Nothing to analyze
-				break;
-		}
-		return result;
-	}
+	COMPARE_RESULT compare(uint32_t value) const;
 };
 
-/** Timings of the normal level protocols: first synch pulse is high. */
+inline TimeRange::COMPARE_RESULT TimeRange::compare(uint32_t value) const {
+	if(value <  lowerBound) {return TOO_SHORT;}
+	if(value >= upperBound) {return TOO_LONG;}
+	return IS_WITHIN;
+}
+
+struct PulsePairTiming {
+	TimeRange durationLowLevelPulse;
+	TimeRange durationHighLevelPulse;
+};
+
+struct Protocol {
+	size_t   protocolNumber;
+	PulsePairTiming  synchronizationPulsePair;
+	PulsePairTiming  logical0PulsePair;
+	PulsePairTiming  logical1PulsePair;
+
+	/** Return the pulse types that a pulse matches for this protocol */
+	PulseTypes pulseToPulseTypes(const Pulse &pulse, const size_t protocolGroupId) const;
+};
+
+/** Timings of the normal level protocols in microseconds: first synch pulse is high. */
 static const Protocol normalLevelProtocols[] { // Sorted in ascending order of lowTimeRange.msecLowerBound
 		//     |synch                                                    |data
 		//#p    |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound
@@ -122,7 +58,7 @@ static const Protocol normalLevelProtocols[] { // Sorted in ascending order of l
 		{    3,{{        5680,        8520},{        2400,        3600}},{{         880,        1320},{         320,         480}},{{         480,         720},{         720,        1080}}},
 };
 
-/** Timings of the normal level protocols: first synch pulse is low. */
+/** Timings of the normal level protocols in microseconds: first synch pulse is low. */
 static const Protocol inverseLevelProtocols[] { // Sorted in ascending order of msecHighTimeLowerBound
 		//     |synch                                                    |data
 		//#p    |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound      |lowerBound  |upperBound    |lowerBound  |upperBound
@@ -133,6 +69,72 @@ static const Protocol inverseLevelProtocols[] { // Sorted in ascending order of 
 		{    9,{{        1120,        1680},{       20800,       31200}},{{        2560,        3840},{        1120,        1680}},{{        2560,        3840},{         480,         720}}},
 };
 
+PulseTypes Protocol::pulseToPulseTypes(const Pulse &pulse, const size_t protocolGroupId) const {
+	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
+	switch (pulse.mPulseLevel) {
+		case PULSE_LEVEL::LO: {
+			const bool inverseLevel = isInverseLevelProtocol(protocolGroupId); // inversität sollte man aus dem protocol erkennen.
+			const TimeRange::COMPARE_RESULT synchCompare =
+					synchronizationPulsePair.durationLowLevelPulse.compare(pulse.mMicroSecDuration);
+			if (inverseLevel) {
+				/* First synch pulse might be longer, because level went from low to low */
+				if (synchCompare == TimeRange::IS_WITHIN || synchCompare == TimeRange::TOO_LONG) {
+					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
+				}
+			} else {
+				if (synchCompare == TimeRange::IS_WITHIN) {
+					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
+				}
+			}
+			const TimeRange::COMPARE_RESULT log0Compare =
+					logical0PulsePair.durationLowLevelPulse.compare(pulse.mMicroSecDuration);
+			if (log0Compare == TimeRange::IS_WITHIN) {
+				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
+			} else {
+				const TimeRange::COMPARE_RESULT log1Compare =
+						logical1PulsePair.durationLowLevelPulse.compare(
+						pulse.mMicroSecDuration);
+				if (log1Compare == TimeRange::IS_WITHIN) {
+					result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
+				}
+			}
+			break;
+		}
+		case PULSE_LEVEL::HI: {
+			const bool inverseLevel = isInverseLevelProtocol(protocolGroupId);
+			const TimeRange::COMPARE_RESULT synchCompare =
+					synchronizationPulsePair.durationHighLevelPulse.compare(pulse.mMicroSecDuration);
+			if (inverseLevel) {
+				if (synchCompare == TimeRange::IS_WITHIN) {
+					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
+				}
+			} else {
+				if (synchCompare == TimeRange::IS_WITHIN) {
+					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
+				}
+			}
+			const TimeRange::COMPARE_RESULT log0Compare =
+					logical0PulsePair.durationHighLevelPulse.compare(
+					pulse.mMicroSecDuration);
+			if (log0Compare == TimeRange::IS_WITHIN) {
+				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
+			} else {
+				const TimeRange::COMPARE_RESULT log1Compare =
+						logical1PulsePair.durationHighLevelPulse.compare(
+						pulse.mMicroSecDuration);
+				if (log1Compare == TimeRange::IS_WITHIN) {
+					result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
+				}
+			}
+			break;
+		}
+		case PULSE_LEVEL::UNKNOWN:
+			// Nothing to analyze
+			break;
+	}
+	return result;
+}
+
 constexpr size_t inverseLevelProtocolsSize = sizeof(inverseLevelProtocols)/sizeof(inverseLevelProtocols[0]);
 constexpr size_t normalLevelProtocolsSize  = sizeof( normalLevelProtocols)/sizeof( normalLevelProtocols[0]);
 
@@ -141,8 +143,8 @@ const std::pair<const Protocol*, size_t> protocolGroups[] = {
 		{inverseLevelProtocols, inverseLevelProtocolsSize},
 };
 
-static inline std::pair<const Protocol*, size_t> getProtocols(const PROTOCOL_GROUP protocolGroup) {
-	return protocolGroups[protocolGroup];
+static inline std::pair<const Protocol*, size_t> getProtocols(const PROTOCOL_GROUP_ID protocolGroupId) {
+	return protocolGroups[protocolGroupId];
 }
 
 static inline bool isInverseLevelProtocol(const size_t protocolGroupId) {
@@ -153,12 +155,12 @@ static inline bool isInverseLevelProtocol(const size_t protocolGroupId) {
 }
 
 static inline void collectNormalLevelProtocolCandidates(
-		ProtocolCandidates& collection, const Pulse&  pulse_0, const Pulse&  pulse_1) {
+		ProtocolCandidates& protocolCandidates, const Pulse&  pulse_0, const Pulse&  pulse_1) {
 
 	for(size_t i = 0; i < normalLevelProtocolsSize; i++) {
 		const Protocol& prot = normalLevelProtocols[i];
 		if(pulse_0.mMicroSecDuration <
-				normalLevelProtocols[i].pulseForSynch.durationHighLevel.microSecLowerBound) {
+				normalLevelProtocols[i].synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.lowTimeRange.microSecLowerBound
 			 * So further protocols will have even higher microSecLowerBound. Hence we can
 			 * break here immediately.
@@ -167,12 +169,12 @@ static inline void collectNormalLevelProtocolCandidates(
 		}
 
 		if(pulse_0.mMicroSecDuration <
-				prot.pulseForSynch.durationHighLevel.microSecUpperBound) {
+				prot.synchronizationPulsePair.durationHighLevelPulse.upperBound) {
 			if(pulse_1.mMicroSecDuration >=
-					prot.pulseForSynch.durationLowLevel.microSecLowerBound) {
+					prot.synchronizationPulsePair.durationLowLevelPulse.lowerBound) {
 				if(pulse_1.mMicroSecDuration <
-						prot.pulseForSynch.durationLowLevel.microSecUpperBound) {
-					collection.push(i);
+						prot.synchronizationPulsePair.durationLowLevelPulse.upperBound) {
+					protocolCandidates.push(i);
 				}
 			}
 		}
@@ -180,12 +182,12 @@ static inline void collectNormalLevelProtocolCandidates(
 }
 
 static inline void collectInverseLevelProtocolCandidates(
-		ProtocolCandidates& collection, const Pulse&  pulse_0, const Pulse&  pulse_1) {
+		ProtocolCandidates& protocolCandidates, const Pulse&  pulse_0, const Pulse&  pulse_1) {
 
 	for(size_t i = 0; i < inverseLevelProtocolsSize; i++) {
 		const Protocol& prot = inverseLevelProtocols[i];
 		if(pulse_0.mMicroSecDuration <
-				inverseLevelProtocols[i].pulseForSynch.durationLowLevel.microSecLowerBound) {
+				inverseLevelProtocols[i].synchronizationPulsePair.durationLowLevelPulse.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.microSecHighTimeLowerBound
 			 * So further protocols will have even higher microSecHighTimeLowerBound. Hence
 			 * we can break here immediately. */
@@ -193,36 +195,18 @@ static inline void collectInverseLevelProtocolCandidates(
 		}
 
 		if(pulse_1.mMicroSecDuration >=
-				prot.pulseForSynch.durationHighLevel.microSecLowerBound) {
+				prot.synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
 			if(pulse_1.mMicroSecDuration
-					< prot.pulseForSynch.durationHighLevel.microSecUpperBound) {
-				collection.push(i);
+					< prot.synchronizationPulsePair.durationHighLevelPulse.upperBound) {
+				protocolCandidates.push(i);
 			}
 		}
 	}
 }
 
-void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1) {
-  if(pulse_0.mPulseLevel != pulse_1.mPulseLevel) {
-		if(pulse_0.mPulseLevel == PULSE_LEVEL::HI) {
-			mProtocolCandidates.setProtocolGroup(NORMAL_LEVEL_PROTOCOLS);
-			collectNormalLevelProtocolCandidates(mProtocolCandidates, pulse_0, pulse_1);
-		} else if(pulse_0.mPulseLevel == PULSE_LEVEL::LO) {
-			mProtocolCandidates.setProtocolGroup(INVERSE_LEVEL_PROTOCOLS);
-			collectInverseLevelProtocolCandidates(mProtocolCandidates, pulse_0, pulse_1);
-		} else {
-			 /* UNKNOWN pulse level given as argument */
-			RCSWITCH_ASSERT(false);
-		}
-  } else {
-  	/* Assert that no UNKNOWN pulse level given as argument */
-		RCSWITCH_ASSERT(pulse_0.mPulseLevel != PULSE_LEVEL::UNKNOWN);
-  }
-}
-
 // ======== ProtocolCandidates =========
 size_t ProtocolCandidates::getProtcolNumber(const size_t protocolCandidateIndex) const {
-	 std::pair<const Protocol*, size_t> protocol = getProtocols(mProtocolGroup);
+	 std::pair<const Protocol*, size_t> protocol = getProtocols(mProtocolGroupId);
 	 RCSWITCH_ASSERT(protocolCandidateIndex < size());
 	 const size_t protocolIndex = at(protocolCandidateIndex);
 	 RCSWITCH_ASSERT(protocolIndex < protocol.second);
@@ -243,6 +227,25 @@ bool ReceivedMessage::isEqual(const size_t index_a, const size_t index_b) {
 		return at(index_a) == at(index_b);
 	}
 	return true;
+}
+
+// ======== Receiver ===================
+void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1) {
+  if(pulse_0.mPulseLevel != pulse_1.mPulseLevel) {
+		if(pulse_0.mPulseLevel == PULSE_LEVEL::HI) {
+			mProtocolCandidates.setProtocolGroup(NORMAL_LEVEL_PROTOCOLS);
+			collectNormalLevelProtocolCandidates(mProtocolCandidates, pulse_0, pulse_1);
+		} else if(pulse_0.mPulseLevel == PULSE_LEVEL::LO) {
+			mProtocolCandidates.setProtocolGroup(INVERSE_LEVEL_PROTOCOLS);
+			collectInverseLevelProtocolCandidates(mProtocolCandidates, pulse_0, pulse_1);
+		} else {
+			 /* UNKNOWN pulse level given as argument */
+			RCSWITCH_ASSERT(false);
+		}
+  } else {
+  	/* Assert that no UNKNOWN pulse level given as argument */
+		RCSWITCH_ASSERT(pulse_0.mPulseLevel != PULSE_LEVEL::UNKNOWN);
+  }
 }
 
 // inline attribute, because it is private and called once.
