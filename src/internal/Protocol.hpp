@@ -104,15 +104,15 @@ inline TimeRange::COMPARE_RESULT TimeRange::compare(uint32_t value) const {
 }
 
 struct PulsePairTiming {
-	TimeRange durationLowLevelPulse;
-	TimeRange durationHighLevelPulse;
+	TimeRange durationA; // A
+	TimeRange durationB; // B
 };
 
 struct Protocol {
 	size_t   protocolNumber;
-	PulsePairTiming  synchronizationPulsePair;
-	PulsePairTiming  logical0PulsePair;
-	PulsePairTiming  logical1PulsePair;
+	PulsePairTiming  synchronizationPulsePair; // synch
+	PulsePairTiming  logical0PulsePair;	// data0
+	PulsePairTiming  logical1PulsePair; // data1
 
 	/** Return true, if this protocol is an inverse level protocol.
 	 * Otherwise false. */
@@ -125,6 +125,45 @@ struct Protocol {
 };
 
 std::pair<const Protocol*, size_t> getProtocolTable(const size_t protocolGroupId);
+
+
+
+template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B>
+struct MakeProtocol {
+	static constexpr size_t uSecSynchA = clock * synchA;
+	static constexpr size_t uSecSynchB = clock * synchB;
+	static constexpr size_t usecSynchA_lowerBound = uSecSynchA * (100-percentTolerance) / 100;
+	static constexpr size_t usecSynchA_upperBound = uSecSynchA * (100+percentTolerance) / 100;
+	static constexpr size_t usecSynchB_lowerBound = uSecSynchB * (100-percentTolerance) / 100;
+	static constexpr size_t usecSynchB_upperBound = uSecSynchB * (100+percentTolerance) / 100;
+
+	static constexpr size_t uSecData0_A = clock * data0_A;
+	static constexpr size_t uSecData0_B = clock * data0_B;
+	static constexpr size_t uSecData0_A_lowerBound = uSecData0_A * (100-percentTolerance) / 100;
+	static constexpr size_t uSecData0_A_upperBound = uSecData0_A * (100+percentTolerance) / 100;
+	static constexpr size_t uSecData0_B_lowerBound = uSecData0_B * (100-percentTolerance) / 100;
+	static constexpr size_t uSecData0_B_upperBound = uSecData0_B * (100+percentTolerance) / 100;
+
+	static constexpr size_t uSecData1_A = clock * data1_A;
+	static constexpr size_t uSecData1_B = clock * data1_B;
+	static constexpr size_t uSecData1_A_lowerBound = uSecData1_A * (100-percentTolerance) / 100;
+	static constexpr size_t uSecData1_A_upperBound = uSecData1_A * (100+percentTolerance) / 100;
+	static constexpr size_t uSecData1_B_lowerBound = uSecData1_B * (100-percentTolerance) / 100;
+	static constexpr size_t uSecData1_B_upperBound = uSecData1_B * (100+percentTolerance) / 100;
+
+	static constexpr Protocol VALUE = {protocolNumber,
+		{	/* synch pulses */
+			{usecSynchA_lowerBound, usecSynchA_upperBound},     {usecSynchB_lowerBound, usecSynchB_upperBound}
+		},
+		{   /* LOGICAL_0 data bit logical pulses */
+			{uSecData0_A_lowerBound, uSecData0_A_upperBound}, {uSecData0_B_lowerBound, uSecData0_B_upperBound}
+		},
+		{
+			/* LOGICAL_1 data bit logical pulses */
+			{uSecData1_A_lowerBound, uSecData1_A_upperBound}, {uSecData1_B_lowerBound, uSecData1_B_upperBound}
+		},
+	};
+};
 
 } /* namespace RcSwitc */
 
