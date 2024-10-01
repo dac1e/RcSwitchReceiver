@@ -50,6 +50,11 @@ template<int IOPIN> class RcSwitchReceiver {
 		mReceiver.handleInterrupt(digitalRead(IOPIN), micros());
 	}
 public:
+
+//	template<size_t N> void begin(const Protocol[N] protocol) {
+//
+//	}
+
 	/**
 	 * Sets up the receiver to receive interrupts from the IOPIN.
 	 */
