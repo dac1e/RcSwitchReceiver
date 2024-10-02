@@ -14,6 +14,8 @@
 #include <sys/types.h>
 #include <tuple>
 
+#define DEBUG_RCSWITCH_PROTOCOL_DEF true
+
 namespace RcSwitch {
 
 /*
@@ -126,8 +128,6 @@ struct Protocol {
 
 std::pair<const Protocol*, size_t> getProtocolTable(const size_t protocolGroupId);
 
-
-
 template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B>
 struct MakeProtocol {
 	static constexpr size_t uSecSynchA = clock * synchA;
@@ -165,6 +165,14 @@ struct MakeProtocol {
 	};
 };
 
+
 } /* namespace RcSwitc */
+
+#if DEBUG_RCSWITCH_PROTOCOL_DEF
+	#include <UartClass.h>
+	namespace RcSwitch {
+		void printProtocolTable(UARTClass& serial, const size_t protocolGroup);
+	}
+#endif
 
 #endif /* RCSWITCH_INTERNAL_PROTOCOL_HPP_ */

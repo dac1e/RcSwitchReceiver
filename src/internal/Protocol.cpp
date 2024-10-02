@@ -83,4 +83,40 @@ std::pair<const Protocol*, size_t> getProtocolTable(const size_t protocolGroupId
 	return protocolGroups[protocolGroupId];
 }
 
+#if DEBUG_RCSWITCH_PROTOCOL_DEF
+
+void printProtocolTable(UARTClass& serial, const size_t protocolGroup) {
+	std::pair<const Protocol*, size_t> pt = RcSwitch::getProtocolTable(protocolGroup);
+	for (size_t i = 0; i < pt.second; i++) {
+		const Protocol &p = (pt.first)[i];
+		serial.print(p.protocolNumber);
+		serial.print(",SY:[");
+		serial.print(p.synchronizationPulsePair.durationA.lowerBound);
+		serial.print("..");
+		serial.print(p.synchronizationPulsePair.durationA.upperBound);
+		serial.print("],[");
+		serial.print(p.synchronizationPulsePair.durationB.lowerBound);
+		serial.print("..");
+		serial.print(p.synchronizationPulsePair.durationB.upperBound);
+		serial.print("],D0:[");
+		serial.print(p.logical0PulsePair.durationA.lowerBound);
+		serial.print("..");
+		serial.print(p.logical0PulsePair.durationA.upperBound);
+		serial.print("],[");
+		serial.print(p.logical0PulsePair.durationB.lowerBound);
+		serial.print("..");
+		serial.print(p.logical0PulsePair.durationB.upperBound);
+		serial.print("],D1:[");
+		serial.print(p.logical1PulsePair.durationA.lowerBound);
+		serial.print("..");
+		serial.print(p.logical1PulsePair.durationA.upperBound);
+		serial.print("],[");
+		serial.print(p.logical1PulsePair.durationB.lowerBound);
+		serial.print("..");
+		serial.print(p.logical1PulsePair.durationB.upperBound);
+		serial.println("]");
+	}
+}
+#endif
+
 } /* namespace RcSwitch */
