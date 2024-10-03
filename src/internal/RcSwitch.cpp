@@ -22,13 +22,55 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
+#include <limits>
+
 #include "RcSwitch.hpp"
-#include "Protocol.hpp"
+#include "ReceiveTimingSpec.hpp"
+
+
+#if defined max // max macro is not compatible with limits standard library.
+#undef max
+#endif
+
+#if defined min // min macro is not compatible with limits standard library.
+#undef min
+#endif
 
 namespace RcSwitch {
 
+#if DEBUG_RCSWITCH
 
-static PulseTypes pulseAtoPulseTypes(const Protocol& protocol, const Pulse &pulse) {
+/** Specialize INITIAL_VALUE for DATA_BIT */
+template<> inline const DATA_BIT& INITIAL_VALUE<DATA_BIT>() {
+	static const DATA_BIT value = DATA_BIT::UNKNOWN;
+	return value;
+}
+
+/** Specialize INITIAL_VALUE for Pulse */
+template<> inline const Pulse& INITIAL_VALUE<Pulse>() {
+	static const Pulse value = Pulse{
+		0, PULSE_LEVEL::UNKNOWN
+	};
+	return value;
+}
+
+/** Specialize INITIAL_VALUE for PROTOCOL_CANDIDATE */
+template<> inline const PROTOCOL_CANDIDATE& INITIAL_VALUE<PROTOCOL_CANDIDATE>() {
+	static const PROTOCOL_CANDIDATE value = std::numeric_limits<size_t>::max();
+	return value;
+}
+
+/** Specialize INITIAL_VALUE for MessagePacket */
+template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
+	static const MessagePacket value;
+	return value;
+}
+
+#endif
+
+
+
+static PulseTypes pulseAtoPulseTypes(const ReceiveTimingSpec& protocol, const Pulse &pulse) {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
@@ -57,7 +99,7 @@ static PulseTypes pulseAtoPulseTypes(const Protocol& protocol, const Pulse &puls
 	return result;
 }
 
-static PulseTypes pulseBtoPulseTypes(const Protocol& protocol, const Pulse &pulse) {
+static PulseTypes pulseBtoPulseTypes(const ReceiveTimingSpec& protocol, const Pulse &pulse) {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
@@ -89,9 +131,9 @@ static PulseTypes pulseBtoPulseTypes(const Protocol& protocol, const Pulse &puls
 
 static inline void collectNormalLevelProtocolCandidates(
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
-	const std::pair<const Protocol*, size_t>& protocol = getProtocolTable(NORMAL_LEVEL_PROTOCOLS);
+	const std::pair<const ReceiveTimingSpec*, size_t>& protocol = getReceiveTiminTable(NORMAL_LEVEL_PROTOCOLS);
 	for(size_t i = 0; i < protocol.second; i++) {
-		const Protocol& prot = protocol.first[i];
+		const ReceiveTimingSpec& prot = protocol.first[i];
 		if(pulseA.mMicroSecDuration <
 				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.lowTimeRange.microSecLowerBound
@@ -116,9 +158,9 @@ static inline void collectNormalLevelProtocolCandidates(
 
 static inline void collectInverseLevelProtocolCandidates(
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
-	const std::pair<const Protocol*, size_t>& protocol = getProtocolTable(INVERSE_LEVEL_PROTOCOLS);
+	const std::pair<const ReceiveTimingSpec*, size_t>& protocol = getReceiveTiminTable(INVERSE_LEVEL_PROTOCOLS);
 	for(size_t i = 0; i < protocol.second; i++) {
-		const Protocol& prot = protocol.first[i];
+		const ReceiveTimingSpec& prot = protocol.first[i];
 		if(pulseA.mMicroSecDuration <
 				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.microSecHighTimeLowerBound
@@ -139,7 +181,7 @@ static inline void collectInverseLevelProtocolCandidates(
 
 // ======== ProtocolCandidates =========
 size_t ProtocolCandidates::getProtcolNumber(const size_t protocolCandidateIndex) const {
-	 const std::pair<const Protocol*, size_t>& protocol = getProtocolTable(mProtocolGroupId);
+	 const std::pair<const ReceiveTimingSpec*, size_t>& protocol = getReceiveTiminTable(mProtocolGroupId);
 	 RCSWITCH_ASSERT(protocolCandidateIndex < size());
 	 const size_t protocolIndex = at(protocolCandidateIndex);
 	 RCSWITCH_ASSERT(protocolIndex < protocol.second);
@@ -169,12 +211,12 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
 // inline attribute, because it is private and called once.
 inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) {
 	PULSE_TYPE result = PULSE_TYPE::UNKNOWN;
-	const std::pair<const Protocol*, size_t> protocols = getProtocolTable(mProtocolCandidates.getProtocolGroup());
+	const std::pair<const ReceiveTimingSpec*, size_t> protocols = getReceiveTiminTable(mProtocolCandidates.getProtocolGroup());
 	size_t protocolCandidatesIndex = mProtocolCandidates.size();
 	while(protocolCandidatesIndex > 0) {
 		--protocolCandidatesIndex;
 		RCSWITCH_ASSERT(protocolCandidatesIndex < protocols.second);
-		const Protocol& protocol = protocols.first[mProtocolCandidates[protocolCandidatesIndex]];
+		const ReceiveTimingSpec& protocol = protocols.first[mProtocolCandidates[protocolCandidatesIndex]];
 
 		const PulseTypes& pulseTypesPulseA = pulseAtoPulseTypes(protocol, pulseA);
 		const PulseTypes& pulseTypesPulseB = pulseBtoPulseTypes(protocol, pulseB);

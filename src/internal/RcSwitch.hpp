@@ -27,8 +27,8 @@
 #ifndef _RCSWTICH_INTERNAL_HPP_
 #define RCSWTICH_INTERNAL_HPP_
 
-#include <stdint.h>
 #include <sys/types.h>
+#include <stdint.h>
 #include <algorithm>
 
 /** Forward declaration of the class providing the API. */
@@ -61,7 +61,7 @@ namespace RcSwitch {
  * 3) Maps macro RCSWITCH_ASSERT to the system function
  * assert.
  */
-#define DEBUG_RCSWITCH false
+#define DEBUG_RCSWITCH true
 
 #if DEBUG_RCSWITCH
 #include <assert.h>
@@ -347,14 +347,6 @@ enum class DATA_BIT : ssize_t{
 	LOGICAL_1 = 1,
 };
 
-/** Specialize INITIAL_VALUE for DATA_BIT */
-#if DEBUG_RCSWITCH
-template<> inline const DATA_BIT& INITIAL_VALUE<DATA_BIT>() {
-	static const DATA_BIT value = DATA_BIT::UNKNOWN;
-	return value;
-}
-#endif
-
 enum class PULSE_LEVEL : uint8_t {
 	UNKNOWN = 0,
 	LO,
@@ -380,16 +372,6 @@ struct Pulse {
 	PULSE_LEVEL mPulseLevel;
 };
 
-/** Specialize INITIAL_VALUE for Pulse */
-#if DEBUG_RCSWITCH
-template<> inline const Pulse& INITIAL_VALUE<Pulse>() {
-	static const Pulse value = Pulse{
-		0, PULSE_LEVEL::UNKNOWN
-	};
-	return value;
-}
-#endif
-
 
 enum PROTOCOL_GROUP_ID : ssize_t {
 	/* Don't change assigned values, because enumerations
@@ -402,14 +384,6 @@ enum PROTOCOL_GROUP_ID : ssize_t {
 
 /** A protocol candidate is identified by an index. */
 typedef size_t PROTOCOL_CANDIDATE;
-
-/** Specialize INITIAL_VALUE for PROTOCOL_CANDIDATE */
-#if DEBUG_RCSWITCH
-template<> inline const PROTOCOL_CANDIDATE& INITIAL_VALUE<PROTOCOL_CANDIDATE>() {
-	static const PROTOCOL_CANDIDATE value = std::numeric_limits<size_t>::max();
-	return value;
-}
-#endif
 
 /**
  * This container stores the all the protocols that match the
@@ -488,14 +462,6 @@ public:
 	// Make the base class reset() method public.
 	using baseClass::reset;
 };
-
-/** Specialize INITIAL_VALUE for MessagePacket */
-#if DEBUG_RCSWITCH
-template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
-	static const MessagePacket value;
-	return value;
-}
-#endif
 
 /**
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes

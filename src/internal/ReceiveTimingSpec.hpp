@@ -10,8 +10,8 @@
 #ifndef RCSWITCH_INTERNAL_PROTOCOL_HPP_
 #define RCSWITCH_INTERNAL_PROTOCOL_HPP_
 
-#include <stdint.h>
 #include <sys/types.h>
+#include <stdint.h>
 #include <tuple>
 
 #define DEBUG_RCSWITCH_PROTOCOL_DEF true
@@ -112,7 +112,7 @@ struct PulsePairTiming {
 	TimeRange durationB; // B
 };
 
-struct Protocol {
+struct ReceiveTimingSpec {
 	size_t   protocolNumber;
 	PulsePairTiming  synchronizationPulsePair; // synch
 	PulsePairTiming  logical0PulsePair;	// data0
@@ -128,10 +128,10 @@ struct Protocol {
 
 };
 
-std::pair<const Protocol*, size_t> getProtocolTable(const size_t protocolGroupId);
+std::pair<const ReceiveTimingSpec*, size_t> getReceiveTiminTable(const size_t protocolGroupId);
 
 template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B>
-struct MakeProtocol {
+struct makeProtocolTimingSpec {
 	static constexpr size_t uSecSynchA = clock * synchA;
 	static constexpr size_t uSecSynchB = clock * synchB;
 	static constexpr size_t usecSynchA_lowerBound = uSecSynchA * (100-percentTolerance) / 100;
@@ -153,7 +153,7 @@ struct MakeProtocol {
 	static constexpr size_t uSecData1_B_lowerBound = uSecData1_B * (100-percentTolerance) / 100;
 	static constexpr size_t uSecData1_B_upperBound = uSecData1_B * (100+percentTolerance) / 100;
 
-	static constexpr Protocol VALUE = {protocolNumber,
+	static constexpr ReceiveTimingSpec VALUE = {protocolNumber,
 		{	/* synch pulses */
 			{usecSynchA_lowerBound, usecSynchA_upperBound},     {usecSynchB_lowerBound, usecSynchB_upperBound}
 		},
@@ -173,7 +173,7 @@ struct MakeProtocol {
 #if DEBUG_RCSWITCH_PROTOCOL_DEF
 	#include <UartClass.h>
 	namespace RcSwitch {
-		void printProtocolTable(UARTClass& serial, const size_t protocolGroup);
+		void printReceiveTimingTable(UARTClass& serial, const size_t protocolGroup);
 	}
 #endif
 
