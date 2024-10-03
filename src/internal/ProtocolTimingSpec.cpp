@@ -5,7 +5,7 @@
  *      Author: Wolfgang
  */
 
-#include "RxTimingSpec.hpp"
+#include "ProtocolTimingSpec.hpp"
 
 namespace RcSwitch {
 
@@ -83,9 +83,9 @@ std::pair<const RxTimingSpec*, size_t> getRxTimingTable(const size_t protocolGro
 	return protocolGroups[protocolGroupId];
 }
 
-#if DEBUG_RCSWITCH_PROTOCOL_DEF
+#if DEBUG_RCSWITCH_PROTOCOL_SPEC
 
-void printReceiveTimingTable(UARTClass& serial, const size_t protocolGroup) {
+void printRxTimingTable(UARTClass& serial, const size_t protocolGroup) {
 	std::pair<const RxTimingSpec*, size_t> pt = RcSwitch::getRxTimingTable(protocolGroup);
 	for (size_t i = 0; i < pt.second; i++) {
 		const RxTimingSpec &p = (pt.first)[i];

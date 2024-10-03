@@ -26,7 +26,7 @@
 
 #include "RcSwitch.hpp"
 
-#include "RxTimingSpec.hpp"
+#include "ProtocolTimingSpec.hpp"
 
 
 #if defined max // max macro is not compatible with limits standard library.

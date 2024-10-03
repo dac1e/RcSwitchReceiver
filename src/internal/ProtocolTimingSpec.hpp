@@ -7,14 +7,14 @@
 
 #pragma once
 
-#ifndef RCSWITCH_INTERNAL_PROTOCOL_HPP_
-#define RCSWITCH_INTERNAL_PROTOCOL_HPP_
+#ifndef RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_
+#define RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_
 
 #include <sys/types.h>
 #include <stdint.h>
 #include <tuple>
 
-#define DEBUG_RCSWITCH_PROTOCOL_DEF true
+#define DEBUG_RCSWITCH_PROTOCOL_SPEC true
 
 namespace RcSwitch {
 
@@ -195,11 +195,11 @@ std::pair<const RxTimingSpec*, size_t> getRxTimingTable(const size_t protocolGro
 
 } /* namespace RcSwitc */
 
-#if DEBUG_RCSWITCH_PROTOCOL_DEF
+#if DEBUG_RCSWITCH_PROTOCOL_SPEC
 	#include <UartClass.h>
 	namespace RcSwitch {
-		void printReceiveTimingTable(UARTClass& serial, const size_t protocolGroup);
+		void printRxTimingTable(UARTClass& serial, const size_t protocolGroup);
 	}
 #endif
 
-#endif /* RCSWITCH_INTERNAL_PROTOCOL_HPP_ */
+#endif /* RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_ */
