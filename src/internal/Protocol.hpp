@@ -20,6 +20,8 @@ namespace RcSwitch {
 
 /*
  * The protocol is a stream of pulse pairs with different duration and pulse levels.
+ * In the context of this documentation, the first pulse will be referenced as
+ * "pulse A" and the second one as "pulse B".
  *
  *   Normal level protocols start with a high level:
  *          ___________________
@@ -30,7 +32,7 @@ namespace RcSwitch {
  *	   XXXX|___________________|                    |XXXX
  *
  *	       ^                   ^                    ^
- *         |1st pulse duration | 2nd pulse duration |
+ *         | pulse A duration  | pulse B duration   |
  *
  *
  *  In the synchronization phase there is a short pulse followed by a very long pulse:

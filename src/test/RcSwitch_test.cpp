@@ -27,7 +27,6 @@
 #if ENABLE_RCSWITCH_TEST
 #include <assert.h>
 
-
 namespace RcSwitch {
 
 /** Call RcSwitch::RcSwitch_test::theTest.run() to execute tests. */
@@ -147,10 +146,10 @@ template<> inline const int& INITIAL_VALUE<int>() {
 template<size_t protocolNumber> class PulseLength {};
 
 template<> struct PulseLength<1> {
-	static constexpr uint32_t synchShortPulseLength = 300;
-	static constexpr uint32_t synchLongPulseLength = 9300;
-	static constexpr uint32_t shortPulseLength =      150;
-	static constexpr uint32_t longPulseLength  =      900;
+	static constexpr uint32_t synchShortPulseLength =  1 * 350;
+	static constexpr uint32_t synchLongPulseLength  = 31 * 350;
+	static constexpr uint32_t dataShortPulseLength  =  1 * 350;
+	static constexpr uint32_t dataLongPulseLength   =  3 * 350;
 	/**
 	 * The target level of the edge of the pulse.
 	 */
@@ -175,8 +174,8 @@ template<size_t protocolNumber> struct Protocol {
 
 		const uint32_t firstPulseEndLevel  = PulseLength<protocolNumber>::firstPulseEndLevel;
 
-		const uint32_t shortPulseLength = PulseLength<protocolNumber>::shortPulseLength;
-		const uint32_t longPulseLength  = PulseLength<protocolNumber>::longPulseLength;
+		const uint32_t shortPulseLength = PulseLength<protocolNumber>::dataShortPulseLength;
+		const uint32_t longPulseLength  = PulseLength<protocolNumber>::dataLongPulseLength;
 
 		RcSwitch_test::sendDataPulse(usec, receiver,
 				shortPulseLength * firstPulseDurationFactor,
@@ -189,8 +188,8 @@ template<size_t protocolNumber> struct Protocol {
 
 		const uint32_t firstPulseEndLevel  = PulseLength<protocolNumber>::firstPulseEndLevel;
 
-		const uint32_t shortPulseLength = PulseLength<protocolNumber>::shortPulseLength;
-		const uint32_t longPulseLength  = PulseLength<protocolNumber>::longPulseLength;
+		const uint32_t shortPulseLength = PulseLength<protocolNumber>::dataShortPulseLength;
+		const uint32_t longPulseLength  = PulseLength<protocolNumber>::dataLongPulseLength;
 
 		RcSwitch_test::sendDataPulse(usec, receiver,
 				longPulseLength  * firstPulseDurationFactor,
@@ -332,24 +331,21 @@ void RcSwitch_test::testSynchRx() const {
 	Receiver receiver;
 	uint32_t usec = 0;
 
-	usec += 100;  // start hi pulse  100 usec duration.
+	usec += 100;  // lo pulse  100 usec duration.
 	receiver.handleInterrupt(1, usec);
 
-	usec += 300;  // start lo pulse 300 usec duration.
+	usec += 300;  // hi pulse 300 usec duration.
 	receiver.handleInterrupt(0, usec);
 
-	usec += 2736; // start lo pulse 2736 usec duration, too short for any protocol.
+	usec += 2736; // lo pulse 2736 usec duration, too long for any protocol.
 	receiver.handleInterrupt(1, usec);
 	assert(receiver.state() == Receiver::SYNC_STATE);
 
-	usec += 100;  // start lo pulse 100 usec duration.
+	usec += 300;  // hi pulse 300 usec duration.
 	receiver.handleInterrupt(0, usec);
 
-	usec += 300;  // start hi pulse 300 usec duration.
+	usec += 9300; // lo pulse 9300 usec duration, match protocol #1 and #7.
 	receiver.handleInterrupt(1, usec);
-
-	usec += 9300; // start lo pulse 9300 usec duration, match protocol #1 and #7.
-	receiver.handleInterrupt(0, usec);
 	assert(receiver.state() == Receiver::DATA_STATE);
 }
 

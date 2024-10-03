@@ -28,81 +28,72 @@
 namespace RcSwitch {
 
 
-static PulseTypes pulseToPulseTypes(const Protocol& protocol, const Pulse &pulse) {
+static PulseTypes pulseAtoPulseTypes(const Protocol& protocol, const Pulse &pulse) {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
-	switch (pulse.mPulseLevel) {
-		case PULSE_LEVEL::LO: {
-			const bool inverseLevel = protocol.isInverseLevelProtocol();
-			const TimeRange::COMPARE_RESULT synchCompare =
-					protocol.synchronizationPulsePair.durationLowLevelPulse.compare(pulse.mMicroSecDuration);
-			if (inverseLevel) {
-				/* First synch pulse might be longer, because level went from low to low */
-				if (synchCompare == TimeRange::IS_WITHIN || synchCompare == TimeRange::TOO_LONG) {
-					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
-				}
-			} else {
-				RCSWITCH_ASSERT(protocol.isNormalLevelProtocol());
-				if (synchCompare == TimeRange::IS_WITHIN) {
-					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
-				}
-			}
-			const TimeRange::COMPARE_RESULT log0Compare =
-					protocol.logical0PulsePair.durationLowLevelPulse.compare(pulse.mMicroSecDuration);
-			if (log0Compare == TimeRange::IS_WITHIN) {
-				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
-			} else {
-				const TimeRange::COMPARE_RESULT log1Compare =
-						protocol.logical1PulsePair.durationLowLevelPulse.compare(
-						pulse.mMicroSecDuration);
-				if (log1Compare == TimeRange::IS_WITHIN) {
-					result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
-				}
-			}
-			break;
+	{
+		const TimeRange::COMPARE_RESULT synchCompare =
+				protocol.synchronizationPulsePair.durationA.compare(pulse.mMicroSecDuration);
+
+		/* First synch pulse is allowed to be longer */
+		if (synchCompare != TimeRange::TOO_SHORT) {
+			result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
 		}
-		case PULSE_LEVEL::HI: {
-			const bool inverseLevel = protocol.isInverseLevelProtocol();
-			const TimeRange::COMPARE_RESULT synchCompare =
-					protocol.synchronizationPulsePair.durationHighLevelPulse.compare(pulse.mMicroSecDuration);
-			if (inverseLevel) {
-				if (synchCompare == TimeRange::IS_WITHIN) {
-					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
-				}
-			} else {
-				RCSWITCH_ASSERT(protocol.isNormalLevelProtocol());
-				if (synchCompare == TimeRange::IS_WITHIN) {
-					result.mPulseTypeSynch = PULSE_TYPE::SYNCH_FIRST_PULSE;
-				}
+	}
+
+	{
+		const TimeRange::COMPARE_RESULT log0Compare =
+				protocol.logical0PulsePair.durationA.compare(pulse.mMicroSecDuration);
+
+		if (log0Compare == TimeRange::IS_WITHIN) {
+			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
+		} else {
+			const TimeRange::COMPARE_RESULT log1Compare =
+					protocol.logical1PulsePair.durationA.compare(pulse.mMicroSecDuration);
+			if (log1Compare == TimeRange::IS_WITHIN) {
+				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
 			}
-			const TimeRange::COMPARE_RESULT log0Compare =
-					protocol.logical0PulsePair.durationHighLevelPulse.compare(
+		}
+	}
+	return result;
+}
+
+static PulseTypes pulseBtoPulseTypes(const Protocol& protocol, const Pulse &pulse) {
+	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
+	{
+		const TimeRange::COMPARE_RESULT synchCompare =
+				protocol.synchronizationPulsePair.durationB.compare(pulse.mMicroSecDuration);
+
+		/* First synch pulse is allowed to be longer */
+		if (synchCompare == TimeRange::IS_WITHIN) {
+			result.mPulseTypeSynch = PULSE_TYPE::SYNCH_SECOND_PULSE;
+		}
+	}
+
+	{
+		const TimeRange::COMPARE_RESULT log0Compare =
+				protocol.logical0PulsePair.durationB.compare(pulse.mMicroSecDuration);
+
+		if (log0Compare == TimeRange::IS_WITHIN) {
+			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
+		} else {
+			const TimeRange::COMPARE_RESULT log1Compare =
+					protocol.logical1PulsePair.durationB.compare(
 					pulse.mMicroSecDuration);
-			if (log0Compare == TimeRange::IS_WITHIN) {
-				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
-			} else {
-				const TimeRange::COMPARE_RESULT log1Compare =
-						protocol.logical1PulsePair.durationHighLevelPulse.compare(
-						pulse.mMicroSecDuration);
-				if (log1Compare == TimeRange::IS_WITHIN) {
-					result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
-				}
+			if (log1Compare == TimeRange::IS_WITHIN) {
+				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
 			}
-			break;
 		}
-		case PULSE_LEVEL::UNKNOWN:
-			// Nothing to analyze
-			break;
 	}
 	return result;
 }
 
 static inline void collectNormalLevelProtocolCandidates(
-		ProtocolCandidates& protocolCandidates, const Pulse&  pulse_0, const Pulse&  pulse_1) {
+		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	const std::pair<const Protocol*, size_t>& protocol = getProtocolTable(NORMAL_LEVEL_PROTOCOLS);
 	for(size_t i = 0; i < protocol.second; i++) {
 		const Protocol& prot = protocol.first[i];
-		if(pulse_0.mMicroSecDuration <
-				protocol.first[i].synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
+		if(pulseA.mMicroSecDuration <
+				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.lowTimeRange.microSecLowerBound
 			 * So further protocols will have even higher microSecLowerBound. Hence we can
 			 * break here immediately.
@@ -110,12 +101,12 @@ static inline void collectNormalLevelProtocolCandidates(
 			return;
 		}
 
-		if(pulse_0.mMicroSecDuration <
-				prot.synchronizationPulsePair.durationHighLevelPulse.upperBound) {
-			if(pulse_1.mMicroSecDuration >=
-					prot.synchronizationPulsePair.durationLowLevelPulse.lowerBound) {
-				if(pulse_1.mMicroSecDuration <
-						prot.synchronizationPulsePair.durationLowLevelPulse.upperBound) {
+		if(pulseA.mMicroSecDuration <
+				prot.synchronizationPulsePair.durationA.upperBound) {
+			if(pulseB.mMicroSecDuration >=
+					prot.synchronizationPulsePair.durationB.lowerBound) {
+				if(pulseB.mMicroSecDuration <
+						prot.synchronizationPulsePair.durationB.upperBound) {
 					protocolCandidates.push(i);
 				}
 			}
@@ -124,22 +115,22 @@ static inline void collectNormalLevelProtocolCandidates(
 }
 
 static inline void collectInverseLevelProtocolCandidates(
-		ProtocolCandidates& protocolCandidates, const Pulse&  pulse_0, const Pulse&  pulse_1) {
+		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	const std::pair<const Protocol*, size_t>& protocol = getProtocolTable(INVERSE_LEVEL_PROTOCOLS);
 	for(size_t i = 0; i < protocol.second; i++) {
 		const Protocol& prot = protocol.first[i];
-		if(pulse_0.mMicroSecDuration <
-				protocol.first[i].synchronizationPulsePair.durationLowLevelPulse.lowerBound) {
+		if(pulseA.mMicroSecDuration <
+				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
 			/* Protocols are sorted in ascending order of synch.microSecHighTimeLowerBound
 			 * So further protocols will have even higher microSecHighTimeLowerBound. Hence
 			 * we can break here immediately. */
 			return;
 		}
 
-		if(pulse_1.mMicroSecDuration >=
-				prot.synchronizationPulsePair.durationHighLevelPulse.lowerBound) {
-			if(pulse_1.mMicroSecDuration
-					< prot.synchronizationPulsePair.durationHighLevelPulse.upperBound) {
+		if(pulseB.mMicroSecDuration >=
+				prot.synchronizationPulsePair.durationB.lowerBound) {
+			if(pulseB.mMicroSecDuration
+					< prot.synchronizationPulsePair.durationB.upperBound) {
 				protocolCandidates.push(i);
 			}
 		}
@@ -176,7 +167,7 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
 }
 
 // inline attribute, because it is private and called once.
-inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse) {
+inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) {
 	PULSE_TYPE result = PULSE_TYPE::UNKNOWN;
 	const std::pair<const Protocol*, size_t> protocols = getProtocolTable(mProtocolCandidates.getProtocolGroup());
 	size_t protocolCandidatesIndex = mProtocolCandidates.size();
@@ -185,22 +176,20 @@ inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& firstPulse, const Puls
 		RCSWITCH_ASSERT(protocolCandidatesIndex < protocols.second);
 		const Protocol& protocol = protocols.first[mProtocolCandidates[protocolCandidatesIndex]];
 
-		const PulseTypes& pulseTypesSecondPulse =
-				pulseToPulseTypes(protocol, secondPulse);
-		const PulseTypes& pulseTypesFirstPulse =
-				pulseToPulseTypes(protocol, firstPulse);
+		const PulseTypes& pulseTypesPulseA = pulseAtoPulseTypes(protocol, pulseA);
+		const PulseTypes& pulseTypesPulseB = pulseBtoPulseTypes(protocol, pulseB);
 
-		if(pulseTypesSecondPulse.mPulseTypeSynch == PULSE_TYPE::SYNCH_SECOND_PULSE
-				&& pulseTypesFirstPulse.mPulseTypeSynch == PULSE_TYPE::SYNCH_FIRST_PULSE) {
+		if(pulseTypesPulseB.mPulseTypeSynch == PULSE_TYPE::SYNCH_SECOND_PULSE
+				&& pulseTypesPulseA.mPulseTypeSynch == PULSE_TYPE::SYNCH_FIRST_PULSE) {
 			/* The pulses match the protocol for synch pulses. */
 			return PULSE_TYPE::SYCH_PULSE;
 		}
 
-		if(pulseTypesSecondPulse.mPulseTypeData == pulseTypesFirstPulse.mPulseTypeData
-				&& pulseTypesSecondPulse.mPulseTypeData !=  PULSE_TYPE::UNKNOWN) {
+		if(pulseTypesPulseB.mPulseTypeData == pulseTypesPulseA.mPulseTypeData
+				&& pulseTypesPulseB.mPulseTypeData !=  PULSE_TYPE::UNKNOWN) {
 			/* The pulses match the protocol for data pulses */
 			if(result == PULSE_TYPE::UNKNOWN) { /* keep the first match */
-				result = pulseTypesSecondPulse.mPulseTypeData;
+				result = pulseTypesPulseB.mPulseTypeData;
 			}
 		} else {
 			// The pulses do not match the protocol
@@ -221,7 +210,10 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 		switch(state()) {
 			case SYNC_STATE:
 				if(size() > 1) {
-					collectProtocolCandidates(at(size()-2), at(size()-1));
+					const Pulse& pulseA = at(size()-2);
+					const Pulse& pulseB = at(size()-1);
+
+					collectProtocolCandidates(pulseA, pulseB);
 					/* If the above call has identified any valid protocol
 					 * candidate, the state has implicitly become DATA_STATE.
 					 * Refer to function state(). */
@@ -230,15 +222,15 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 			case DATA_STATE:
 				if(++mDataModePulseCount == 2) {
 					mDataModePulseCount = 0;
-					const Pulse& firstPulse  = at(size()-2);
-					const Pulse& secondPulse = at(size()-1);
-					const PULSE_TYPE pulseType = analyzePulsePair(firstPulse, secondPulse);
+					const Pulse& pulseA = at(size()-2);
+					const Pulse& pulseB = at(size()-1);
+					const PULSE_TYPE pulseType = analyzePulsePair(pulseA, pulseB);
 					if(pulseType == PULSE_TYPE::UNKNOWN) {
 						/* Unknown pulses received, hence start from scratch. Current pulses
 						 * might be the synch start, but for a different protocol. */
 						mProtocolCandidates.reset();
 						/* Check current pulses for being a synch of a different protocol. */
-						collectProtocolCandidates(firstPulse, secondPulse);
+						collectProtocolCandidates(pulseA, pulseB);
 						retry();
 					} else {
 						if(pulseType == PULSE_TYPE::SYCH_PULSE) {
@@ -252,7 +244,7 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 								 * for a different protocol. */
 								mProtocolCandidates.reset();
 								/* Check current pulses for being a synch of a different protocol. */
-								collectProtocolCandidates(firstPulse, secondPulse);
+								collectProtocolCandidates(pulseA, pulseB);
 								retry();
 							}
 						} else {
