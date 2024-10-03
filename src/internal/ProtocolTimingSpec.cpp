@@ -9,6 +9,63 @@
 
 namespace RcSwitch {
 
+template<typename T, typename ...R> struct ExtractFirst {
+	typedef T type;
+};
+
+template<typename T1, typename T2> struct Greater;
+
+template<
+	size_t protocolNumberL, size_t percentToleranceL, size_t clockL, size_t synchAL, size_t synchBL, size_t data0_AL, size_t data0_BL, size_t data1_AL, size_t data1_BL,
+	size_t protocolNumberR, size_t percentToleranceR, size_t clockR, size_t synchAR, size_t synchBR, size_t data0_AR, size_t data0_BR, size_t data1_AR, size_t data1_BR
+>
+struct Greater <
+	makeProtocolTimingSpec<protocolNumberL, percentToleranceL, clockL, synchAL, synchBL, data0_AL, data0_BL, data1_AL, data1_BL>,
+	makeProtocolTimingSpec<protocolNumberR, percentToleranceR, clockR, synchAR, synchBR, data0_AR, data0_BR, data1_AR, data1_BR>
+>
+{
+	static constexpr bool VALUE = protocolNumberL > protocolNumberR;
+};
+
+
+template<bool greater, typename T1, typename ...R> struct X {
+	static constexpr bool x_ = Greater<T1, typename ExtractFirst<R...>::type >::VALUE;
+	typename T1::rx_spec_t m=T1::RX;
+	X<x_, R...> successor;
+};
+
+template<typename T1, typename ...R> struct X<true, T1, R...> {
+	static constexpr bool x_ = Greater<T1, typename ExtractFirst<R...>::type >::VALUE;
+	X<x_, R...> predecessor;
+	typename T1::rx_spec_t m=T1::RX;
+};
+
+template<bool greater, typename T1> struct X<greater, T1> {
+	typename T1::rx_spec_t m=T1::RX;
+};
+
+template<typename T1> struct X<true, T1> {
+	typename T1::rx_spec_t m=T1::RX;
+};
+
+template<typename T1, typename ...R> struct Y {
+	static constexpr bool x_ = Greater<T1, typename ExtractFirst<R...>::type >::VALUE;
+	X<x_, T1, R...> m;
+};
+
+template<typename T1> struct Y<T1> {
+	typename T1::rx_spec_t m=T1::RX;
+};
+
+
+Y <
+	makeProtocolTimingSpec<  7, 20,  150,  2,   62,    1,  6,    6,  1>,
+	makeProtocolTimingSpec<  1, 20,  350,  1,   31,    1,  3,    3,  1> // ()
+
+> y;
+
+
+
 
 /** Normal level protocol group specification in microseconds: */
 static const RxTimingSpec normalLevelProtocolsTable[] { // Sorted in ascending order of lowTimeRange.msecLowerBound

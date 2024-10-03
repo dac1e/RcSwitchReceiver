@@ -142,6 +142,7 @@ struct TxTimingSpec { /* Currently only required for test */
 
 template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B>
 struct makeProtocolTimingSpec {
+
 	static constexpr size_t uSecSynchA = clock * synchA;
 	static constexpr size_t uSecSynchB = clock * synchB;
 	static constexpr size_t usecSynchA_lowerBound = uSecSynchA * (100-percentTolerance) / 100;
@@ -163,7 +164,8 @@ struct makeProtocolTimingSpec {
 	static constexpr size_t uSecData1_B_lowerBound = uSecData1_B * (100-percentTolerance) / 100;
 	static constexpr size_t uSecData1_B_upperBound = uSecData1_B * (100+percentTolerance) / 100;
 
-	static constexpr RxTimingSpec RX = {protocolNumber,
+	typedef RxTimingSpec rx_spec_t;
+	static constexpr rx_spec_t RX = {protocolNumber,
 		{	/* synch pulses */
 			{usecSynchA_lowerBound, usecSynchA_upperBound},     {usecSynchB_lowerBound, usecSynchB_upperBound}
 		},
@@ -177,7 +179,8 @@ struct makeProtocolTimingSpec {
 	};
 
 	/* Currently only required for tests */
-	static constexpr RxTimingSpec TX = {protocolNumber,
+	typedef RxTimingSpec tx_spec_t;
+	static constexpr tx_spec_t TX = {protocolNumber,
 		{	/* synch pulses */
 			uSecSynchA, uSecSynchB
 		},
