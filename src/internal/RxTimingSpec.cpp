@@ -5,13 +5,13 @@
  *      Author: Wolfgang
  */
 
-#include "ReceiveTimingSpec.hpp"
+#include "RxTimingSpec.hpp"
 
 namespace RcSwitch {
 
 
 /** Normal level protocol group specification in microseconds: */
-static const ReceiveTimingSpec normalLevelProtocolsTable[] { // Sorted in ascending order of lowTimeRange.msecLowerBound
+static const RxTimingSpec normalLevelProtocolsTable[] { // Sorted in ascending order of lowTimeRange.msecLowerBound
 		//     |synch                                                    |data
 		//                                                                |logical 0 data bit pulse pair                            |logical 1 data bit pulse pair
         //      |low level pulse duration.. |high level pulse duration..  |low level pulse duration.. |high level pulse duration..  |low level pulse duration.. |high level pulse duration..
@@ -26,17 +26,17 @@ static const ReceiveTimingSpec normalLevelProtocolsTable[] { // Sorted in ascend
 //		{    3,{{        5680,        8520},{        2400,        3600}},{{         880,        1320},{         320,         480}},{{         480,         720},{         720,        1080}}},
 
 		//             #,  %,  clk,  syA,syB,  d0A,d0B,  d1A,d1B
-		makeProtocolTimingSpec<  7, 20,  150,  2,   62,    1,  6,    6,  1>::VALUE, // (HS2303-PT)
-		makeProtocolTimingSpec<  1, 20,  350,  1,   31,    1,  3,    3,  1>::VALUE, // ()
-		makeProtocolTimingSpec<  4, 20,  380,  1,    6,    1,  3,    3,  1>::VALUE, // ()
-		makeProtocolTimingSpec<  8, 20,  200,  3,  130,    7, 16,    3, 16>::VALUE, // (Conrad RS-200 RX)
-		makeProtocolTimingSpec<  2, 20,  650,  1,   10,    1,  3,    3,  1>::VALUE, // ()
-		makeProtocolTimingSpec<  5, 20,  500,  6,   14,    1,  2,    2,  1>::VALUE, // ()
-		makeProtocolTimingSpec<  3, 20,  100, 30,   71,    4, 11,    9,  6>::VALUE, // ()
+		makeProtocolTimingSpec<  7, 20,  150,  2,   62,    1,  6,    6,  1>::RX, // (HS2303-PT)
+		makeProtocolTimingSpec<  1, 20,  350,  1,   31,    1,  3,    3,  1>::RX, // ()
+		makeProtocolTimingSpec<  4, 20,  380,  1,    6,    1,  3,    3,  1>::RX, // ()
+		makeProtocolTimingSpec<  8, 20,  200,  3,  130,    7, 16,    3, 16>::RX, // (Conrad RS-200 RX)
+		makeProtocolTimingSpec<  2, 20,  650,  1,   10,    1,  3,    3,  1>::RX, // ()
+		makeProtocolTimingSpec<  5, 20,  500,  6,   14,    1,  2,    2,  1>::RX, // ()
+		makeProtocolTimingSpec<  3, 20,  100, 30,   71,    4, 11,    9,  6>::RX, // ()
 };
 
 /** Inverse level protocol group specification in microseconds: */
-static const ReceiveTimingSpec inverseLevelProtocolsTable[] { // Sorted in ascending order of msecHighTimeLowerBound
+static const RxTimingSpec inverseLevelProtocolsTable[] { // Sorted in ascending order of msecHighTimeLowerBound
 		//     |synch                                                    |data
 		//                                                                |logical 0 data bit pulse pair                            |logical 1 data bit pulse pair
         //      |low level pulse duration.. |high level pulse duration..  |low level pulse duration.. |high level pulse duration..  |low level pulse duration.. |high level pulse duration..
@@ -49,10 +49,10 @@ static const ReceiveTimingSpec inverseLevelProtocolsTable[] { // Sorted in ascen
 //		{    9,{{        1120,        1680},{       20800,       31200}},{{        2560,        3840},{        1120,        1680}},{{        2560,        3840},{         480,         720}}},
 
 		//             #,  %,  clk,  syA,syB,  d0A,d0B,  d1A,d1B
-		makeProtocolTimingSpec< 12, 20,  320,    1, 36,    1,  2,    2,  1>::VALUE, // (SM5212)
-		makeProtocolTimingSpec< 11, 20,  270,    1, 36,    1,  2,    2,  1>::VALUE, // (HT12E)
-		makeProtocolTimingSpec< 10, 20,  365,    1, 18,    3,  1,    1,  3>::VALUE, // (1ByOne Doorbell)
-		makeProtocolTimingSpec<  6, 20,  450,    1, 23,    1,  2,    2,  1>::VALUE, // (HT6P20B)
+		makeProtocolTimingSpec< 12, 20,  320,    1, 36,    1,  2,    2,  1>::RX, // (SM5212)
+		makeProtocolTimingSpec< 11, 20,  270,    1, 36,    1,  2,    2,  1>::RX, // (HT12E)
+		makeProtocolTimingSpec< 10, 20,  365,    1, 18,    3,  1,    1,  3>::RX, // (1ByOne Doorbell)
+		makeProtocolTimingSpec<  6, 20,  450,    1, 23,    1,  2,    2,  1>::RX, // (HT6P20B)
 };
 
 /* The number of rows of the 2 above tables. */
@@ -61,21 +61,21 @@ constexpr size_t  normalLevelProtocolsTableRowCount =
 constexpr size_t inverseLevelProtocolsTableRowCount =
 		sizeof(inverseLevelProtocolsTable)/sizeof(inverseLevelProtocolsTable[0]);
 
-bool ReceiveTimingSpec::isNormalLevelProtocol() const {
+bool RxTimingSpec::isNormalLevelProtocol() const {
 	const bool result = (this < &normalLevelProtocolsTable[normalLevelProtocolsTableRowCount]) &&
 			(this >= &normalLevelProtocolsTable[0]);
 	return result;
 }
 
-bool ReceiveTimingSpec::isInverseLevelProtocol() const {
+bool RxTimingSpec::isInverseLevelProtocol() const {
 	const bool result = this < (&inverseLevelProtocolsTable[inverseLevelProtocolsTableRowCount]) &&
 			(this >= &inverseLevelProtocolsTable[0]);
 	return result;
 }
 
 /** Returns the array of protocols for a protocol group. */
-std::pair<const ReceiveTimingSpec*, size_t> getReceiveTiminTable(const size_t protocolGroupId) {
-	static const std::pair<const ReceiveTimingSpec*, size_t> protocolGroups[] = {
+std::pair<const RxTimingSpec*, size_t> getRxTimingTable(const size_t protocolGroupId) {
+	static const std::pair<const RxTimingSpec*, size_t> protocolGroups[] = {
 			{ normalLevelProtocolsTable,  normalLevelProtocolsTableRowCount},
 			{inverseLevelProtocolsTable, inverseLevelProtocolsTableRowCount},
 	};
@@ -86,9 +86,9 @@ std::pair<const ReceiveTimingSpec*, size_t> getReceiveTiminTable(const size_t pr
 #if DEBUG_RCSWITCH_PROTOCOL_DEF
 
 void printReceiveTimingTable(UARTClass& serial, const size_t protocolGroup) {
-	std::pair<const ReceiveTimingSpec*, size_t> pt = RcSwitch::getReceiveTiminTable(protocolGroup);
+	std::pair<const RxTimingSpec*, size_t> pt = RcSwitch::getRxTimingTable(protocolGroup);
 	for (size_t i = 0; i < pt.second; i++) {
-		const ReceiveTimingSpec &p = (pt.first)[i];
+		const RxTimingSpec &p = (pt.first)[i];
 		serial.print(p.protocolNumber);
 		serial.print(",SY:[");
 		serial.print(p.synchronizationPulsePair.durationA.lowerBound);
@@ -99,21 +99,21 @@ void printReceiveTimingTable(UARTClass& serial, const size_t protocolGroup) {
 		serial.print("..");
 		serial.print(p.synchronizationPulsePair.durationB.upperBound);
 		serial.print("],D0:[");
-		serial.print(p.logical0PulsePair.durationA.lowerBound);
+		serial.print(p.data0pulsePair.durationA.lowerBound);
 		serial.print("..");
-		serial.print(p.logical0PulsePair.durationA.upperBound);
+		serial.print(p.data0pulsePair.durationA.upperBound);
 		serial.print("],[");
-		serial.print(p.logical0PulsePair.durationB.lowerBound);
+		serial.print(p.data0pulsePair.durationB.lowerBound);
 		serial.print("..");
-		serial.print(p.logical0PulsePair.durationB.upperBound);
+		serial.print(p.data0pulsePair.durationB.upperBound);
 		serial.print("],D1:[");
-		serial.print(p.logical1PulsePair.durationA.lowerBound);
+		serial.print(p.data1pulsePair.durationA.lowerBound);
 		serial.print("..");
-		serial.print(p.logical1PulsePair.durationA.upperBound);
+		serial.print(p.data1pulsePair.durationA.upperBound);
 		serial.print("],[");
-		serial.print(p.logical1PulsePair.durationB.lowerBound);
+		serial.print(p.data1pulsePair.durationB.lowerBound);
 		serial.print("..");
-		serial.print(p.logical1PulsePair.durationB.upperBound);
+		serial.print(p.data1pulsePair.durationB.upperBound);
 		serial.println("]");
 	}
 }

@@ -89,8 +89,8 @@ namespace RcSwitch {
  */
 
 struct TimeRange {
-	uint32_t lowerBound;
-	uint32_t upperBound;
+	size_t lowerBound;
+	size_t upperBound;
 
 	enum COMPARE_RESULT {
 		IS_WITHIN =  0,
@@ -107,16 +107,16 @@ inline TimeRange::COMPARE_RESULT TimeRange::compare(uint32_t value) const {
 	return IS_WITHIN;
 }
 
-struct PulsePairTiming {
-	TimeRange durationA; // A
-	TimeRange durationB; // B
+struct RxPulsePairTimeRanges {
+	TimeRange durationA;
+	TimeRange durationB;
 };
 
-struct ReceiveTimingSpec {
+struct RxTimingSpec {
 	size_t   protocolNumber;
-	PulsePairTiming  synchronizationPulsePair; // synch
-	PulsePairTiming  logical0PulsePair;	// data0
-	PulsePairTiming  logical1PulsePair; // data1
+	RxPulsePairTimeRanges  synchronizationPulsePair; // synch
+	RxPulsePairTimeRanges  data0pulsePair;
+	RxPulsePairTimeRanges  data1pulsePair;
 
 	/** Return true, if this protocol is an inverse level protocol.
 	 * Otherwise false. */
@@ -128,7 +128,17 @@ struct ReceiveTimingSpec {
 
 };
 
-std::pair<const ReceiveTimingSpec*, size_t> getReceiveTiminTable(const size_t protocolGroupId);
+struct TxPulsePairTiming {
+	size_t durationA;
+	size_t durationB;
+};
+
+struct TxTimingSpec { /* Currently only required for test */
+	size_t   protocolNumber;
+	TxPulsePairTiming	 synchPulsePair;
+	TxPulsePairTiming	 data0PulsePair;
+	TxPulsePairTiming	 data1PulsePair;
+};
 
 template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B>
 struct makeProtocolTimingSpec {
@@ -153,7 +163,7 @@ struct makeProtocolTimingSpec {
 	static constexpr size_t uSecData1_B_lowerBound = uSecData1_B * (100-percentTolerance) / 100;
 	static constexpr size_t uSecData1_B_upperBound = uSecData1_B * (100+percentTolerance) / 100;
 
-	static constexpr ReceiveTimingSpec VALUE = {protocolNumber,
+	static constexpr RxTimingSpec RX = {protocolNumber,
 		{	/* synch pulses */
 			{usecSynchA_lowerBound, usecSynchA_upperBound},     {usecSynchB_lowerBound, usecSynchB_upperBound}
 		},
@@ -165,8 +175,23 @@ struct makeProtocolTimingSpec {
 			{uSecData1_A_lowerBound, uSecData1_A_upperBound}, {uSecData1_B_lowerBound, uSecData1_B_upperBound}
 		},
 	};
+
+	/* Currently only required for tests */
+	static constexpr RxTimingSpec TX = {protocolNumber,
+		{	/* synch pulses */
+			uSecSynchA, uSecSynchB
+		},
+		{   /* LOGICAL_0 data bit logical pulses */
+			uSecData0_A, uSecData0_B
+		},
+		{
+			/* LOGICAL_1 data bit logical pulses */
+			uSecData1_A, uSecData1_B
+		},
+	};
 };
 
+std::pair<const RxTimingSpec*, size_t> getRxTimingTable(const size_t protocolGroupId);
 
 } /* namespace RcSwitc */
 
