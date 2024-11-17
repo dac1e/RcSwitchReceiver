@@ -1,17 +1,33 @@
-#include "Arduino.h"
-#include <RcSwitchReceiver.hpp>
 
+#include "RcSwitchReceiver.hpp"
+
+#include "test/RcSwitch_test.hpp"
+
+#include <Arduino.h>
+#include "../../internal/ProtocolTimingSpec.hpp"
 
 constexpr int RX433_DATA_PIN = 6;
 static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 
 // Reference to the serial to be used for printing.
-UARTClass& serial = Serial;
+UARTClass& serial = Serial3;
 
 //The setup function is called once at startup of the sketch
 void setup()
 {
 	serial.begin(9600);
+	delay(100);
+#if DEBUG_RCSWITCH_PROTOCOL_SPEC
+	RcSwitch::printRxTimingTable(serial, 0);
+	delay(300);
+	RcSwitch::printRxTimingTable(serial, 1);
+	delay(300);
+#endif
+
+#if ENABLE_RCSWITCH_TEST
+	RcSwitch::RcSwitch_test::theTest.run();
+#endif
+
 	rcSwitchReceiver.begin();
 }
 
