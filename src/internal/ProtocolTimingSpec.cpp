@@ -9,59 +9,13 @@
 
 namespace RcSwitch {
 
-/** Get the first type of a list of types. */
-template<typename T, typename ...R> struct firstType {
-	typedef T type;
-};
-
-/** isGreater<T1,T2> type comparison declaration. */
-template<typename T1, typename T2> struct isGreater;
-
-/** isGreater<T1,T2> comparison specialization for protocol timing specification. isGreater<T1,T2>::VALUE is true if T1 > T2. Otherwise false. */
-template<
-	size_t protocolNumber_T1, size_t percentTolerance_T1, size_t clock_T1, size_t synchA_T1, size_t synchB_T1, size_t data0_A_T1, size_t data0_B_T1, size_t data1_A_T1, size_t data1_B_T1,
-	size_t protocolNumber_T2, size_t percentTolerance_T2, size_t clock_T2, size_t synchA_T2, size_t synchB_T2, size_t data0_A_T2, size_t data0_B_T2, size_t data1_A_T2, size_t data1_B_T2
->
-struct isGreater <
-	makeProtocolTimingSpec<protocolNumber_T1, percentTolerance_T1, clock_T1, synchA_T1, synchB_T1, data0_A_T1, data0_B_T1, data1_A_T1, data1_B_T1>,
-	makeProtocolTimingSpec<protocolNumber_T2, percentTolerance_T2, clock_T2, synchA_T2, synchB_T2, data0_A_T2, data0_B_T2, data1_A_T2, data1_B_T2>
->
-{
-	static constexpr size_t usecSynchA_lowerBound_T1 = makeProtocolTimingSpec<protocolNumber_T1, percentTolerance_T1, clock_T1, synchA_T1, synchB_T1, data0_A_T1, data0_B_T1, data1_A_T1, data1_B_T1>::usecSynchA_lowerBound;
-	static constexpr size_t usecSynchA_lowerBound_T2 = makeProtocolTimingSpec<protocolNumber_T2, percentTolerance_T2, clock_T2, synchA_T2, synchB_T2, data0_A_T2, data0_B_T2, data1_A_T2, data1_B_T2>::usecSynchA_lowerBound;
-
-	/* Implement greater: Comparison criteria is usecSynchA_lowerBound. */
-	static constexpr bool VALUE = usecSynchA_lowerBound_T1 > usecSynchA_lowerBound_T2;
-};
-
-
-template<bool greater, typename T1, typename ...R> struct SortRxSpec {
-	static constexpr bool IS_T1_GREATER = isGreater<T1, typename firstType<R...>::type >::VALUE;
-	typename T1::rx_spec_t m=T1::RX;
-	SortRxSpec<IS_T1_GREATER, R...> successor;
-};
-
-template<typename T1, typename ...R> struct SortRxSpec<true, T1, R...> {
-	static constexpr bool IS_T1_GREATER = isGreater<T1, typename firstType<R...>::type >::VALUE;
-	SortRxSpec<IS_T1_GREATER, R...> predecessor;
-	typename T1::rx_spec_t m=T1::RX;
-};
-
-template<bool greater, typename T1> struct SortRxSpec<greater, T1> {
-	typename T1::rx_spec_t m=T1::RX;
-};
-
-template<typename T1> struct SortRxSpec<true, T1> {
-	typename T1::rx_spec_t m=T1::RX;
-};
-
 template<typename T1, typename ...R> struct RxTimingSpecTable {
-	static constexpr bool IS_T1_GREATER = isGreater<T1, typename firstType<R...>::type >::VALUE;
-	SortRxSpec<IS_T1_GREATER, T1, R...> m;
+	typename T1::rx_spec_t mT1=T1::RX;
+	RxTimingSpecTable<R...> mRest;
 	static constexpr size_t ELEMENT_COUNT = sizeof(RxTimingSpecTable) / sizeof(typename T1::rx_spec_t);
 
 	static const typename T1::rx_spec_t* toArray(const RxTimingSpecTable& rxSpecTable) {
-		return reinterpret_cast<const typename T1::rx_spec_t*>(&rxSpecTable.m);
+		return reinterpret_cast<const typename T1::rx_spec_t*>(&rxSpecTable.mT1);
 	}
 
 	const typename T1::rx_spec_t* toArray() const {
@@ -108,13 +62,13 @@ template<typename T1> struct RxTimingSpecTable<T1> {
 //};
 static const RxTimingSpecTable <
 //                           #,  %,  clk,  syA,syB,  d0A,d0B,  d1A,d1B
-	makeProtocolTimingSpec<  7, 20,  150,  2,   62,    1,  6,    6,  1>, // (HS2303-PT)
 	makeProtocolTimingSpec<  1, 20,  350,  1,   31,    1,  3,    3,  1>, // ()
-	makeProtocolTimingSpec<  4, 20,  380,  1,    6,    1,  3,    3,  1>, // ()
-	makeProtocolTimingSpec<  8, 20,  200,  3,  130,    7, 16,    3, 16>, // (Conrad RS-200 RX)
 	makeProtocolTimingSpec<  2, 20,  650,  1,   10,    1,  3,    3,  1>, // ()
+	makeProtocolTimingSpec<  3, 20,  100, 30,   71,    4, 11,    9,  6>, // ()
+	makeProtocolTimingSpec<  4, 20,  380,  1,    6,    1,  3,    3,  1>, // ()
 	makeProtocolTimingSpec<  5, 20,  500,  6,   14,    1,  2,    2,  1>, // ()
-	makeProtocolTimingSpec<  3, 20,  100, 30,   71,    4, 11,    9,  6>  // ()
+	makeProtocolTimingSpec<  7, 20,  150,  2,   62,    1,  6,    6,  1>, // (HS2303-PT)
+	makeProtocolTimingSpec<  8, 20,  200,  3,  130,    7, 16,    3, 16>  // (Conrad RS-200 RX)
 > normalLevelProtocolsTable;
 
 
@@ -139,10 +93,10 @@ static const RxTimingSpecTable <
 //};
 static const RxTimingSpecTable <
 //     		                 #,  %,  clk,  syA,syB,  d0A,d0B,  d1A,d1B
-	makeProtocolTimingSpec< 12, 20,  320,    1, 36,    1,  2,    2,  1>, // (SM5212)
-	makeProtocolTimingSpec< 11, 20,  270,    1, 36,    1,  2,    2,  1>, // (HT12E)
+	makeProtocolTimingSpec<  6, 20,  450,    1, 23,    1,  2,    2,  1>, // (HT6P20B)
 	makeProtocolTimingSpec< 10, 20,  365,    1, 18,    3,  1,    1,  3>, // (1ByOne Doorbell)
-	makeProtocolTimingSpec<  6, 20,  450,    1, 23,    1,  2,    2,  1>  // (HT6P20B)
+	makeProtocolTimingSpec< 11, 20,  270,    1, 36,    1,  2,    2,  1>, // (HT12E)
+	makeProtocolTimingSpec< 12, 20,  320,    1, 36,    1,  2,    2,  1>  // (SM5212)
 > inverseLevelProtocolsTable;
 
 
