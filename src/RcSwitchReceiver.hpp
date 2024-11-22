@@ -27,9 +27,8 @@
 #ifndef RCSWITCHRECEIVER_HPP_
 #define RCSWITCHRECEIVER_HPP_
 
-#include "internal/ProtocolTimingSpec.hpp"
 #include "internal/RcSwitch.hpp"
-
+#include "internal/ProtocolTimingSpec.hpp"
 #include "Arduino.h"
 /**
  * This is the library API class for receiving data from a remote control.
@@ -69,7 +68,7 @@ public:
 	static inline bool available() {return mReceiver.available();}
 
 	/**
-	 * Return the receive value if a value is available. Otherwise 0.
+	 * Return the received value if a value is available. Otherwise 0.
 	 * The first received bit will be reflected as the highest
 	 * significant bit.
 	 * Must not be called, when available returns false.

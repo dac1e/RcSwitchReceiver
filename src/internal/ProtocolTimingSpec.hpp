@@ -212,7 +212,7 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 			(L::usecSynchA_lowerBound < R::usecSynchA_lowerBound) : L::INVERSE_LEVEL < R::INVERSE_LEVEL;
 };
 
-// RxProtocolTable
+// RxProtocolTable, sorted automatically at compile time by inverseLevel flag and usecSynchA_lowerBound
 template<typename ...Ts> struct
 RxProtocolTable {
 private:

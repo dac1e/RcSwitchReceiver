@@ -546,18 +546,8 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 			Array::init();
 	}
 
-	void setRxProtocolTable(const RxTimingSpec* rxTimingSpecTable, size_t tableLength) {
-		size_t i = 0;
-		for(;i < tableLength; i++) {
-			if(rxTimingSpecTable->bInverseLevel) {
-				break;
-			}
-		}
-		mRxTimingSpecTableNormal.first= &rxTimingSpecTable[0];
-		mRxTimingSpecTableNormal.second = i;
-		mRxTimingSpecTableInverse.first= &rxTimingSpecTable[i];
-		mRxTimingSpecTableInverse.second = tableLength-i;
-	}
+	void setRxProtocolTable(const RxTimingSpec *rxTimingSpecTable,
+			size_t tableLength);
 
 
 	/**

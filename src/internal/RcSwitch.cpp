@@ -364,6 +364,20 @@ std::pair<const RxTimingSpec*, size_t> Receiver::getRxTimingTable(
 	return std::make_pair(nullptr, 0);
 }
 
+void Receiver::setRxProtocolTable(const RxTimingSpec *rxTimingSpecTable,
+		size_t tableLength) {
+	size_t i = 0;
+	for (; i < tableLength; i++) {
+		if (rxTimingSpecTable->bInverseLevel) {
+			break;
+		}
+	}
+	mRxTimingSpecTableNormal.first = &rxTimingSpecTable[0];
+	mRxTimingSpecTableNormal.second = i;
+	mRxTimingSpecTableInverse.first = &rxTimingSpecTable[i];
+	mRxTimingSpecTableInverse.second = tableLength - i;
+}
+
 } /* namespace RcSwitch */
 
 #include <UartClass.h>
