@@ -523,7 +523,6 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	enum STATE state() const;
 
 	rxTimingSpecTable_t getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
-
 	void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
 	void push(uint32_t microSecDuration, const int pinLevel);
 	PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
