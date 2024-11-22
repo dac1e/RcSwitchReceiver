@@ -549,7 +549,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	/**
 	 * Set the protocol table for receiving data.
 	 */
-	void setRxProtocolTable(const rxTimingSpecTable_t& rxTimingSpecTable);
+	void setRxTimingSpecTable(const rxTimingSpecTable_t& rxTimingSpecTable);
 
 	/**
 	 * Evaluate a new pulse that has been received. Will only

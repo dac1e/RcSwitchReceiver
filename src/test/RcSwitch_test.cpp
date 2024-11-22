@@ -303,7 +303,7 @@ void RcSwitch_test::tooShortMessagePacketTest(uint32_t& usec, Receiver &receiver
 
 void RcSwitch_test::testFaultyDataRx() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
+	receiver.setRxTimingSpecTable(rxProtocolTable.toTimingSpecTable());
 	uint32_t usec = 0;
 
 	usec += 100; // start hi pulse 100 usec duration.
@@ -323,7 +323,7 @@ void RcSwitch_test::testFaultyDataRx() const {
 
 void RcSwitch_test::testDataRx() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
+	receiver.setRxTimingSpecTable(rxProtocolTable.toTimingSpecTable());
 	uint32_t usec = 0;
 
 	usec += 100; // start hi pulse 100 usec duration.
@@ -357,7 +357,7 @@ void RcSwitch_test::testDataRx() const {
 
 void RcSwitch_test::testSynchRx() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
+	receiver.setRxTimingSpecTable(rxProtocolTable.toTimingSpecTable());
 	uint32_t usec = 0;
 
 	usec += 100;  // lo pulse  100 usec duration.
@@ -380,7 +380,7 @@ void RcSwitch_test::testSynchRx() const {
 
 void RcSwitch_test::testProtocolCandidates() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
+	receiver.setRxTimingSpecTable(rxProtocolTable.toTimingSpecTable());
 
 	Pulse pulse_0 = {				// Hi level pulse too short
 			239, PULSE_LEVEL::HI

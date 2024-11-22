@@ -364,7 +364,7 @@ rxTimingSpecTable_t Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) 
 	return std::make_pair(nullptr, 0);
 }
 
-void Receiver::setRxProtocolTable(const rxTimingSpecTable_t& rxTimingSpecTable) {
+void Receiver::setRxTimingSpecTable(const rxTimingSpecTable_t& rxTimingSpecTable) {
 	size_t i = 0;
 	for (; i < rxTimingSpecTable.second; i++) {
 		if (rxTimingSpecTable.first[i].bInverseLevel) {
