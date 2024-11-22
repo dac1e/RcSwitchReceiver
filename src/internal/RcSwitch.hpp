@@ -546,8 +546,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 			Array::init();
 	}
 
-	void setRxProtocolTable(const RxTimingSpec *rxTimingSpecTable,
-			size_t tableLength);
+	void setRxProtocolTable(const std::pair<const RcSwitch::RxTimingSpec*, size_t>& timingSpecTable);
 
 
 	/**

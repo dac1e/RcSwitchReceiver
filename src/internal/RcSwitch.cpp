@@ -135,9 +135,10 @@ static inline void collectProtocolCandidates(const std::pair<const RxTimingSpec*
 		const RxTimingSpec& prot = protocol.first[i];
 		if(pulseA.mMicroSecDuration <
 				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
-			/* Protocols are sorted in ascending order of pulseA.mMicroSecDuration
-			 * So further protocols will have even higher mMicroSecDuration. Hence we can
-			 * break here immediately.
+			/* Protocols are sorted in ascending order of synchronization
+			 * pulseA lower bound.
+			 * So further protocols will have even higher duration. Hence
+			 * we can break here immediately.
 			 */
 			return;
 		}
@@ -158,7 +159,7 @@ static inline void collectProtocolCandidates(const std::pair<const RxTimingSpec*
 // ======== ProtocolCandidates =========
 size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
 	 const std::pair<const RxTimingSpec*, size_t>& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
-	 RCSWITCH_ASSERT(protocolCandidateIndex < size());
+	 RCSWITCH_ASSERT(protocolCandidateIndex < mProtocolCandidates.size());
 	 const size_t protocolIndex = mProtocolCandidates.at(protocolCandidateIndex);
 	 RCSWITCH_ASSERT(protocolIndex < protocol.second);
 	 return protocol.first[protocolIndex].protocolNumber;
@@ -351,10 +352,10 @@ int Receiver::receivedProtocol(const size_t index) const {
 std::pair<const RxTimingSpec*, size_t> Receiver::getRxTimingTable(
 		PROTOCOL_GROUP_ID protocolGroup) const {
 	switch (protocolGroup) {
-	case PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS:
+	case PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS:
 		return mRxTimingSpecTableNormal;
 		break;
-	case PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS:
+	case PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS:
 		return mRxTimingSpecTableInverse;
 		break;
 	case PROTOCOL_GROUP_ID::UNKNOWN_PROTOCOL:
@@ -364,18 +365,17 @@ std::pair<const RxTimingSpec*, size_t> Receiver::getRxTimingTable(
 	return std::make_pair(nullptr, 0);
 }
 
-void Receiver::setRxProtocolTable(const RxTimingSpec *rxTimingSpecTable,
-		size_t tableLength) {
+void Receiver::setRxProtocolTable(const std::pair<const RcSwitch::RxTimingSpec*, size_t>& timingSpecTable) {
 	size_t i = 0;
-	for (; i < tableLength; i++) {
-		if (rxTimingSpecTable->bInverseLevel) {
+	for (; i < timingSpecTable.second; i++) {
+		if (timingSpecTable.first[i].bInverseLevel) {
 			break;
 		}
 	}
-	mRxTimingSpecTableNormal.first = &rxTimingSpecTable[0];
+	mRxTimingSpecTableNormal.first = &timingSpecTable.first[0];
 	mRxTimingSpecTableNormal.second = i;
-	mRxTimingSpecTableInverse.first = &rxTimingSpecTable[i];
-	mRxTimingSpecTableInverse.second = tableLength - i;
+	mRxTimingSpecTableInverse.first = &timingSpecTable.first[i];
+	mRxTimingSpecTableInverse.second = timingSpecTable.second - i;
 }
 
 } /* namespace RcSwitch */

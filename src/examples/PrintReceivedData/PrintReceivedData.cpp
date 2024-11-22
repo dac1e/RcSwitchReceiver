@@ -1,7 +1,7 @@
 
 
 #include "RcSwitchReceiver.hpp"
-// #include "test/RcSwitch_test.hpp"
+#include "test/RcSwitch_test.hpp"
 #include <Arduino.h>
 
 static const RxProtocolTable <
@@ -29,6 +29,10 @@ UARTClass& serial = Serial3;
 //The setup function is called once at startup of the sketch
 void setup()
 {
+#if ENABLE_RCSWITCH_TEST
+	RcSwitch::RcSwitch_test::theTest.run();
+#endif
+
 	serial.begin(9600);
 	delay(100);
 	serial.println();
@@ -36,11 +40,7 @@ void setup()
 
 #if DEBUG_RCSWITCH_PROTOCOL_SPEC
 	rcSwitchReceiver.dumpRxTimingTable(serial);
-	delay(300);
-#endif
-
-#if ENABLE_RCSWITCH_TEST
-	RcSwitch::RcSwitch_test::theTest.run();
+	delay(500);
 #endif
 
 }

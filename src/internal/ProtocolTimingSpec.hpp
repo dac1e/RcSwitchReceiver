@@ -230,6 +230,10 @@ public:
 	RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
 	const RcSwitch::RxTimingSpec* toArray() const {return toArray(*this);}
+	inline operator std::pair<const RcSwitch::RxTimingSpec*, size_t>() const {
+		constexpr size_t rowCount = ROW_COUNT;
+		return std::make_pair(toArray(), rowCount);
+	}
 };
 
 template<typename T> struct
