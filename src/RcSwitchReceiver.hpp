@@ -144,14 +144,14 @@ public:
 	/**
 	 * Print out the receiver's Rx timing table. Main purpose is for debugging.
 	 */
-	static void dumpRxTimingTable(UARTClass& serial) {mReceiver.dumpRxTimingTable(serial);}
+	static void dumpRxTimingSpecTable(UARTClass& serial) {mReceiver.dumpRxTimingSpecTable(serial);}
 
 	/**
 	 * Print out any Rx timing table. Main purpose is for debugging.
 	 */
-	static void dumpRxTimingTable(UARTClass& serial, const rxTimingSpecTable_t& rxTimingSpecTable)
+	static void dumpRxTimingSpecTable(UARTClass& serial, const rxTimingSpecTable_t& rxTimingSpecTable)
 	{
-		mReceiver.dumpRxTimingTable(serial, rxTimingSpecTable);
+		mReceiver.dumpRxTimingSpecTable(serial, rxTimingSpecTable);
 	}
 };
 

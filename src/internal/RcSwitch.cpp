@@ -383,7 +383,7 @@ void Receiver::setRxProtocolTable(const rxTimingSpecTable_t& rxTimingSpecTable) 
 
 namespace RcSwitch {
 
-void Receiver::dumpRxTimingTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable) {
+void Receiver::dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable) {
 	for (size_t i = 0; i < rxtimingSpecTable.second; i++) {
 		const RxTimingSpec &p = rxtimingSpecTable.first[i];
 		if (p.protocolNumber < 10) {
@@ -423,7 +423,7 @@ void Receiver::dumpRxTimingTable(UARTClass &serial, const rxTimingSpecTable_t &r
 	}
 }
 
-void Receiver::dumpRxTimingTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGroup) {
+void Receiver::dumpRxTimingSpecTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGroup) {
 	if(protocolGroup == PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS ||
 	   protocolGroup == PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS) {
 
@@ -431,7 +431,7 @@ void Receiver::dumpRxTimingTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGr
 				protocolGroup == PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS ?
 						mRxTimingSpecTableNormal : mRxTimingSpecTableInverse;
 
-		dumpRxTimingTable(serial, timingTable);
+		dumpRxTimingSpecTable(serial, timingTable);
 	}
 }
 

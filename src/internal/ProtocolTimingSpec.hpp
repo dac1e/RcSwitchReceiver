@@ -153,7 +153,7 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 
 
 template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B, bool inverseLevel = false>
-struct makeProtocolTimingSpec { // Calculate the timing from the protocol definition.
+struct makeTimingSpec { // Calculate the timing specification from the protocol definition.
 	static constexpr size_t PROTOCOL_NUMBER = protocolNumber;
 	static constexpr bool INVERSE_LEVEL = inverseLevel;
 
