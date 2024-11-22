@@ -22,15 +22,40 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
+#include "../internal/ProtocolTimingSpec.hpp"
 #include "RcSwitch_test.hpp"
 
 #if ENABLE_RCSWITCH_TEST
 #include <assert.h>
 
+#if defined max // max macro is not compatible with limits standard library.
+#undef max
+#endif
+
+#if defined min // min macro is not compatible with limits standard library.
+#undef min
+#endif
+
 namespace RcSwitch {
 
 /** Call RcSwitch::RcSwitch_test::theTest.run() to execute tests. */
 RcSwitch_test RcSwitch_test::theTest;
+
+static const RxProtocolTable <
+//                           #,  %,  clk,  syA,syB,  d0A,d0B,  d1A,d1B  inverseLevel
+	makeProtocolTimingSpec<  1, 20,  350,  1,   31,    1,  3,    3,  1>, // ()
+	makeProtocolTimingSpec<  2, 20,  650,  1,   10,    1,  3,    3,  1>, // ()
+	makeProtocolTimingSpec<  3, 20,  100, 30,   71,    4, 11,    9,  6>, // ()
+	makeProtocolTimingSpec<  4, 20,  380,  1,    6,    1,  3,    3,  1>, // ()
+	makeProtocolTimingSpec<  5, 20,  500,  6,   14,    1,  2,    2,  1>, // ()
+	makeProtocolTimingSpec<  6, 20,  450,    1, 23,    1,  2,    2,  1, true>, // (HT6P20B)
+	makeProtocolTimingSpec<  7, 20,  150,  2,   62,    1,  6,    6,  1>, // (HS2303-PT)
+	makeProtocolTimingSpec<  8, 20,  200,  3,  130,    7, 16,    3, 16>, // (Conrad RS-200 RX)
+
+	makeProtocolTimingSpec< 10, 20,  365,    1, 18,    3,  1,    1,  3, true>, // (1ByOne Doorbell)
+	makeProtocolTimingSpec< 11, 20,  270,    1, 36,    1,  2,    2,  1, true>, // (HT12E)
+	makeProtocolTimingSpec< 12, 20,  320,    1, 36,    1,  2,    2,  1, true>  // (SM5212)
+> rxTimingSpecTable;
 
 /** Message repeat is required for the message packet end detection */
 constexpr size_t MIN_MSG_PACKET_REPEATS = 1;
@@ -137,6 +162,7 @@ static const TxDataBit invalidMessagePacket_secondPulseTooLong[] = {
 };
 
 #if DEBUG_RCSWITCH
+
 template<> inline const int& INITIAL_VALUE<int>() {
 	static const int value = std::numeric_limits<int>::max();
 	return value;
@@ -277,6 +303,7 @@ void RcSwitch_test::tooShortMessagePacketTest(uint32_t& usec, Receiver &receiver
 
 void RcSwitch_test::testFaultyDataRx() const {
 	Receiver receiver;
+	receiver.setRxProtocolTable(rxTimingSpecTable.toArray(), rxTimingSpecTable.ROW_COUNT);
 	uint32_t usec = 0;
 
 	usec += 100; // start hi pulse 100 usec duration.
@@ -296,6 +323,7 @@ void RcSwitch_test::testFaultyDataRx() const {
 
 void RcSwitch_test::testDataRx() const {
 	Receiver receiver;
+	receiver.setRxProtocolTable(rxTimingSpecTable.toArray(), rxTimingSpecTable.ROW_COUNT);
 	uint32_t usec = 0;
 
 	usec += 100; // start hi pulse 100 usec duration.
@@ -329,6 +357,7 @@ void RcSwitch_test::testDataRx() const {
 
 void RcSwitch_test::testSynchRx() const {
 	Receiver receiver;
+	receiver.setRxProtocolTable(rxTimingSpecTable.toArray(), rxTimingSpecTable.ROW_COUNT);
 	uint32_t usec = 0;
 
 	usec += 100;  // lo pulse  100 usec duration.
@@ -351,6 +380,7 @@ void RcSwitch_test::testSynchRx() const {
 
 void RcSwitch_test::testProtocolCandidates() const {
 	Receiver receiver;
+	receiver.setRxProtocolTable(rxTimingSpecTable.toArray(), rxTimingSpecTable.ROW_COUNT);
 
 	Pulse pulse_0 = {				// Hi level pulse too short
 			239, PULSE_LEVEL::HI
@@ -366,9 +396,10 @@ void RcSwitch_test::testProtocolCandidates() const {
 	pulse_0.mMicroSecDuration = 280;
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 2); 					// Match protocol #1 and #7
+
 	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  	// Check protocol candidates
 		static const size_t expectedProtocols[] = {7,1};
-		assert(receiver.mProtocolCandidates.getProtcolNumber(i) == expectedProtocols[i]);
+		assert(receiver.getProtcolNumber(i) == expectedProtocols[i]);
 	}
 
 	receiver.mProtocolCandidates.reset();						// Remove protocol candidates
@@ -385,7 +416,7 @@ void RcSwitch_test::testProtocolCandidates() const {
 	assert(receiver.mProtocolCandidates.size() == 1); 			// No matching protocol
 	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  // Check protocol candidates
 		static const size_t expectedProtocols[] = {4};
-		assert(receiver.mProtocolCandidates.getProtcolNumber(i) == expectedProtocols[i]);
+		assert(receiver.getProtcolNumber(i) == expectedProtocols[i]);
 	}
 }
 

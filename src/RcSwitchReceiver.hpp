@@ -27,9 +27,10 @@
 #ifndef RCSWITCHRECEIVER_HPP_
 #define RCSWITCHRECEIVER_HPP_
 
-#include "Arduino.h"
+#include "internal/ProtocolTimingSpec.hpp"
 #include "internal/RcSwitch.hpp"
 
+#include "Arduino.h"
 /**
  * This is the library API class for receiving data from a remote control.
  * The IO pin to be used is defined at compile time by the template
@@ -51,23 +52,21 @@ template<int IOPIN> class RcSwitchReceiver {
 	}
 public:
 
-//	template<size_t N> void begin(const Protocol[N] protocol) {
-//
-//	}
-
 	/**
 	 * Sets up the receiver to receive interrupts from the IOPIN.
 	 */
-	void begin() {
-	  pinMode(IOPIN, INPUT_PULLUP);
+	template<typename T, typename ...R>
+	static void begin(const RcSwitch::RxProtocolTable<T, R...>& timingSpecTable) {
+		pinMode(IOPIN, INPUT_PULLUP);
 		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
+		mReceiver.setRxProtocolTable(timingSpecTable.toArray(), timingSpecTable.ROW_COUNT);
 	}
 
 	/**
 	 * Returns true, when a new received value is available.
 	 * Can be called at any time.
 	 */
-	inline bool available() const {return mReceiver.available();}
+	static inline bool available() {return mReceiver.available();}
 
 	/**
 	 * Return the receive value if a value is available. Otherwise 0.
@@ -75,7 +74,7 @@ public:
 	 * significant bit.
 	 * Must not be called, when available returns false.
 	 */
-	inline uint32_t receivedValue() const {return mReceiver.receivedValue();}
+	static inline uint32_t receivedValue() {return mReceiver.receivedValue();}
 
 	/**
 	 * Return the number of received bits. Can be greater than
@@ -84,14 +83,14 @@ public:
 	 * can be increased to avoid such an overflow.
 	 * Must not be called, when available returns false.
 	 */
-	inline size_t receivedBitsCount() const {return mReceiver.receivedBitsCount();}
+	static inline size_t receivedBitsCount() {return mReceiver.receivedBitsCount();}
 
 	/**
 	 * Return the number of protocols that matched the synch and
 	 * data pulses for the received value.
 	 * Must not be called, when available returns false.
 	 */
-	inline 	size_t receivedProtocolCount() const {return mReceiver.receivedProtocolCount();}
+	static inline 	size_t receivedProtocolCount() {return mReceiver.receivedProtocolCount();}
 
 	/**
 	 * Return the protocol number that matched the synch and data
@@ -120,25 +119,29 @@ public:
 	 * }
 	 *
 	 */
-	inline int receivedProtocol(const size_t index = 0) const
+	static inline int receivedProtocol(const size_t index = 0)
 		{return mReceiver.receivedProtocol(index);}
 
 	/**
 	 * Clear the last received value in order to receive a new one.
 	 * Can be called at any time.
 	 */
-	inline void resetAvailable() {if(mReceiver.available()) {mReceiver.reset();}}
+	static inline void resetAvailable() {if(mReceiver.available()) {mReceiver.reset();}}
 
 	/**
 	 * Suspend receiving new message packets.
 	 */
-	void suspend() {mReceiver.suspend();}
+	static void suspend() {mReceiver.suspend();}
 
 	/**
 	 * Resume receiving new message packets.
 	 */
-	void resume() {mReceiver.resume();}
+	static void resume() {mReceiver.resume();}
 
+	/**
+	 * Print out the Rx timing table. Main purpose is for debugging.
+	 */
+	static void dumpRxTimingTable(UARTClass& serial) {mReceiver.dumpRxTimingTable(serial);}
 };
 
 /** The receiver instance for this IO pin. */

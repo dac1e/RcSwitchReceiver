@@ -24,9 +24,8 @@
 
 #include <limits>
 
-#include "RcSwitch.hpp"
-
 #include "ProtocolTimingSpec.hpp"
+#include "RcSwitch.hpp"
 
 
 #if defined max // max macro is not compatible with limits standard library.
@@ -130,15 +129,14 @@ static PulseTypes pulseBtoPulseTypes(const RxTimingSpec& protocol, const Pulse &
 	return result;
 }
 
-static inline void collectNormalLevelProtocolCandidates(
+static inline void collectProtocolCandidates(const std::pair<const RxTimingSpec*, size_t>& protocol,
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
-	const std::pair<const RxTimingSpec*, size_t>& protocol = getRxTimingTable(NORMAL_LEVEL_PROTOCOLS);
 	for(size_t i = 0; i < protocol.second; i++) {
 		const RxTimingSpec& prot = protocol.first[i];
 		if(pulseA.mMicroSecDuration <
 				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
-			/* Protocols are sorted in ascending order of synch.lowTimeRange.microSecLowerBound
-			 * So further protocols will have even higher microSecLowerBound. Hence we can
+			/* Protocols are sorted in ascending order of pulseA.mMicroSecDuration
+			 * So further protocols will have even higher mMicroSecDuration. Hence we can
 			 * break here immediately.
 			 */
 			return;
@@ -157,34 +155,11 @@ static inline void collectNormalLevelProtocolCandidates(
 	}
 }
 
-static inline void collectInverseLevelProtocolCandidates(
-		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
-	const std::pair<const RxTimingSpec*, size_t>& protocol = getRxTimingTable(INVERSE_LEVEL_PROTOCOLS);
-	for(size_t i = 0; i < protocol.second; i++) {
-		const RxTimingSpec& prot = protocol.first[i];
-		if(pulseA.mMicroSecDuration <
-				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
-			/* Protocols are sorted in ascending order of synch.microSecHighTimeLowerBound
-			 * So further protocols will have even higher microSecHighTimeLowerBound. Hence
-			 * we can break here immediately. */
-			return;
-		}
-
-		if(pulseB.mMicroSecDuration >=
-				prot.synchronizationPulsePair.durationB.lowerBound) {
-			if(pulseB.mMicroSecDuration
-					< prot.synchronizationPulsePair.durationB.upperBound) {
-				protocolCandidates.push(i);
-			}
-		}
-	}
-}
-
 // ======== ProtocolCandidates =========
-size_t ProtocolCandidates::getProtcolNumber(const size_t protocolCandidateIndex) const {
-	 const std::pair<const RxTimingSpec*, size_t>& protocol = getRxTimingTable(mProtocolGroupId);
+size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
+	 const std::pair<const RxTimingSpec*, size_t>& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	 RCSWITCH_ASSERT(protocolCandidateIndex < size());
-	 const size_t protocolIndex = at(protocolCandidateIndex);
+	 const size_t protocolIndex = mProtocolCandidates.at(protocolCandidateIndex);
 	 RCSWITCH_ASSERT(protocolIndex < protocol.second);
 	 return protocol.first[protocolIndex].protocolNumber;
 }
@@ -194,10 +169,10 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
   if(pulse_0.mPulseLevel != pulse_1.mPulseLevel) {
 		if(pulse_0.mPulseLevel == PULSE_LEVEL::HI) {
 			mProtocolCandidates.setProtocolGroup(NORMAL_LEVEL_PROTOCOLS);
-			collectNormalLevelProtocolCandidates(mProtocolCandidates, pulse_0, pulse_1);
+			RcSwitch::collectProtocolCandidates(getRxTimingTable(NORMAL_LEVEL_PROTOCOLS), mProtocolCandidates, pulse_0, pulse_1);
 		} else if(pulse_0.mPulseLevel == PULSE_LEVEL::LO) {
 			mProtocolCandidates.setProtocolGroup(INVERSE_LEVEL_PROTOCOLS);
-			collectInverseLevelProtocolCandidates(mProtocolCandidates, pulse_0, pulse_1);
+			RcSwitch::collectProtocolCandidates(getRxTimingTable(INVERSE_LEVEL_PROTOCOLS), mProtocolCandidates, pulse_0, pulse_1);
 		} else {
 			 /* UNKNOWN pulse level given as argument */
 			RCSWITCH_ASSERT(false);
@@ -368,9 +343,81 @@ uint32_t Receiver::receivedValue() const {
 
 int Receiver::receivedProtocol(const size_t index) const {
 	if(index < mProtocolCandidates.size()) {
-		return mProtocolCandidates.getProtcolNumber(index);
+		return getProtcolNumber(index);
 	}
 	return -1;
+}
+
+std::pair<const RxTimingSpec*, size_t> Receiver::getRxTimingTable(
+		PROTOCOL_GROUP_ID protocolGroup) const {
+	switch (protocolGroup) {
+	case PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS:
+		return mRxTimingSpecTableNormal;
+		break;
+	case PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS:
+		return mRxTimingSpecTableInverse;
+		break;
+	case PROTOCOL_GROUP_ID::UNKNOWN_PROTOCOL:
+		RCSWITCH_ASSERT(false);
+		break;
+	}
+	return std::make_pair(nullptr, 0);
+}
+
+} /* namespace RcSwitch */
+
+#include <UartClass.h>
+
+namespace RcSwitch {
+
+void Receiver::dumpRxTimingTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGroup) {
+	if(protocolGroup == PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS ||
+	   protocolGroup == PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS) {
+
+		const std::pair<const RxTimingSpec*, size_t> timingTable =
+				protocolGroup == PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS ?
+						mRxTimingSpecTableNormal : mRxTimingSpecTableInverse;
+
+		for (size_t i = 0; i < timingTable.second; i++) {
+			const RxTimingSpec& p = timingTable.first[i];
+
+			if(p.protocolNumber < 10) {
+				serial.print(' ');
+			}
+			serial.print(p.protocolNumber);
+
+			if(not p.bInverseLevel) {
+				serial.print(", normal");
+			} else {
+				serial.print(",inverse");
+			}
+			serial.print(",SY:[");
+			serial.print(p.synchronizationPulsePair.durationA.lowerBound);
+			serial.print("..");
+			serial.print(p.synchronizationPulsePair.durationA.upperBound);
+			serial.print("],[");
+			serial.print(p.synchronizationPulsePair.durationB.lowerBound);
+			serial.print("..");
+			serial.print(p.synchronizationPulsePair.durationB.upperBound);
+			serial.print("],D0:[");
+			serial.print(p.data0pulsePair.durationA.lowerBound);
+			serial.print("..");
+			serial.print(p.data0pulsePair.durationA.upperBound);
+			serial.print("],[");
+			serial.print(p.data0pulsePair.durationB.lowerBound);
+			serial.print("..");
+			serial.print(p.data0pulsePair.durationB.upperBound);
+			serial.print("],D1:[");
+			serial.print(p.data1pulsePair.durationA.lowerBound);
+			serial.print("..");
+			serial.print(p.data1pulsePair.durationA.upperBound);
+			serial.print("],[");
+			serial.print(p.data1pulsePair.durationB.lowerBound);
+			serial.print("..");
+			serial.print(p.data1pulsePair.durationB.upperBound);
+			serial.println("]");
+		}
+	}
 }
 
 } /* namespace RcSwitch */

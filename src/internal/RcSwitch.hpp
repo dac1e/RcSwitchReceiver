@@ -25,11 +25,20 @@
 #pragma once
 
 #ifndef _RCSWTICH_INTERNAL_HPP_
-#define RCSWTICH_INTERNAL_HPP_
+#define _RCSWTICH_INTERNAL_HPP_
 
 #include <sys/types.h>
 #include <stdint.h>
 #include <algorithm>
+
+#define DEBUG_RCSWITCH true
+
+#if DEBUG_RCSWITCH
+#include <assert.h>
+#endif
+
+/** Forward declaration of UARTClass */
+class UARTClass;
 
 /** Forward declaration of the class providing the API. */
 template<int IOPIN> class RcSwitchReceiver;
@@ -61,10 +70,8 @@ namespace RcSwitch {
  * 3) Maps macro RCSWITCH_ASSERT to the system function
  * assert.
  */
-#define DEBUG_RCSWITCH true
 
 #if DEBUG_RCSWITCH
-#include <assert.h>
 /**
  * The size of the pulse tracer.
  * Can be changed.
@@ -413,7 +420,6 @@ public:
 
 	void setProtocolGroup(const PROTOCOL_GROUP_ID protocolGroup) {mProtocolGroupId=protocolGroup;}
 	PROTOCOL_GROUP_ID getProtocolGroup()const {return mProtocolGroupId;}
-	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
 };
 
 
@@ -463,6 +469,9 @@ public:
 	using baseClass::reset;
 };
 
+/** Forward declaration */
+struct RxTimingSpec;
+
 /**
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes
  * these last pulses, whenever a new pulse arrives by a new interrupt.
@@ -497,7 +506,11 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	}
 #endif
 
+	std::pair<const RxTimingSpec*, size_t> mRxTimingSpecTableNormal;
+	std::pair<const RxTimingSpec*, size_t> mRxTimingSpecTableInverse;
+
 	MessagePacket mReceivedMessagePacket;
+
 	volatile bool mMessageAvailable;
 	volatile bool mSuspended;
 
@@ -508,10 +521,14 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
 	enum STATE state() const;
 
+	std::pair<const RxTimingSpec*, size_t> getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
+
 	void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
 	void push(uint32_t microSecDuration, const int pinLevel);
 	PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
 	void retry();
+	void dumpRxTimingTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGroup);
+
 
 	/** ========================================================================== */
 	/** ========= Methods used by API class RcSwitchReceiver ===================== */
@@ -519,13 +536,29 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	/**
 	 * Constructor.
 	 */
+
 	Receiver()
-			: mMessageAvailable(false), mSuspended(false)
+		    : mRxTimingSpecTableNormal(nullptr, 0), mRxTimingSpecTableInverse(nullptr, 0)
+		    , mMessageAvailable(false), mSuspended(false)
 			, mDataModePulseCount(0), mMicrosecLastInterruptTime(0)
 			{
 			/* Initialize pulse elements. */
 			Array::init();
 	}
+
+	void setRxProtocolTable(const RxTimingSpec* rxTimingSpecTable, size_t tableLength) {
+		size_t i = 0;
+		for(;i < tableLength; i++) {
+			if(rxTimingSpecTable->bInverseLevel) {
+				break;
+			}
+		}
+		mRxTimingSpecTableNormal.first= &rxTimingSpecTable[0];
+		mRxTimingSpecTableNormal.second = i;
+		mRxTimingSpecTableInverse.first= &rxTimingSpecTable[i];
+		mRxTimingSpecTableInverse.second = tableLength-i;
+	}
+
 
 	/**
 	 * Evaluate a new pulse that has been received. Will only
@@ -562,8 +595,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	/**
 	 * Refer to corresponding API class RcSwitchReceiver;
 	 */
-	inline size_t receivedProtocolCount() const
-		{return mProtocolCandidates.size();}
+	inline size_t receivedProtocolCount() const {return mProtocolCandidates.size();}
 
 	/**
 	 * Refer to corresponding API class RcSwitchReceiver;
@@ -579,6 +611,16 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	 * Refer to corresponding API class RcSwitchReceiver;
 	 */
 	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
+
+	/**
+	 * Refer to corresponding API class RcSwitchReceiver;
+	 */
+	inline void dumpRxTimingTable(UARTClass& serial) {
+		dumpRxTimingTable(serial, PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS);
+		dumpRxTimingTable(serial, PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS);
+	}
+
+	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
 };
 
 } /* namespace RcSwitch */
