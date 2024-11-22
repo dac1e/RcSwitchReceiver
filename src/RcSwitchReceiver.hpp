@@ -55,7 +55,7 @@ public:
 	 * Sets up the receiver to receive interrupts from the IOPIN.
 	 */
 	template<typename T, typename ...R>
-	static void begin(const RcSwitch::RxProtocolTable<T, R...>& timingSpecTable) {
+	static void begin(const RxProtocolTable<T, R...>& timingSpecTable) {
 		pinMode(IOPIN, INPUT_PULLUP);
 		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
 		mReceiver.setRxProtocolTable(timingSpecTable.toArray(), timingSpecTable.ROW_COUNT);

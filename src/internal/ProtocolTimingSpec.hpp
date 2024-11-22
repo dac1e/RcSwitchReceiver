@@ -146,6 +146,14 @@ struct TxTimingSpec { /* Currently only required for test */
 	TxPulsePairTiming	 data1PulsePair;
 };
 
+template<typename L, typename R> struct isRxTimingSpecLower {
+	static constexpr bool value = L::INVERSE_LEVEL == R::INVERSE_LEVEL ?
+			(L::usecSynchA_lowerBound < R::usecSynchA_lowerBound) : L::INVERSE_LEVEL < R::INVERSE_LEVEL;
+};
+
+} // namespace RcSwitch
+
+
 template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B, bool inverseLevel = false>
 struct makeProtocolTimingSpec {
 	static constexpr size_t PROTOCOL_NUMBER = protocolNumber;
@@ -172,7 +180,7 @@ struct makeProtocolTimingSpec {
 	static constexpr size_t uSecData1_B_lowerBound = uSecData1_B * (100-percentTolerance) / 100;
 	static constexpr size_t uSecData1_B_upperBound = uSecData1_B * (100+percentTolerance) / 100;
 
-	typedef RxTimingSpec rx_spec_t;
+	typedef RcSwitch::RxTimingSpec rx_spec_t;
 	static constexpr rx_spec_t RX = {PROTOCOL_NUMBER, INVERSE_LEVEL,
 		{	/* synch pulses */
 			{usecSynchA_lowerBound, usecSynchA_upperBound},     {usecSynchB_lowerBound, usecSynchB_upperBound}
@@ -192,7 +200,7 @@ struct makeProtocolTimingSpec {
 	};
 
 	/* Currently only required for tests */
-	typedef TxTimingSpec tx_spec_t;
+	typedef RcSwitch::TxTimingSpec tx_spec_t;
 	static constexpr tx_spec_t TX = {protocolNumber, inverseLevel,
 		{	/* synch pulses */
 			uSecSynchA, uSecSynchB
@@ -207,55 +215,50 @@ struct makeProtocolTimingSpec {
 	};
 };
 
-template<typename L, typename R> struct isRxTimingSpecLower {
-	static constexpr bool value = L::INVERSE_LEVEL == R::INVERSE_LEVEL ?
-			(L::usecSynchA_lowerBound < R::usecSynchA_lowerBound) : L::INVERSE_LEVEL < R::INVERSE_LEVEL;
-};
 
 // RxProtocolTable, sorted automatically at compile time by inverseLevel flag and usecSynchA_lowerBound
 template<typename ...Ts> struct
 RxProtocolTable {
 private:
-	using T = typename typeselect::select<isRxTimingSpecLower, Ts...>::selected;
-	using R = typename typeselect::select<isRxTimingSpecLower, Ts...>::rest;
-	static const RxTimingSpec* toArray(const RxProtocolTable& rxSpecTable) {
-		return reinterpret_cast<const RxTimingSpec*>(&rxSpecTable.m);
+	using T = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::selected;
+	using R = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::rest;
+	static const RcSwitch::RxTimingSpec* toArray(const RxProtocolTable& rxSpecTable) {
+		return reinterpret_cast<const RcSwitch::RxTimingSpec*>(&rxSpecTable.m);
 	}
 public:
-	static constexpr size_t ROW_COUNT = sizeof(RxProtocolTable) / sizeof(RxTimingSpec);
-	RxTimingSpec m = T::RX;
+	static constexpr size_t ROW_COUNT = sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
+	RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
-	const RxTimingSpec* toArray() const {return toArray(*this);}
+	const RcSwitch::RxTimingSpec* toArray() const {return toArray(*this);}
 };
 
 template<typename T> struct
 RxProtocolTable<T> {
 private:
-	static const RxTimingSpec* toArray(const RxProtocolTable& rxSpecTable) {
-		return reinterpret_cast<const RxTimingSpec*>(&rxSpecTable.m);
+	static const RcSwitch::RxTimingSpec* toArray(const RxProtocolTable& rxSpecTable) {
+		return reinterpret_cast<const RcSwitch::RxTimingSpec*>(&rxSpecTable.m);
 	}
 public:
-	static constexpr size_t ROW_COUNT = sizeof(RxProtocolTable) / sizeof(RxTimingSpec);
-	RxTimingSpec m = T::RX;
-	const RxTimingSpec* toArray() const {return toArray(*this);}
+	static constexpr size_t ROW_COUNT = sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
+	RcSwitch::RxTimingSpec m = T::RX;
+	const RcSwitch::RxTimingSpec* toArray() const {return toArray(*this);}
 };
 
 template<typename ...Ts> struct
 RxProtocolTable<std::tuple<Ts...>> {
 private:
-	using T = typename typeselect::select<isRxTimingSpecLower, Ts...>::selected;
-	using R = typename typeselect::select<isRxTimingSpecLower, Ts...>::rest;
+	using T = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::selected;
+	using R = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::rest;
 public:
-	RxTimingSpec m = T::RX;
+	RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
 };
 
 template<typename T> struct
 RxProtocolTable<std::tuple<T>> {
-	RxTimingSpec m = T::RX;
+	RcSwitch::RxTimingSpec m = T::RX;
 };
 
-} // namespace RcSwitch
 
 
 #endif /* RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_ */

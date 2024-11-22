@@ -4,8 +4,7 @@
 // #include "test/RcSwitch_test.hpp"
 #include <Arduino.h>
 
-using namespace RcSwitch;
-static const RcSwitch::RxProtocolTable <
+static const RxProtocolTable <
 //                           #,  %,  clk,  syA,syB,  d0A,d0B,  d1A,d1B , inverseLevel
 	makeProtocolTimingSpec<  1, 20,  350,  1,   31,    1,  3,    3,  1>, 		// ()
 	makeProtocolTimingSpec<  2, 20,  650,  1,   10,    1,  3,    3,  1>, 		// ()
