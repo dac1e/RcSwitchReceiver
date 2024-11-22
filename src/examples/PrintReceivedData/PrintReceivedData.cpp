@@ -1,11 +1,12 @@
 
 
 #include "RcSwitchReceiver.hpp"
-#include "test/RcSwitch_test.hpp"
+// #include "test/RcSwitch_test.hpp" // Comment in, if you want to run the test.
 #include <Arduino.h>
 
+// Add own protocols. Remove not needed protocols.
 static const RxProtocolTable <
-//                           #,  %,  clk,  syA,syB,  d0A,d0B,  d1A,d1B , inverseLevel
+//                           #,  %,  clk,syA,  syB,  d0A,d0B,  d1A,d1B , inverseLevel
 	makeProtocolTimingSpec<  1, 20,  350,  1,   31,    1,  3,    3,  1>, 		// ()
 	makeProtocolTimingSpec<  2, 20,  650,  1,   10,    1,  3,    3,  1>, 		// ()
 	makeProtocolTimingSpec<  3, 20,  100, 30,   71,    4, 11,    9,  6>, 		// ()
@@ -26,7 +27,7 @@ static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 // Reference to the serial to be used for printing.
 UARTClass& serial = Serial3;
 
-//The setup function is called once at startup of the sketch
+// The setup function is called once at startup of the sketch
 void setup()
 {
 #if ENABLE_RCSWITCH_TEST
@@ -36,13 +37,10 @@ void setup()
 	serial.begin(9600);
 	delay(100);
 	serial.println();
-	rcSwitchReceiver.begin(rxProtocolTable);
 
-#if DEBUG_RCSWITCH_PROTOCOL_SPEC
+	rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
 	rcSwitchReceiver.dumpRxTimingTable(serial);
 	delay(500);
-#endif
-
 }
 
 // The loop function is called in an endless loop

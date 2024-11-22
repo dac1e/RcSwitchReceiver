@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include <algorithm>
 
-#define DEBUG_RCSWITCH true
+#define DEBUG_RCSWITCH false
 
 #if DEBUG_RCSWITCH
 #include <assert.h>
@@ -470,7 +470,8 @@ public:
 };
 
 /** Forward declaration */
-struct RxTimingSpec;
+class RxTimingSpec;
+typedef std::pair<const RxTimingSpec*, size_t> rxTimingSpecTable_t;
 
 /**
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes
@@ -506,8 +507,8 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	}
 #endif
 
-	std::pair<const RxTimingSpec*, size_t> mRxTimingSpecTableNormal;
-	std::pair<const RxTimingSpec*, size_t> mRxTimingSpecTableInverse;
+	rxTimingSpecTable_t mRxTimingSpecTableNormal;
+	rxTimingSpecTable_t mRxTimingSpecTableInverse;
 
 	MessagePacket mReceivedMessagePacket;
 
@@ -521,7 +522,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
 	enum STATE state() const;
 
-	std::pair<const RxTimingSpec*, size_t> getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
+	rxTimingSpecTable_t getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
 
 	void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
 	void push(uint32_t microSecDuration, const int pinLevel);
@@ -546,8 +547,10 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 			Array::init();
 	}
 
-	void setRxProtocolTable(const std::pair<const RcSwitch::RxTimingSpec*, size_t>& timingSpecTable);
-
+	/**
+	 * Set the protocol table for receiving data.
+	 */
+	void setRxProtocolTable(const rxTimingSpecTable_t& rxTimingSpecTable);
 
 	/**
 	 * Evaluate a new pulse that has been received. Will only
@@ -608,6 +611,11 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 		dumpRxTimingTable(serial, PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS);
 		dumpRxTimingTable(serial, PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS);
 	}
+
+	/**
+	 * Refer to corresponding API class RcSwitchReceiver;
+	 */
+	void dumpRxTimingTable(UARTClass &serial, const rxTimingSpecTable_t & rxtimingSpecTable);
 
 	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
 };

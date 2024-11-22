@@ -55,7 +55,7 @@ static const RxProtocolTable <
 	makeProtocolTimingSpec< 10, 20,  365,    1, 18,    3,  1,    1,  3, true>, 	// (1ByOne Doorbell)
 	makeProtocolTimingSpec< 11, 20,  270,    1, 36,    1,  2,    2,  1, true>, 	// (HT12E)
 	makeProtocolTimingSpec< 12, 20,  320,    1, 36,    1,  2,    2,  1, true>  	// (SM5212)
-> rxTimingSpecTable;
+> rxProtocolTable;
 
 /** Message repeat is required for the message packet end detection */
 constexpr size_t MIN_MSG_PACKET_REPEATS = 1;
@@ -303,7 +303,7 @@ void RcSwitch_test::tooShortMessagePacketTest(uint32_t& usec, Receiver &receiver
 
 void RcSwitch_test::testFaultyDataRx() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxTimingSpecTable);
+	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
 	uint32_t usec = 0;
 
 	usec += 100; // start hi pulse 100 usec duration.
@@ -323,7 +323,7 @@ void RcSwitch_test::testFaultyDataRx() const {
 
 void RcSwitch_test::testDataRx() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxTimingSpecTable);
+	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
 	uint32_t usec = 0;
 
 	usec += 100; // start hi pulse 100 usec duration.
@@ -357,7 +357,7 @@ void RcSwitch_test::testDataRx() const {
 
 void RcSwitch_test::testSynchRx() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxTimingSpecTable);
+	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
 	uint32_t usec = 0;
 
 	usec += 100;  // lo pulse  100 usec duration.
@@ -380,7 +380,7 @@ void RcSwitch_test::testSynchRx() const {
 
 void RcSwitch_test::testProtocolCandidates() const {
 	Receiver receiver;
-	receiver.setRxProtocolTable(rxTimingSpecTable);
+	receiver.setRxProtocolTable(rxProtocolTable.toTimingSpecTable());
 
 	Pulse pulse_0 = {				// Hi level pulse too short
 			239, PULSE_LEVEL::HI

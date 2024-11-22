@@ -15,8 +15,6 @@
 
 #include "typeselect.hpp"
 
-#define DEBUG_RCSWITCH_PROTOCOL_SPEC true
-
 namespace RcSwitch {
 
 /*
@@ -141,9 +139,9 @@ struct TxPulsePairTiming {
 struct TxTimingSpec { /* Currently only required for test */
 	size_t   protocolNumber;
 	bool bInverseLevel;
-	TxPulsePairTiming	 synchPulsePair;
-	TxPulsePairTiming	 data0PulsePair;
-	TxPulsePairTiming	 data1PulsePair;
+	TxPulsePairTiming	 synchPulsePair;    // pulse pair for synch
+	TxPulsePairTiming	 data0PulsePair;	// pulse pair for logical 0
+	TxPulsePairTiming	 data1PulsePair;    // pulse pair for logical 1
 };
 
 template<typename L, typename R> struct isRxTimingSpecLower {
@@ -155,7 +153,7 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 
 
 template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B, bool inverseLevel = false>
-struct makeProtocolTimingSpec {
+struct makeProtocolTimingSpec { // Calculate the timing from the protocol definition.
 	static constexpr size_t PROTOCOL_NUMBER = protocolNumber;
 	static constexpr bool INVERSE_LEVEL = inverseLevel;
 
@@ -222,15 +220,15 @@ RxProtocolTable {
 private:
 	using T = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::selected;
 	using R = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::rest;
-	static const RcSwitch::RxTimingSpec* toArray(const RxProtocolTable& rxSpecTable) {
-		return reinterpret_cast<const RcSwitch::RxTimingSpec*>(&rxSpecTable.m);
-	}
+	const RcSwitch::RxTimingSpec* toArray() const {return &m;}
 public:
-	static constexpr size_t ROW_COUNT = sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
+	static constexpr size_t ROW_COUNT =	sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
 	RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
-	const RcSwitch::RxTimingSpec* toArray() const {return toArray(*this);}
-	inline operator std::pair<const RcSwitch::RxTimingSpec*, size_t>() const {
+
+	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
+	// Convert to rxTimingSpecTable_t
+	inline rxTimingSpecTable_t toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
 		return std::make_pair(toArray(), rowCount);
 	}
@@ -239,13 +237,17 @@ public:
 template<typename T> struct
 RxProtocolTable<T> {
 private:
-	static const RcSwitch::RxTimingSpec* toArray(const RxProtocolTable& rxSpecTable) {
-		return reinterpret_cast<const RcSwitch::RxTimingSpec*>(&rxSpecTable.m);
-	}
+	const RcSwitch::RxTimingSpec* toArray() const {return &m;}
 public:
-	static constexpr size_t ROW_COUNT = sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
+	static constexpr size_t ROW_COUNT =	sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
 	RcSwitch::RxTimingSpec m = T::RX;
-	const RcSwitch::RxTimingSpec* toArray() const {return toArray(*this);}
+
+	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
+	// Convert to rxTimingSpecTable_t
+	inline rxTimingSpecTable_t toTimingSpecTable() const {
+		constexpr size_t rowCount = ROW_COUNT;
+		return std::make_pair(toArray(), rowCount);
+	}
 };
 
 template<typename ...Ts> struct

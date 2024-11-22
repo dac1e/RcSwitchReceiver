@@ -30,6 +30,9 @@
 #include "internal/RcSwitch.hpp"
 #include "internal/ProtocolTimingSpec.hpp"
 #include "Arduino.h"
+
+using RcSwitch::rxTimingSpecTable_t;
+
 /**
  * This is the library API class for receiving data from a remote control.
  * The IO pin to be used is defined at compile time by the template
@@ -43,6 +46,7 @@
  * RcSwitchReceiver<5> rcSwitchReceiver433;
  * RcSwitchReceiver<6> rcSwitchReceiver315;
  */
+
 template<int IOPIN> class RcSwitchReceiver {
 	static RcSwitch::Receiver mReceiver;
 
@@ -52,12 +56,13 @@ template<int IOPIN> class RcSwitchReceiver {
 public:
 
 	/**
+	 * Sets the protocol timing specification table to be used for receiving data.
 	 * Sets up the receiver to receive interrupts from the IOPIN.
 	 */
-	static void begin(const std::pair<const RcSwitch::RxTimingSpec*, size_t>& timingSpecTable) {
+	static void begin(const rxTimingSpecTable_t& rxTimingSpecTable) {
 		pinMode(IOPIN, INPUT_PULLUP);
 		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
-		mReceiver.setRxProtocolTable(timingSpecTable);
+		mReceiver.setRxProtocolTable(rxTimingSpecTable);
 	}
 
 	/**
@@ -137,9 +142,17 @@ public:
 	static void resume() {mReceiver.resume();}
 
 	/**
-	 * Print out the Rx timing table. Main purpose is for debugging.
+	 * Print out the receiver's Rx timing table. Main purpose is for debugging.
 	 */
 	static void dumpRxTimingTable(UARTClass& serial) {mReceiver.dumpRxTimingTable(serial);}
+
+	/**
+	 * Print out any Rx timing table. Main purpose is for debugging.
+	 */
+	static void dumpRxTimingTable(UARTClass& serial, const rxTimingSpecTable_t& rxTimingSpecTable)
+	{
+		mReceiver.dumpRxTimingTable(serial, rxTimingSpecTable);
+	}
 };
 
 /** The receiver instance for this IO pin. */

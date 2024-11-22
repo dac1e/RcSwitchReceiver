@@ -349,8 +349,7 @@ int Receiver::receivedProtocol(const size_t index) const {
 	return -1;
 }
 
-std::pair<const RxTimingSpec*, size_t> Receiver::getRxTimingTable(
-		PROTOCOL_GROUP_ID protocolGroup) const {
+rxTimingSpecTable_t Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const {
 	switch (protocolGroup) {
 	case PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS:
 		return mRxTimingSpecTableNormal;
@@ -365,17 +364,17 @@ std::pair<const RxTimingSpec*, size_t> Receiver::getRxTimingTable(
 	return std::make_pair(nullptr, 0);
 }
 
-void Receiver::setRxProtocolTable(const std::pair<const RcSwitch::RxTimingSpec*, size_t>& timingSpecTable) {
+void Receiver::setRxProtocolTable(const rxTimingSpecTable_t& rxTimingSpecTable) {
 	size_t i = 0;
-	for (; i < timingSpecTable.second; i++) {
-		if (timingSpecTable.first[i].bInverseLevel) {
+	for (; i < rxTimingSpecTable.second; i++) {
+		if (rxTimingSpecTable.first[i].bInverseLevel) {
 			break;
 		}
 	}
-	mRxTimingSpecTableNormal.first = &timingSpecTable.first[0];
+	mRxTimingSpecTableNormal.first = &rxTimingSpecTable.first[0];
 	mRxTimingSpecTableNormal.second = i;
-	mRxTimingSpecTableInverse.first = &timingSpecTable.first[i];
-	mRxTimingSpecTableInverse.second = timingSpecTable.second - i;
+	mRxTimingSpecTableInverse.first = &rxTimingSpecTable.first[i];
+	mRxTimingSpecTableInverse.second = rxTimingSpecTable.second - i;
 }
 
 } /* namespace RcSwitch */
@@ -383,6 +382,46 @@ void Receiver::setRxProtocolTable(const std::pair<const RcSwitch::RxTimingSpec*,
 #include <UartClass.h>
 
 namespace RcSwitch {
+
+void Receiver::dumpRxTimingTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable) {
+	for (size_t i = 0; i < rxtimingSpecTable.second; i++) {
+		const RxTimingSpec &p = rxtimingSpecTable.first[i];
+		if (p.protocolNumber < 10) {
+			serial.print(' ');
+		}
+		serial.print(p.protocolNumber);
+		if (!p.bInverseLevel) {
+			serial.print(", normal");
+		} else {
+			serial.print(",inverse");
+		}
+		serial.print(",SY:[");
+		serial.print(p.synchronizationPulsePair.durationA.lowerBound);
+		serial.print("..");
+		serial.print(p.synchronizationPulsePair.durationA.upperBound);
+		serial.print("],[");
+		serial.print(p.synchronizationPulsePair.durationB.lowerBound);
+		serial.print("..");
+		serial.print(p.synchronizationPulsePair.durationB.upperBound);
+		serial.print("],D0:[");
+		serial.print(p.data0pulsePair.durationA.lowerBound);
+		serial.print("..");
+		serial.print(p.data0pulsePair.durationA.upperBound);
+		serial.print("],[");
+		serial.print(p.data0pulsePair.durationB.lowerBound);
+		serial.print("..");
+		serial.print(p.data0pulsePair.durationB.upperBound);
+		serial.print("],D1:[");
+		serial.print(p.data1pulsePair.durationA.lowerBound);
+		serial.print("..");
+		serial.print(p.data1pulsePair.durationA.upperBound);
+		serial.print("],[");
+		serial.print(p.data1pulsePair.durationB.lowerBound);
+		serial.print("..");
+		serial.print(p.data1pulsePair.durationB.upperBound);
+		serial.println("]");
+	}
+}
 
 void Receiver::dumpRxTimingTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGroup) {
 	if(protocolGroup == PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS ||
@@ -392,45 +431,7 @@ void Receiver::dumpRxTimingTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGr
 				protocolGroup == PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS ?
 						mRxTimingSpecTableNormal : mRxTimingSpecTableInverse;
 
-		for (size_t i = 0; i < timingTable.second; i++) {
-			const RxTimingSpec& p = timingTable.first[i];
-
-			if(p.protocolNumber < 10) {
-				serial.print(' ');
-			}
-			serial.print(p.protocolNumber);
-
-			if(not p.bInverseLevel) {
-				serial.print(", normal");
-			} else {
-				serial.print(",inverse");
-			}
-			serial.print(",SY:[");
-			serial.print(p.synchronizationPulsePair.durationA.lowerBound);
-			serial.print("..");
-			serial.print(p.synchronizationPulsePair.durationA.upperBound);
-			serial.print("],[");
-			serial.print(p.synchronizationPulsePair.durationB.lowerBound);
-			serial.print("..");
-			serial.print(p.synchronizationPulsePair.durationB.upperBound);
-			serial.print("],D0:[");
-			serial.print(p.data0pulsePair.durationA.lowerBound);
-			serial.print("..");
-			serial.print(p.data0pulsePair.durationA.upperBound);
-			serial.print("],[");
-			serial.print(p.data0pulsePair.durationB.lowerBound);
-			serial.print("..");
-			serial.print(p.data0pulsePair.durationB.upperBound);
-			serial.print("],D1:[");
-			serial.print(p.data1pulsePair.durationA.lowerBound);
-			serial.print("..");
-			serial.print(p.data1pulsePair.durationA.upperBound);
-			serial.print("],[");
-			serial.print(p.data1pulsePair.durationB.lowerBound);
-			serial.print("..");
-			serial.print(p.data1pulsePair.durationB.upperBound);
-			serial.println("]");
-		}
+		dumpRxTimingTable(serial, timingTable);
 	}
 }
 
