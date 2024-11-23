@@ -43,7 +43,7 @@
  *
  *   Inverse level protocols start with a low level:
  *                              ____________________
- *	   XXXX|___________________|                    |XXXX
+ *     XXXX|___________________|                    |XXXX
  *
  *	       ^                   ^                    ^
  *         | pulse A duration  | pulse B duration   |
