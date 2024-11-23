@@ -131,6 +131,6 @@ struct makeTimingSpec;
  */
 template<typename ...TimingSpecs> struct RxProtocolTable;
 
-#include "internal/ProtocolTimingSpec.hpp"
+#include "internal/ProtocolTimingSpec.inc"
 
 #endif /* SRC_INTERNAL_PROTOCOLDEFINITION_HPP_ */
