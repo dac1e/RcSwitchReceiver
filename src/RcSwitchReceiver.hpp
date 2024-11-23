@@ -141,18 +141,6 @@ public:
 	 */
 	static void resume() {mReceiver.resume();}
 
-	/**
-	 * Print out the receiver's Rx timing table. Main purpose is for debugging.
-	 */
-	static void dumpRxTimingSpecTable(UARTClass& serial) {mReceiver.dumpRxTimingSpecTable(serial);}
-
-	/**
-	 * Print out any Rx timing table. Main purpose is for debugging.
-	 */
-	static void dumpRxTimingSpecTable(UARTClass& serial, const rxTimingSpecTable_t& rxTimingSpecTable)
-	{
-		mReceiver.dumpRxTimingSpecTable(serial, rxTimingSpecTable);
-	}
 };
 
 /** The receiver instance for this IO pin. */

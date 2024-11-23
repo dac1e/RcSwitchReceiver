@@ -27,6 +27,9 @@
 // #include "test/RcSwitch_test.hpp" // Comment in, if you want to run the test.
 #include <Arduino.h>
 
+// Change to true, if you want to print the timing spec table that has been created
+#define DUMP_TIMING_SPEC_TABLE true
+
 // Add own protocols. Remove not needed protocols.
 static const RxProtocolTable <
 //                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B , inverseLevel
@@ -58,10 +61,14 @@ void setup()
 
 	serial.begin(9600);
 	delay(100);
+
+#if DUMP_TIMING_SPEC_TABLE
 	serial.println();
+	dumpRxTimingSpecTable(serial, rxProtocolTable.toTimingSpecTable());
+	serial.println();
+#endif
 
 	rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
-	rcSwitchReceiver.dumpRxTimingSpecTable(serial);
 	delay(500);
 }
 

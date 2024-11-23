@@ -144,4 +144,8 @@ template<typename ...TimingSpecs> struct RxProtocolTable;
 
 #include "internal/ProtocolTimingSpec.inc"
 
+class UARTClass;
+
+void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable);
+
 #endif /* SRC_INTERNAL_PROTOCOLDEFINITION_HPP_ */

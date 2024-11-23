@@ -527,7 +527,6 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	void push(uint32_t microSecDuration, const int pinLevel);
 	PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
 	void retry();
-	void dumpRxTimingSpecTable(UARTClass& serial, PROTOCOL_GROUP_ID protocolGroup);
 
 
 	/** ========================================================================== */
@@ -602,19 +601,6 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	 * Refer to corresponding API class RcSwitchReceiver;
 	 */
 	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
-
-	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
-	 */
-	inline void dumpRxTimingSpecTable(UARTClass& serial) {
-		dumpRxTimingSpecTable(serial, PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS);
-		dumpRxTimingSpecTable(serial, PROTOCOL_GROUP_ID::INVERSE_LEVEL_PROTOCOLS);
-	}
-
-	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
-	 */
-	void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t & rxtimingSpecTable);
 
 	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
 };

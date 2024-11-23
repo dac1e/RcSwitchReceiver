@@ -170,6 +170,8 @@ struct makeTimingSpec { // Calculate the timing specification from the protocol 
 	};
 };
 
+typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
+
 /**
  * RxProtocolTable
  */
@@ -186,7 +188,6 @@ public:
 	RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
 
-	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
 	// Convert to rxTimingSpecTable_t
 	inline rxTimingSpecTable_t toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
@@ -205,7 +206,6 @@ public:
 	static constexpr size_t ROW_COUNT =	sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
 	RcSwitch::RxTimingSpec m = T::RX;
 
-	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
 	// Convert to rxTimingSpecTable_t
 	inline rxTimingSpecTable_t toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
@@ -235,7 +235,5 @@ template<typename T> struct
 RxProtocolTable<std::tuple<T>> {
 	RcSwitch::RxTimingSpec m = T::RX;
 };
-
-
 
 #endif /* RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_ */
