@@ -39,6 +39,8 @@
  *          ___________________
  *	   XXXX|                   |____________________|XXXX
  *
+ *
+ *
  *   Inverse level protocols start with a low level:
  *                              ____________________
  *	   XXXX|___________________|                    |XXXX
@@ -51,6 +53,8 @@
  *     Normal level protocols:
  *          ____
  *     XXXX|    |_____________________________________________________________|XXXX
+ *
+ *
  *
  *     Inverse level protocols:
  *               _____________________________________________________________
@@ -78,23 +82,26 @@
  *
  *
  * Pulse durations sent out by a real world transmitter can vary. Hence the
- * specification contains upper and lower boundaries for a pulse to be
- * recognized as a valid synchronization pulse respectively data pulse.
+ * timing specification for receiving pulses contain upper and lower boundaries
+ * for a pulse to be recognized as a valid synchronization pulse respectively
+ * data pulse.
  *
- * Synch. pulses and data pulses are typically a multiple of a protocol
+ * Synch. pulses and data pulses are defined as a multiple of a protocol
  * specific clock cycle.
  *
- * There is a decision to be made, when a the reception of data bits shall be stopped,
- * because they constitute a completed message packet. Here is assumed, that the
- * transmitter transmits the same message packets multiple times in a row. The
- * completion of a message packet is noted, when new synch pulses from a subsequent
- * transmission appear.
+ * There is a decision to be made, when the received of data bits constitute
+ * a completed message packet and further reception of data bits must be
+ * stopped. It is assumed, that the transmitter transmits the same message
+ * packets multiple times in a row. The completion of a message packet is
+ * determined, upon receiving new synch pulses from a subsequent transmission.
  */
 
 /**
  * makeTimingSpec
- * Calculate the pulse timings specification from a given protocol specification at compile time.
- * To be used in combination with RxProtocolTable.
+ *
+ * Calculates the pulse timings specification from a given protocol specification
+ * at compile time. Compile time calculation keeps the interrupt handler quick.
+ * makeTimingSpec is to be used in combination with RxProtocolTable below.
  */
 template<
 	/** A protocol specification is given by the following parameters: */
@@ -108,9 +115,13 @@ template<
 struct makeTimingSpec;
 
 /**
- * RxProtocolTable provides an array of timing specifications from given protocol specifications.
- * The array gets sorted at compile time to keep the interrupt handler quick. Sort criteria are
- * the inverseLevel flag and the lowerBound of the synch A pulse.
+ * RxProtocolTable
+ *
+ * Provides an array of timing specifications from given protocol specifications.
+ * The array gets sorted at compile time. Sort criteria are the inverseLevel
+ * flag and the lowerBound of the synch A pulse.
+ * Sorting the table at compile time provides an means to speed up the
+ * interrupt handler.
  *
  * Usage example:
  *
