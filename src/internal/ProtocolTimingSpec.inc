@@ -32,6 +32,9 @@
 
 #include "typeselect.hpp"
 
+// Forward declaration
+class UARTClass;
+
 namespace RcSwitch {
 
 struct TimeRange {
@@ -95,6 +98,11 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 	static constexpr bool value = L::INVERSE_LEVEL == R::INVERSE_LEVEL ?
 			(L::usecSynchA_lowerBound < R::usecSynchA_lowerBound) : L::INVERSE_LEVEL < R::INVERSE_LEVEL;
 };
+
+namespace Debug {
+	void dumpRxTimingSpecTable(UARTClass &serial,
+		const std::pair<const RxTimingSpec*, size_t> &rxtimingSpecTable);
+}
 
 } // namespace RcSwitch
 
@@ -170,7 +178,6 @@ struct makeTimingSpec { // Calculate the timing specification from the protocol 
 	};
 };
 
-typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
 
 /**
  * RxProtocolTable
@@ -189,9 +196,13 @@ public:
 	RxProtocolTable<R> r;
 
 	// Convert to rxTimingSpecTable_t
+	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
 	inline rxTimingSpecTable_t toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
 		return std::make_pair(toArray(), rowCount);
+	}
+	inline void dumpTimingSpec(UARTClass &serial) const {
+		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());
 	}
 };
 
@@ -207,9 +218,13 @@ public:
 	RcSwitch::RxTimingSpec m = T::RX;
 
 	// Convert to rxTimingSpecTable_t
+	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
 	inline rxTimingSpecTable_t toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
 		return std::make_pair(toArray(), rowCount);
+	}
+	inline void dumpTimingSpec(UARTClass &serial) const {
+		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());
 	}
 };
 

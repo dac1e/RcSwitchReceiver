@@ -139,13 +139,16 @@ struct makeTimingSpec;
  *  	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>, 	// (HT12E)
  *  	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)
  *  > rxProtocolTable;
+ *
+ *  The resulting array of timing specifications can be dumped for debug purpose:
+ *  ...
+ *  rxProtocolTable.dumpTimingSpec(serial);
+ *  ...
+ *
  */
 template<typename ...TimingSpecs> struct RxProtocolTable;
 
 #include "internal/ProtocolTimingSpec.inc"
 
-class UARTClass;
-
-void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable);
 
 #endif /* SRC_INTERNAL_PROTOCOLDEFINITION_HPP_ */

@@ -23,8 +23,8 @@
 */
 
 
+//#include "test/RcSwitch_test.hpp" // Comment in, if you want to run the test.
 #include "RcSwitchReceiver.hpp"
-// #include "test/RcSwitch_test.hpp" // Comment in, if you want to run the test.
 #include <Arduino.h>
 
 // Change to true, if you want to print the timing spec table that has been created
@@ -64,7 +64,7 @@ void setup()
 
 #if DUMP_TIMING_SPEC_TABLE
 	serial.println();
-	dumpRxTimingSpecTable(serial, rxProtocolTable.toTimingSpecTable());
+	rxProtocolTable.dumpTimingSpec(serial);
 	serial.println();
 #endif
 

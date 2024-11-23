@@ -5,11 +5,15 @@
  *      Author: Wolfgang
  */
 
-#include "ProtocolDefinition.hpp"
+#include "ProtocolTimingSpec.inc"
 #include <UartClass.h>
 
-void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable) {
-	using namespace RcSwitch;
+namespace RcSwitch {
+
+namespace Debug {
+
+void dumpRxTimingSpecTable(UARTClass &serial,
+		const std::pair<const RxTimingSpec*, size_t> &rxtimingSpecTable) {
 
 	for (size_t i = 0; i < rxtimingSpecTable.second; i++) {
 		const RxTimingSpec &p = rxtimingSpecTable.first[i];
@@ -50,4 +54,5 @@ void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimin
 	}
 }
 
-
+} // namespace Debug
+} // namespace RcSwitch
