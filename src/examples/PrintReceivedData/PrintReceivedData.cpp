@@ -30,7 +30,7 @@
 // Change to true, if you want to print the timing spec table that has been created
 #define DUMP_TIMING_SPEC_TABLE true
 
-// Add own protocols. Remove not needed protocols.
+// Add own protocols and remove not needed protocols.
 static const RxProtocolTable <
 //                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B , inverseLevel
 	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1>, 		// ()
