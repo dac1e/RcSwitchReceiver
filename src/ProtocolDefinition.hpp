@@ -37,7 +37,7 @@
  *
  *   Normal level protocols start with a high level:
  *          ___________________
- *	   XXXX|                   |____________________|XXXX
+ *     XXXX|                   |____________________|XXXX
  *
  *
  *
