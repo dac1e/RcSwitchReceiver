@@ -37,9 +37,6 @@
 #include <assert.h>
 #endif
 
-/** Forward declaration of UARTClass */
-class UARTClass;
-
 /** Forward declaration of the class providing the API. */
 template<int IOPIN> class RcSwitchReceiver;
 

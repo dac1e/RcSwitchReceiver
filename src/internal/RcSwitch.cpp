@@ -156,7 +156,7 @@ static inline void collectProtocolCandidates(const std::pair<const RxTimingSpec*
 	}
 }
 
-// ======== ProtocolCandidates =========
+// ======== Receiver ===================
 size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
 	 const std::pair<const RxTimingSpec*, size_t>& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	 RCSWITCH_ASSERT(protocolCandidateIndex < mProtocolCandidates.size());
@@ -165,7 +165,6 @@ size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
 	 return protocol.first[protocolIndex].protocolNumber;
 }
 
-// ======== Receiver ===================
 void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1) {
   if(pulse_0.mPulseLevel != pulse_1.mPulseLevel) {
 		if(pulse_0.mPulseLevel == PULSE_LEVEL::HI) {
@@ -366,6 +365,8 @@ rxTimingSpecTable_t Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) 
 
 void Receiver::setRxTimingSpecTable(const rxTimingSpecTable_t& rxTimingSpecTable) {
 	size_t i = 0;
+	/* The given timing spec table is sorted in a way that inverse level protocols
+	 * reside at the end. */
 	for (; i < rxTimingSpecTable.second; i++) {
 		if (rxTimingSpecTable.first[i].bInverseLevel) {
 			break;

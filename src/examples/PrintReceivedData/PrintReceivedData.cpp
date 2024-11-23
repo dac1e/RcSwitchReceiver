@@ -27,10 +27,13 @@
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
-// Change to true, if you want to print the timing spec table that has been created
+// Optionally print the timing spec table that has been created for curiosity.
 #define DUMP_TIMING_SPEC_TABLE true
 
-// Add own protocols and remove not needed protocols.
+// For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
+// You can add own protocols and remove not needed protocols.
+// However, the number of normal level protocols as well as the number of inverse level
+// Protocols should not exceed 7 in this table. Refer to MAX_PROTOCOL_CANDIDATES in RcSwitch.hpp.
 static const RxProtocolTable <
 //                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B , inverseLevel
 	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1>, 		// ()
@@ -66,10 +69,10 @@ void setup()
 	serial.println();
 	rxProtocolTable.dumpTimingSpec(serial);
 	serial.println();
+	delay(500);
 #endif
 
 	rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
-	delay(500);
 }
 
 // The loop function is called in an endless loop

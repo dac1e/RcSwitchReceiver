@@ -90,7 +90,7 @@
  * specific clock cycle.
  *
  * There is a decision to be made, when the received of data bits constitute
- * a completed message packet and further reception of data bits must be
+ * a completed message packet so that further reception of data bits must be
  * stopped. It is assumed, that the transmitter transmits the same message
  * packets multiple times in a row. The completion of a message packet is
  * determined, upon receiving new synch pulses from a subsequent transmission.
@@ -105,7 +105,7 @@
  */
 template<
 	/** A protocol specification is given by the following parameters: */
-	size_t protocolNumber,					/* A unique integer identifier for this protocol. */
+	size_t protocolNumber,					/* A unique integer identifier of this protocol. */
 	size_t clock,							/* The clock rate in microseconds.  */
 	size_t percentTolerance,				/* The tolerance for a pulse length to be recognized as a valid. */
 	size_t synchA,  size_t synchB,			/* Number of clocks for the synchronization pulse pair. */
@@ -120,7 +120,7 @@ struct makeTimingSpec;
  * Provides an array of timing specifications from given protocol specifications.
  * The array gets sorted at compile time. Sort criteria are the inverseLevel
  * flag and the lowerBound of the synch A pulse.
- * Sorting the table at compile time provides an means to speed up the
+ * Sorting the table at compile time provides an opportunity to speed up the
  * interrupt handler.
  *
  * Usage example:
