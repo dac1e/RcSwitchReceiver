@@ -27,7 +27,7 @@
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
-// Optionally print the timing spec table that has been created for curiosity.
+// For curiosity or debugging print the timing spec table that has been created.
 #define DUMP_TIMING_SPEC_TABLE true
 
 // For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
@@ -53,7 +53,7 @@ constexpr int RX433_DATA_PIN = 6;
 static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 
 // Reference to the serial to be used for printing.
-UARTClass& serial = Serial3;
+UARTClass& serial = Serial;
 
 // The setup function is called once at startup of the sketch
 void setup()
