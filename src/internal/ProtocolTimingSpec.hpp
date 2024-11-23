@@ -64,21 +64,12 @@ namespace RcSwitch {
  *     XXXX|________|  |XXXX
  *
  *
- * The pulse duration specification for the different protocols are stored in 2 arrays
- *   normalLevelProtocolsTable[]
- *  inverseLevelProtocolsTable[]
- *
  * Pulse durations sent out by a real world transmitter can vary. Hence the
  * specification contains upper and lower boundaries for a pulse to be
- * recognized as a valid synch. or data pulse.
+ * recognized as a valid synchronization pulse respectively data pulse.
  *
- * Synch. pulses and data pulses are typically a multiple of a protocol specific clock
- * cycle. The specification tables contain already pre-calculated
- * durations to keep the interrupt handler quick. The lower / upper boundary tolerance
- * is +- 20%.
- *
- * The protocol specs. are also sorted by a particular column within the table to
- * speed up pulse validation. That helps to keep the interrupt handler quick.
+ * Synch. pulses and data pulses are typically a multiple of a protocol
+ * specific clock cycle.
  *
  * There is a decision to be made, when a the reception of data bits shall be stopped,
  * because they constitute a completed message packet. Here is assumed, that the
@@ -151,8 +142,21 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 
 } // namespace RcSwitch
 
+/**
+ * makeTimingSpec
+ * Calculate the pulse timings specification from a given protocol specification at compile time.
+ * To be used i combination with RxProtocolTable.
+ */
+template<
+	/** A protocol specification is given by the following parameters: */
+	size_t protocolNumber,					/* A unique integer identifier for this protocol. */
+	size_t clock,							/* The clock rate in microseconds.  */
+	size_t percentTolerance,				/* The tolerance for a pulse length to be recognized as a valid. */
+	size_t synchA,  size_t synchB,			/* Number of clocks for the synchronization pulse pair. */
+	size_t data0_A, size_t data0_B,			/* Number of clocks for a logical 0 bit data pulse pair. */
+	size_t data1_A, size_t data1_B,			/* Number of clocks for a logical 1 bit data pulse pair. */
+	bool inverseLevel = false>				/* Flag whether pulse levels are normal or inverse. */
 
-template<size_t protocolNumber, size_t percentTolerance, size_t clock, size_t synchA, size_t synchB, size_t data0_A, size_t data0_B, size_t data1_A, size_t data1_B, bool inverseLevel = false>
 struct makeTimingSpec { // Calculate the timing specification from the protocol definition.
 	static constexpr size_t PROTOCOL_NUMBER = protocolNumber;
 	static constexpr bool INVERSE_LEVEL = inverseLevel;
@@ -213,8 +217,28 @@ struct makeTimingSpec { // Calculate the timing specification from the protocol 
 	};
 };
 
-
-// RxProtocolTable, sorted automatically at compile time by inverseLevel flag and usecSynchA_lowerBound
+/**
+ * RxProtocolTable provides an array of timing specifications from given protocol specifications.
+ * The array gets sorted at compile time to keep the interrupt handler quick. Sort criteria are
+ * the inverseLevel flag and the lowerBound of the synch A pulse.
+ *
+ * Usage example:
+ *
+ * static const RxProtocolTable <
+ *  //                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B , inverseLevel
+ *  	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1>, 		// ()
+ *  	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1>, 		// ()
+ *  	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6>, 		// ()
+ *  	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1>, 		// ()
+ *  	makeTimingSpec<  5, 500, 20,   6,   14,    1,  2,    2,  1>, 		// ()
+ *  	makeTimingSpec<  6, 450, 20,   1,   23,    1,  2,    2,  1, true>, 	// (HT6P20B)
+ *  	makeTimingSpec<  7, 150, 20,   2,   62,    1,  6,    6,  1>, 		// (HS2303-PT)
+ *  	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16>, 		// (Conrad RS-200)
+ *  	makeTimingSpec<  9, 365, 20,   1,   18,    3,  1,    1,  3, true>, 	// (1ByOne Doorbell)
+ *  	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>, 	// (HT12E)
+ *  	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)
+ *  > rxProtocolTable;
+ */
 template<typename ...Ts> struct
 RxProtocolTable {
 private:
@@ -234,6 +258,9 @@ public:
 	}
 };
 
+/**
+ * RxProtocolTable specialization for a table with just 1 row.
+ */
 template<typename T> struct
 RxProtocolTable<T> {
 private:
@@ -250,6 +277,10 @@ public:
 	}
 };
 
+/**
+ * For internal use only.
+ * RxProtocolTable specialization for timing specs being passed as a tuple.
+ */
 template<typename ...Ts> struct
 RxProtocolTable<std::tuple<Ts...>> {
 private:
@@ -260,6 +291,10 @@ public:
 	RxProtocolTable<R> r;
 };
 
+/**
+ * For internal use only.
+ * RxProtocolTable specialization for a single timing spec being passed as a tuple.
+ */
 template<typename T> struct
 RxProtocolTable<std::tuple<T>> {
 	RcSwitch::RxTimingSpec m = T::RX;
