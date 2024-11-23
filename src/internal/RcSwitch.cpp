@@ -24,7 +24,7 @@
 
 #include <limits>
 
-#include "ProtocolTimingSpec.hpp"
+#include "../ProtocolDefinition.hpp"
 #include "RcSwitch.hpp"
 
 
