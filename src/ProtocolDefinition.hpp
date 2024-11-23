@@ -89,7 +89,7 @@
  * Synch. pulses and data pulses are defined as a multiple of a protocol
  * specific clock cycle.
  *
- * There is a decision to be made, when the received of data bits constitute
+ * There is a decision to be made, when the received number of data bits constitute
  * a completed message packet so that further reception of data bits must be
  * stopped. It is assumed, that the transmitter transmits the same message
  * packets multiple times in a row. The completion of a message packet is
@@ -105,13 +105,13 @@
  */
 template<
 	/** A protocol specification is given by the following parameters: */
-	size_t protocolNumber,					/* A unique integer identifier of this protocol. */
-	size_t clock,							/* The clock rate in microseconds.  */
-	size_t percentTolerance,				/* The tolerance for a pulse length to be recognized as a valid. */
-	size_t synchA,  size_t synchB,			/* Number of clocks for the synchronization pulse pair. */
-	size_t data0_A, size_t data0_B,			/* Number of clocks for a logical 0 bit data pulse pair. */
-	size_t data1_A, size_t data1_B,			/* Number of clocks for a logical 1 bit data pulse pair. */
-	bool inverseLevel = false>				/* Flag whether pulse levels are normal or inverse. */
+	size_t protocolNumber,           /* A unique integer identifier of this protocol. */
+	size_t clock,                    /* The clock rate in microseconds.  */
+	size_t percentTolerance,         /* The tolerance for a pulse length to be recognized as a valid. */
+	size_t synchA,  size_t synchB,   /* Number of clocks for the synchronization pulse pair. */
+	size_t data0_A, size_t data0_B,  /* Number of clocks for a logical 0 bit data pulse pair. */
+	size_t data1_A, size_t data1_B,  /* Number of clocks for a logical 1 bit data pulse pair. */
+	bool inverseLevel = false>       /* Flag whether pulse levels are normal or inverse. */
 struct makeTimingSpec;
 
 /**

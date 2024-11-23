@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map For RcSwitchReceiver
+#######################################
+
+#######################################
+# Datatypes
+#######################################
+
+RcSwitchReceiver	KEYWORD1
+RxProtocolTable	KEYWORD1
+makeTimingSpec	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+available	KEYWORD2
+begin	KEYWORD2
+dumpTimingSpec	KEYWORD2
+receivedBitsCount	KEYWORD2
+receivedProtocol	KEYWORD2
+receivedProtocolCount	KEYWORD2
+receivedValue	KEYWORD2
+resetAvailable	KEYWORD2
+resume	KEYWORD2
+suspend	KEYWORD2
+toTimingSpecTable	KEYWORD2
