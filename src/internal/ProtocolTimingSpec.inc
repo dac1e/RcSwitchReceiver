@@ -29,7 +29,7 @@
 
 #include <sys/types.h>
 #include <stdint.h>
-
+#include "common.hpp"
 #include "typeselect.hpp"
 
 // Forward declaration
@@ -100,8 +100,7 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 };
 
 namespace Debug {
-	void dumpRxTimingSpecTable(UARTClass &serial,
-		const std::pair<const RxTimingSpec*, size_t> &rxtimingSpecTable);
+	void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable);
 }
 
 } // namespace RcSwitch
@@ -181,10 +180,9 @@ public:
 	RxProtocolTable<R> r;
 
 	// Convert to rxTimingSpecTable_t
-	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
-	inline rxTimingSpecTable_t toTimingSpecTable() const {
+	inline RcSwitch::rxTimingSpecTable_t toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
-		return std::make_pair(toArray(), rowCount);
+		return RcSwitch::rxTimingSpecTable_t{toArray(), rowCount};
 	}
 	inline void dumpTimingSpec(UARTClass &serial) const {
 		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());
@@ -203,10 +201,9 @@ public:
 	RcSwitch::RxTimingSpec m = T::RX;
 
 	// Convert to rxTimingSpecTable_t
-	typedef std::pair<const RcSwitch::RxTimingSpec*, size_t> rxTimingSpecTable_t;
-	inline rxTimingSpecTable_t toTimingSpecTable() const {
+	inline RcSwitch::rxTimingSpecTable_t toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
-		return std::make_pair(toArray(), rowCount);
+		return RcSwitch::rxTimingSpecTable_t{toArray(), rowCount};
 	}
 	inline void dumpTimingSpec(UARTClass &serial) const {
 		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());

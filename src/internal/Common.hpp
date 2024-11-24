@@ -44,13 +44,19 @@
 #define TEXT_ISR_ATTR_1 TEXT_ISR_ATTR // attibute functions called by handleInterrupt()
 #define TEXT_ISR_ATTR_2 TEXT_ISR_ATTR // attibute functions called by functions called by handleInterrupt()
 
-#include <tuple>
+#include <sys/types.h>
+#include <stdint.h>
 
 namespace RcSwitch {
 
 /** Forward declaration */
 class RxTimingSpec;
-typedef std::pair<const RxTimingSpec*, size_t> rxTimingSpecTable_t;
+struct rxTimingSpecTable {
+	const RxTimingSpec* first;
+	size_t second;
+};
+
+typedef rxTimingSpecTable rxTimingSpecTable_t;
 
 }
 

@@ -129,7 +129,7 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 	return result;
 }
 
-static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const std::pair<const RxTimingSpec*, size_t>& protocol,
+static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecTable_t& protocol,
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	for(size_t i = 0; i < protocol.second; i++) {
 		const RxTimingSpec& prot = protocol.first[i];
@@ -158,7 +158,7 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const std::pair<con
 
 // ======== Receiver ===================
 size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
-	 const std::pair<const RxTimingSpec*, size_t>& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
+	 const rxTimingSpecTable_t& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	 RCSWITCH_ASSERT(protocolCandidateIndex < mProtocolCandidates.size());
 	 const size_t protocolIndex = mProtocolCandidates.at(protocolCandidateIndex);
 	 RCSWITCH_ASSERT(protocolIndex < protocol.second);
@@ -187,7 +187,7 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
 // inline attribute, because it is private and called once.
 inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) {
 	PULSE_TYPE result = PULSE_TYPE::UNKNOWN;
-	const std::pair<const RxTimingSpec*, size_t> protocols = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
+	const rxTimingSpecTable_t protocols = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	size_t protocolCandidatesIndex = mProtocolCandidates.size();
 	while(protocolCandidatesIndex > 0) {
 		--protocolCandidatesIndex;
@@ -360,7 +360,7 @@ rxTimingSpecTable_t Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) 
 		RCSWITCH_ASSERT(false);
 		break;
 	}
-	return std::make_pair(nullptr, 0);
+	return rxTimingSpecTable_t{nullptr, 0};
 }
 
 void Receiver::setRxTimingSpecTable(const rxTimingSpecTable_t& rxTimingSpecTable) {

@@ -27,9 +27,9 @@
 #ifndef RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_
 #define RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_
 
-#include "internal/common.hpp"
 #include <sys/types.h>
 #include <stdint.h>
+#include "internal/Common.hpp"
 
 /*
  * The protocol is a stream of pulse pairs with different duration and pulse levels.
@@ -112,7 +112,7 @@ template<
 	size_t synchA,  size_t synchB,   /* Number of clocks for the synchronization pulse pair. */
 	size_t data0_A, size_t data0_B,  /* Number of clocks for a logical 0 bit data pulse pair. */
 	size_t data1_A, size_t data1_B,  /* Number of clocks for a logical 1 bit data pulse pair. */
-	bool inverseLevel = false>       /* Flag whether pulse levels are normal or inverse. */
+	bool inverseLevel>               /* Flag whether pulse levels are normal or inverse. */
 struct makeTimingSpec;
 
 /**
@@ -127,15 +127,15 @@ struct makeTimingSpec;
  * Usage example:
  *
  * static const RxProtocolTable <
- *  //                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B , inverseLevel
- *  	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1>, 		// ()
- *  	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1>, 		// ()
- *  	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6>, 		// ()
- *  	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1>, 		// ()
- *  	makeTimingSpec<  5, 500, 20,   6,   14,    1,  2,    2,  1>, 		// ()
+ *  //                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
+ *  	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // ()
+ *  	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1, false>, // ()
+ *  	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6, false>, // ()
+ *  	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1, false>, // ()
+ *  	makeTimingSpec<  5, 500, 20,   6,   14,    1,  2,    2,  1, false>, // ()
  *  	makeTimingSpec<  6, 450, 20,   1,   23,    1,  2,    2,  1, true>, 	// (HT6P20B)
- *  	makeTimingSpec<  7, 150, 20,   2,   62,    1,  6,    6,  1>, 		// (HS2303-PT)
- *  	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16>, 		// (Conrad RS-200)
+ *  	makeTimingSpec<  7, 150, 20,   2,   62,    1,  6,    6,  1, false>, // (HS2303-PT)
+ *  	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16, false>, // (Conrad RS-200)
  *  	makeTimingSpec<  9, 365, 20,   1,   18,    3,  1,    1,  3, true>, 	// (1ByOne Doorbell)
  *  	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>, 	// (HT12E)
  *  	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)

@@ -67,10 +67,7 @@ namespace RcSwitch {
 
 namespace Debug {
 
-
-
-void dumpRxTimingSpecTable(UARTClass &serial,
-	const std::pair<const RxTimingSpec*, size_t> &rxtimingSpecTable) {
+void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable) {
 
 	serial.println(" #,i,{<--------SYNCH----------->}{<--------DATA 0-------->}{<--------DATA 1-------->}");
 	serial.println("      [  PulseA  ][   PulseB   ]  [  PulseA  ][  PulseB  ]  [  PulseA  ][  PulseB  ]");

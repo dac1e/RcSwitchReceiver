@@ -27,7 +27,6 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_
 
-#include "internal/common.hpp"
 #include <sys/types.h>
 #include <stdint.h>
 
@@ -36,6 +35,8 @@
 #if DEBUG_RCSWITCH
 #include <assert.h>
 #endif
+
+#include "internal/Common.hpp"
 
 /** Forward declaration of the class providing the API. */
 template<int IOPIN> class RcSwitchReceiver;
@@ -468,6 +469,8 @@ public:
 	using baseClass::reset;
 };
 
+using RcSwitch::rxTimingSpecTable_t;
+
 /**
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes
  * these last pulses, whenever a new pulse arrives by a new interrupt.
@@ -532,7 +535,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	 */
 
 	Receiver()
-		    : mRxTimingSpecTableNormal(nullptr, 0), mRxTimingSpecTableInverse(nullptr, 0)
+		    : mRxTimingSpecTableNormal{nullptr, 0}, mRxTimingSpecTableInverse{nullptr, 0}
 		    , mMessageAvailable(false), mSuspended(false)
 			, mDataModePulseCount(0), mMicrosecLastInterruptTime(0)
 			{

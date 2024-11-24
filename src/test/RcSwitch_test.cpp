@@ -24,7 +24,6 @@
 
 #include "../ProtocolDefinition.hpp"
 #include "RcSwitch_test.hpp"
-#include <algorithm>
 
 #if ENABLE_RCSWITCH_TEST
 #include <assert.h>
@@ -43,15 +42,15 @@ namespace RcSwitch {
 RcSwitch_test RcSwitch_test::theTest;
 
 static const RxProtocolTable <
-//                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B , inverseLevel
-	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1>, 		// ()
-	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1>, 		// ()
-	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6>, 		// ()
-	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1>, 		// ()
-	makeTimingSpec<  5, 500, 20,   6,   14,    1,  2,    2,  1>, 		// ()
+//                 #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
+	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // ()
+	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1, false>, // ()
+	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6, false>, // ()
+	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1, false>, // ()
+	makeTimingSpec<  5, 500, 20,   6,   14,    1,  2,    2,  1, false>, // ()
 	makeTimingSpec<  6, 450, 20,   1,   23,    1,  2,    2,  1, true>, 	// (HT6P20B)
-	makeTimingSpec<  7, 150, 20,   2,   62,    1,  6,    6,  1>, 		// (HS2303-PT)
-	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16>, 		// (Conrad RS-200)
+	makeTimingSpec<  7, 150, 20,   2,   62,    1,  6,    6,  1, false>, // (HS2303-PT)
+	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16, false>, // (Conrad RS-200)
 	makeTimingSpec<  9, 365, 20,   1,   18,    3,  1,    1,  3, true>, 	// (1ByOne Doorbell)
 	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>, 	// (HT12E)
 	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)
