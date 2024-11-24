@@ -22,8 +22,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#ifndef _INTERNAL_TYPESELECT_HPP_
-#define _INTERNAL_TYPESELECT_HPP_
+#ifndef RCSWITCH_RECEIVER_INTERNAL_TYPESELECT_HPP_
+#define RCSWITCH_RECEIVER_INTERNAL_TYPESELECT_HPP_
 
 
 #include <type_traits>
@@ -108,4 +108,4 @@ public:
 } // namespace typeselect
 
 
-#endif /* _INTERNAL_TYPESELECT_HPP_ */
+#endif /* RCSWITCH_RECEIVER_INTERNAL_TYPESELECT_HPP_ */

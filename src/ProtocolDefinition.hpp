@@ -24,9 +24,10 @@
 
 #pragma once
 
-#ifndef _PROTOCOLDEFINITION_HPP_
-#define _PROTOCOLDEFINITION_HPP_
+#ifndef RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_
+#define RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_
 
+#include "internal/common.hpp"
 #include <sys/types.h>
 #include <stdint.h>
 
@@ -151,4 +152,4 @@ template<typename ...TimingSpecs> struct RxProtocolTable;
 #include "internal/ProtocolTimingSpec.inc"
 
 
-#endif /* SRC_INTERNAL_PROTOCOLDEFINITION_HPP_ */
+#endif /* RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_ */

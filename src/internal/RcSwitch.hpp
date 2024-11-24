@@ -24,12 +24,12 @@
 
 #pragma once
 
-#ifndef _RCSWTICH_INTERNAL_HPP_
-#define _RCSWTICH_INTERNAL_HPP_
+#ifndef RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_
+#define RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_
 
+#include "internal/common.hpp"
 #include <sys/types.h>
 #include <stdint.h>
-#include <algorithm>
 
 #define DEBUG_RCSWITCH false
 
@@ -130,20 +130,23 @@ template<typename ELEMENT_TYPE> const ELEMENT_TYPE& INITIAL_VALUE();
 template<typename ELEMENT_TYPE, size_t CAPACITY>
 class Array {
 protected:
-  typedef ELEMENT_TYPE element_type;
-  /** The array where data is stored. */
-  element_type mData[CAPACITY];
+	typedef ELEMENT_TYPE element_type;
+	/** The array where data is stored. */
+	element_type mData[CAPACITY];
 
-  /** A variable to store the actual size of the array. */
-  size_t mSize;
+	/** A variable to store the actual size of the array. */
+	size_t mSize;
 
-	inline void init() {
+	TEXT_ISR_ATTR_1 inline void init() {
 #if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
-		std::fill(std::begin(mData), std::end(mData), INITIAL_VALUE<ELEMENT_TYPE>());
+		size_t i = 0;
+		for(; i < CAPACITY; i++) {
+			mData[i] = INITIAL_VALUE<ELEMENT_TYPE>();
+		}
 #endif
 	}
 
-	inline void reset() {
+	TEXT_ISR_ATTR_1 inline void reset() {
 		mSize = 0;
 		init();
 	}
@@ -152,8 +155,8 @@ protected:
 	Array() : mSize(0) {
 	}
 public:
-	inline size_t size() const {return mSize;}
-	inline bool canGrow() const {return mSize < CAPACITY;}
+	TEXT_ISR_ATTR_1 inline size_t size() const {return mSize;}
+	TEXT_ISR_ATTR_1 inline bool canGrow() const {return mSize < CAPACITY;}
 };
 
 /**
@@ -176,7 +179,7 @@ protected:
 	/* Set the actual size of this stack to zero and clear
 	 * the overflow counter.
 	 */
-	inline void reset() {baseClass::reset(), mOverflow = 0;}
+	TEXT_ISR_ATTR_2 inline void reset() {baseClass::reset(), mOverflow = 0;}
 
 	/* Default constructor */
 	inline StackBuffer() : mOverflow(0) {}
@@ -189,7 +192,7 @@ public:
 	 * beyond the top stack element. Return null, if there is
 	 * no beyond top stack element available.
 	 */
-	inline element_type* beyondTop() {
+	TEXT_ISR_ATTR_2 inline element_type* beyondTop() {
 		if (baseClass::mSize < CAPACITY) {
 			return &baseClass::mData[baseClass::mSize];
 		}
@@ -202,7 +205,7 @@ public:
 	 * set increment the overflow counter.
 	 * Returns true if successful, otherwise false.
 	 */
-	inline bool selectNext() {
+	TEXT_ISR_ATTR_2 inline bool selectNext() {
 		if (baseClass::mSize < CAPACITY) {
 			++baseClass::mSize;
 			return true;
@@ -215,7 +218,7 @@ public:
 	 * Push an element on top of the stack.
 	 * Returns true if successful, otherwise false.
 	 */
-	bool push(const element_type &value) {
+	TEXT_ISR_ATTR_1 bool push(const element_type &value) {
 		element_type* const storage = beyondTop();
 		if (storage) {
 			*storage = value;
@@ -244,14 +247,19 @@ public:
 	 * operator[]. The function will alter the actual stack size.
 	 * The overflow counter stays untouched.
 	 */
-	void remove(const size_t index) {
+	TEXT_ISR_ATTR_2 void remove(const size_t index) {
 		if(index < baseClass::mSize) {
 #if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
 			baseClass::mData[index] = INITIAL_VALUE<element_type>();
 #endif
-			std::move(&baseClass::mData[index+1], &baseClass::mData[baseClass::mSize],
-					&baseClass::mData[index]);
+			size_t i = index+1;
+			for(;i < baseClass::mSize; i++) {
+				baseClass::mData[i-1] = baseClass::mData[i];
+			}
 			--baseClass::mSize;
+#if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
+			baseClass::mData[mSize] = INITIAL_VALUE<element_type>();
+#endif
 		}
 	}
 
@@ -272,13 +280,16 @@ class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	 * The index of the bottom element of the stack.
 	 */
 	size_t mBegin;
-	static size_t inline squashedIndex(const size_t i) {return (i + CAPACITY) % CAPACITY;}
+	TEXT_ISR_ATTR_2 static size_t inline squashedIndex(const size_t i)
+	{
+		return (i + CAPACITY) % CAPACITY;
+	}
 protected:
 	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
 	using element_type = typename baseClass::element_type;
 
 	/** Set the actual size of this stack to zero. */
-	inline void reset() {baseClass::reset(); mBegin = 0;}
+	TEXT_ISR_ATTR_2 inline void reset() {baseClass::reset(); mBegin = 0;}
 
 	/** Default constructor */
 	inline RingBuffer() : mBegin(0) {}
@@ -289,7 +300,7 @@ public:
 	 * Return a pointer to the memory, that stores the element
 	 * beyond the top stack element.
 	 */
-	inline element_type* beyondTop() {
+	TEXT_ISR_ATTR_2 inline element_type* beyondTop() {
 		const size_t index = squashedIndex(mBegin + baseClass::mSize);
 		return &baseClass::mData[index];
 	}
@@ -299,7 +310,7 @@ public:
 	 * the stack size has already reached the capacity, the
 	 * bottom element will be dropped.
 	 */
-	inline void selectNext() {
+	TEXT_ISR_ATTR_2 inline void selectNext() {
 		if(baseClass::mSize < capacity) {
 			++baseClass::mSize;
 		} else {
@@ -317,32 +328,19 @@ public:
 	 * Return a const reference to the element at the specified index.
 	 * The index is validated by assert() system function.
 	 */
-	inline const element_type& at(const size_t index) const {
+	TEXT_ISR_ATTR_1 inline const element_type& at(const size_t index) const {
 		RCSWITCH_ASSERT(index < baseClass::mSize);
 		return baseClass::mData[squashedIndex(mBegin + index)];
-	}
-
-	/** Refer to methon at() */
-	inline const element_type& operator[](const size_t index) const {
-		return at(index);
 	}
 
 	/**
 	 * Return a reference to the element at the specified index.
 	 * The index is validated by assert() system function.
 	 */
-	inline element_type& at(const size_t index) {
+	TEXT_ISR_ATTR_1 inline element_type& at(const size_t index) {
 		RCSWITCH_ASSERT(index < baseClass::mSize);
 		return baseClass::mData[squashedIndex(mBegin + index)];
 	}
-
-	/**
-	 * Refer to method at()
-	 */
-	inline element_type& operator[](const size_t index) {
-		return at(index);
-	}
-
 };
 
 enum class DATA_BIT : ssize_t{
@@ -404,7 +402,7 @@ public:
 	}
 
 	/** Remove all protocol candidates from this container. */
-	inline void reset() {
+	TEXT_ISR_ATTR_1 inline void reset() {
 		baseClass::reset();
 		mProtocolGroupId = UNKNOWN_PROTOCOL;
 	}
@@ -415,8 +413,12 @@ public:
 	// Make the base class push() method public.
 	using baseClass::push;
 
-	void setProtocolGroup(const PROTOCOL_GROUP_ID protocolGroup) {mProtocolGroupId=protocolGroup;}
-	PROTOCOL_GROUP_ID getProtocolGroup()const {return mProtocolGroupId;}
+	TEXT_ISR_ATTR_2 void setProtocolGroup(const PROTOCOL_GROUP_ID protocolGroup) {
+		mProtocolGroupId = protocolGroup;
+	}
+	TEXT_ISR_ATTR_2 PROTOCOL_GROUP_ID getProtocolGroup() const {
+		return mProtocolGroupId;
+	}
 };
 
 
@@ -466,10 +468,6 @@ public:
 	using baseClass::reset;
 };
 
-/** Forward declaration */
-class RxTimingSpec;
-typedef std::pair<const RxTimingSpec*, size_t> rxTimingSpecTable_t;
-
 /**
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes
  * these last pulses, whenever a new pulse arrives by a new interrupt.
@@ -497,7 +495,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 #if DEBUG_RCSWITCH
 	PulseTracer mPulseTracer;
 	/** Store a new pulse in the trace buffer of this message packet. */
-	inline void tracePulse(uint32_t microSecDuration, const int pinLevel) {
+	TEXT_ISR_ATTR_1 inline void tracePulse(uint32_t microSecDuration, const int pinLevel) {
 		Pulse * const currentPulse = mPulseTracer.beyondTop();
 		*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
 		mPulseTracer.selectNext();
@@ -519,11 +517,11 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
 	enum STATE state() const;
 
-	rxTimingSpecTable_t getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
-	void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
-	void push(uint32_t microSecDuration, const int pinLevel);
-	PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
-	void retry();
+	TEXT_ISR_ATTR_2 rxTimingSpecTable_t getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
+	TEXT_ISR_ATTR_1 void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
+	TEXT_ISR_ATTR_1 void push(uint32_t microSecDuration, const int pinLevel);
+	TEXT_ISR_ATTR_1 PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
+	TEXT_ISR_ATTR_1 void retry();
 
 
 	/** ========================================================================== */
@@ -551,7 +549,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	 * Evaluate a new pulse that has been received. Will only
 	 * be called from within interrupt context.
 	 */
-	void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
+	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
 
 	/**
 	 * Remove protocol candidates
@@ -604,4 +602,4 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 
 } /* namespace RcSwitch */
 
-#endif /* RCSWTICH_INTERNAL_HPP_ */
+#endif /* RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_ */

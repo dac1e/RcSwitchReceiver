@@ -24,10 +24,10 @@
 
 #pragma once
 
-#ifndef RCSWITCHRECEIVER_HPP_
-#define RCSWITCHRECEIVER_HPP_
+#ifndef RCSWITCH_RECEIVER_API_HPP_
+#define RCSWITCH_RECEIVER_API_HPP_
 
-#include "ProtocolDefinition.hpp"
+#include "internal/common.hpp"
 #include "internal/RcSwitch.hpp"
 #include "Arduino.h"
 
@@ -146,4 +146,4 @@ public:
 /** The receiver instance for this IO pin. */
 template<int IOPIN> RcSwitch::Receiver RcSwitchReceiver<IOPIN>::mReceiver;
 
-#endif /* RCSWITCHRECEIVER_HPP_ */
+#endif /* RCSWITCH_RECEIVER_API_HPP_ */

@@ -25,6 +25,7 @@
 
 //#include "test/RcSwitch_test.hpp" // Comment in, if you want to run the test.
 #include "RcSwitchReceiver.hpp"
+#include "ProtocolDefinition.hpp"
 #include <Arduino.h>
 
 // For curiosity or debugging print the timing spec table that has been created.

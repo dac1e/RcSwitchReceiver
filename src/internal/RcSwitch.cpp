@@ -70,7 +70,7 @@ template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
 
 
 
-static PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protocol, const Pulse &pulse) {
+static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protocol, const Pulse &pulse) {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
@@ -99,7 +99,7 @@ static PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protocol, const Pulse &
 	return result;
 }
 
-static PulseTypes pulseBtoPulseTypes(const RxTimingSpec& protocol, const Pulse &pulse) {
+static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protocol, const Pulse &pulse) {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
@@ -129,7 +129,7 @@ static PulseTypes pulseBtoPulseTypes(const RxTimingSpec& protocol, const Pulse &
 	return result;
 }
 
-static inline void collectProtocolCandidates(const std::pair<const RxTimingSpec*, size_t>& protocol,
+static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const std::pair<const RxTimingSpec*, size_t>& protocol,
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	for(size_t i = 0; i < protocol.second; i++) {
 		const RxTimingSpec& prot = protocol.first[i];

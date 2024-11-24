@@ -24,6 +24,7 @@
 
 #include "../ProtocolDefinition.hpp"
 #include "RcSwitch_test.hpp"
+#include <algorithm>
 
 #if ENABLE_RCSWITCH_TEST
 #include <assert.h>
@@ -465,7 +466,7 @@ void RcSwitch_test::testRingBuffer() const {
 	for(; e < end; e++) { 											// fill stack elements with -2 .. 3.
 		assert(overwritingStack.size() == static_cast<size_t>(e-start));
 		overwritingStack.push(e);
-		assert(overwritingStack[e-start] == e);
+		assert(overwritingStack.at(e-start) == e);
 	}
 
 	assert(overwritingStack.size() == end-start); 					// stack should be full.
@@ -474,7 +475,7 @@ void RcSwitch_test::testRingBuffer() const {
 
 	for(size_t i = 0; i < overwritingStack.size(); i++) {      		// check the elements.
 		static const int expected[] = {-1,0,1,2,3};
-		assert(overwritingStack[i] == expected[i]);
+		assert(overwritingStack.at(i) == expected[i]);
 	}
 
 	overwritingStack.push(e++); 									// element should overwrite the oldest one.
@@ -482,7 +483,7 @@ void RcSwitch_test::testRingBuffer() const {
 
 	for(size_t i = 0; i < overwritingStack.size(); i++) {      		// check the elements.
 		static const int expected[] = {0,1,2,3,4};
-		assert(overwritingStack[i] == expected[i]);
+		assert(overwritingStack.at(i) == expected[i]);
 	}
 }
 

@@ -24,8 +24,8 @@
 
 #pragma once
 
-#ifndef RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_
-#define RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_
+#ifndef RCSWITCH_RECEIVER_INTERNAL_PROTOCOL_TIMING_SPEC__INC_
+#define RCSWITCH_RECEIVER_INTERNAL_PROTOCOL_TIMING_SPEC__INC_
 
 #include <sys/types.h>
 #include <stdint.h>
@@ -161,21 +161,6 @@ struct makeTimingSpec { // Calculate the timing specification from the protocol 
 		static constexpr bool value = inverseLevel == T::inverseLevel ?
 				(usecSynchA_lowerBound < T::usecSynchA_lowerBound) : inverseLevel < T::inverseLevel;
 	};
-
-	/* Currently only required for tests */
-	typedef RcSwitch::TxTimingSpec tx_spec_t;
-	static constexpr tx_spec_t TX = {protocolNumber, inverseLevel,
-		{	/* synch pulses */
-			uSecSynchA, uSecSynchB
-		},
-		{   /* LOGICAL_0 data bit logical pulses */
-			uSecData0_A, uSecData0_B
-		},
-		{
-			/* LOGICAL_1 data bit logical pulses */
-			uSecData1_A, uSecData1_B
-		},
-	};
 };
 
 
@@ -251,4 +236,4 @@ RxProtocolTable<std::tuple<T>> {
 	RcSwitch::RxTimingSpec m = T::RX;
 };
 
-#endif /* RCSWITCH_PROTOCOL_TIMING_SPEC_HPP_ */
+#endif // RCSWITCH_RECEIVER_INTERNAL_PROTOCOL_TIMING_SPEC__INC_
