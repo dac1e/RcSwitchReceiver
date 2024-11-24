@@ -2,7 +2,7 @@
 <project>
 	<configuration id="io.sloeber.core.sketch.0" name="Release">
 		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
-			<provider class="io.sloeber.core.toolchain.ArduinoLanguageProvider" console="false" env-hash="833914883241" id="io.sloeber.languageSettingsProvider" keep-relative-paths="false" name="Arduino Compiler Settings" parameter="${COMMAND} -E -P -v -dD -D__IN_ECLIPSE__ &quot;${INPUTS}&quot;" prefer-non-shared="true">
+			<provider class="io.sloeber.core.toolchain.ArduinoLanguageProvider" console="false" env-hash="819047631701014403" id="io.sloeber.languageSettingsProvider" keep-relative-paths="false" name="Arduino Compiler Settings" parameter="${COMMAND} -E -P -v -dD -D__IN_ECLIPSE__ &quot;${INPUTS}&quot;" prefer-non-shared="true">
 				<language-scope id="org.eclipse.cdt.core.gcc"/>
 				<language-scope id="org.eclipse.cdt.core.g++"/>
 			</provider>
@@ -10,7 +10,7 @@
 	</configuration>
 	<configuration id="io.sloeber.core.sketch.0.323711163" name="Debug">
 		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
-			<provider class="io.sloeber.core.toolchain.ArduinoLanguageProvider" console="false" env-hash="864583946417654309" id="io.sloeber.languageSettingsProvider" keep-relative-paths="false" name="Arduino Compiler Settings" parameter="${COMMAND} -E -P -v -dD -D__IN_ECLIPSE__ &quot;${INPUTS}&quot;" prefer-non-shared="true">
+			<provider class="io.sloeber.core.toolchain.ArduinoLanguageProvider" console="false" env-hash="815093909137566671" id="io.sloeber.languageSettingsProvider" keep-relative-paths="false" name="Arduino Compiler Settings" parameter="${COMMAND} -E -P -v -dD -D__IN_ECLIPSE__ &quot;${INPUTS}&quot;" prefer-non-shared="true">
 				<language-scope id="org.eclipse.cdt.core.gcc"/>
 				<language-scope id="org.eclipse.cdt.core.g++"/>
 			</provider>

@@ -216,7 +216,7 @@ public:
  * RxProtocolTable specialization for timing specs being passed as a tuple.
  */
 template<typename ...Ts> struct
-RxProtocolTable<std::tuple<Ts...>> {
+RxProtocolTable<typeselect::tuple<Ts...>> {
 private:
 	using T = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::selected;
 	using R = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::rest;
@@ -230,7 +230,7 @@ public:
  * RxProtocolTable specialization for a single timing spec being passed as a tuple.
  */
 template<typename T> struct
-RxProtocolTable<std::tuple<T>> {
+RxProtocolTable<typeselect::tuple<T>> {
 	DATA_ISR_ATTR RcSwitch::RxTimingSpec m = T::RX;
 };
 
