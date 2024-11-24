@@ -27,8 +27,8 @@
 #ifndef RCSWITCH_RECEIVER_API_HPP_
 #define RCSWITCH_RECEIVER_API_HPP_
 
-#include "internal/ProtocolDefinition.hpp"
 #include "internal/RcSwitch.hpp"
+#include "ProtocolDefinition.hpp"
 #include <Arduino.h>
 
 using RcSwitch::rxTimingSpecTable;
