@@ -5,7 +5,7 @@
  *      Author: Wolfgang
  */
 
-#include "ProtocolTimingSpec.inc"
+#include "ProtocolTimingSpec.hpp"
 #include <sys/types.h>
 #include <itoa.h>
 #include <UartClass.h>
@@ -67,14 +67,14 @@ namespace RcSwitch {
 
 namespace Debug {
 
-void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable) {
+void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable &rxtimingSpecTable) {
 
 	serial.println(" #,i,{<--------SYNCH----------->}{<--------DATA 0-------->}{<--------DATA 1-------->}");
 	serial.println("      [  PulseA  ][   PulseB   ]  [  PulseA  ][  PulseB  ]  [  PulseA  ][  PulseB  ]");
 	char buffer[96];
 
-	for (size_t i = 0; i < rxtimingSpecTable.second; i++) {
-		const RxTimingSpec &p = rxtimingSpecTable.first[i];
+	for (size_t i = 0; i < rxtimingSpecTable.size; i++) {
+		const RxTimingSpec &p = rxtimingSpecTable.start[i];
 		sprintNumber(buffer, p.protocolNumber, 2);
 		serial.print(buffer);
 		if (p.bInverseLevel) {

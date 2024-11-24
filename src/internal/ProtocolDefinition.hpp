@@ -29,6 +29,7 @@
 
 #include <sys/types.h>
 #include <stdint.h>
+
 #include "internal/Common.hpp"
 
 /*
@@ -149,7 +150,6 @@ struct makeTimingSpec;
  */
 template<typename ...TimingSpecs> struct RxProtocolTable;
 
-#include "internal/ProtocolTimingSpec.inc"
-
+#include "internal/ProtocolTimingSpec.hpp"
 
 #endif /* RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_ */

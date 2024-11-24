@@ -29,6 +29,7 @@
 
 #include <sys/types.h>
 #include <stdint.h>
+
 #include "common.hpp"
 #include "typeselect.hpp"
 
@@ -100,7 +101,7 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 };
 
 namespace Debug {
-	void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable_t &rxtimingSpecTable);
+	void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable &rxtimingSpecTable);
 }
 
 } // namespace RcSwitch
@@ -179,10 +180,10 @@ public:
 	RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
 
-	// Convert to rxTimingSpecTable_t
-	inline RcSwitch::rxTimingSpecTable_t toTimingSpecTable() const {
+	// Convert to rxTimingSpecTable
+	inline RcSwitch::rxTimingSpecTable toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
-		return RcSwitch::rxTimingSpecTable_t{toArray(), rowCount};
+		return RcSwitch::rxTimingSpecTable{toArray(), rowCount};
 	}
 	inline void dumpTimingSpec(UARTClass &serial) const {
 		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());
@@ -200,10 +201,10 @@ public:
 	static constexpr size_t ROW_COUNT =	sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
 	RcSwitch::RxTimingSpec m = T::RX;
 
-	// Convert to rxTimingSpecTable_t
-	inline RcSwitch::rxTimingSpecTable_t toTimingSpecTable() const {
+	// Convert to rxTimingSpecTable
+	inline RcSwitch::rxTimingSpecTable toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
-		return RcSwitch::rxTimingSpecTable_t{toArray(), rowCount};
+		return RcSwitch::rxTimingSpecTable{toArray(), rowCount};
 	}
 	inline void dumpTimingSpec(UARTClass &serial) const {
 		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());

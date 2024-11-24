@@ -22,7 +22,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#include "../ProtocolDefinition.hpp"
+#include "../internal/ProtocolDefinition.hpp"
 #include "RcSwitch_test.hpp"
 
 #if ENABLE_RCSWITCH_TEST

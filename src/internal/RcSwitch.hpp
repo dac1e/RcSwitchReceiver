@@ -469,7 +469,7 @@ public:
 	using baseClass::reset;
 };
 
-using RcSwitch::rxTimingSpecTable_t;
+using RcSwitch::rxTimingSpecTable;
 
 /**
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes
@@ -505,8 +505,8 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	}
 #endif
 
-	rxTimingSpecTable_t mRxTimingSpecTableNormal;
-	rxTimingSpecTable_t mRxTimingSpecTableInverse;
+	rxTimingSpecTable mRxTimingSpecTableNormal;
+	rxTimingSpecTable mRxTimingSpecTableInverse;
 
 	MessagePacket mReceivedMessagePacket;
 
@@ -520,7 +520,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
 	enum STATE state() const;
 
-	TEXT_ISR_ATTR_2 rxTimingSpecTable_t getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
+	TEXT_ISR_ATTR_2 rxTimingSpecTable getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
 	TEXT_ISR_ATTR_1 void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
 	TEXT_ISR_ATTR_1 void push(uint32_t microSecDuration, const int pinLevel);
 	TEXT_ISR_ATTR_1 PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
@@ -546,7 +546,7 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	/**
 	 * Set the protocol table for receiving data.
 	 */
-	void setRxTimingSpecTable(const rxTimingSpecTable_t& rxTimingSpecTable);
+	void setRxTimingSpecTable(const rxTimingSpecTable& rxTimingSpecTable);
 
 	/**
 	 * Evaluate a new pulse that has been received. Will only

@@ -24,7 +24,7 @@
 
 #include <limits>
 
-#include "../ProtocolDefinition.hpp"
+#include "ProtocolTimingSpec.hpp"
 #include "RcSwitch.hpp"
 
 
@@ -129,12 +129,12 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 	return result;
 }
 
-static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecTable_t& protocol,
+static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecTable& protocol,
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
-	for(size_t i = 0; i < protocol.second; i++) {
-		const RxTimingSpec& prot = protocol.first[i];
+	for(size_t i = 0; i < protocol.size; i++) {
+		const RxTimingSpec& prot = protocol.start[i];
 		if(pulseA.mMicroSecDuration <
-				protocol.first[i].synchronizationPulsePair.durationA.lowerBound) {
+				protocol.start[i].synchronizationPulsePair.durationA.lowerBound) {
 			/* Protocols are sorted in ascending order of synchronization
 			 * pulseA lower bound.
 			 * So further protocols will have even higher duration. Hence
@@ -158,11 +158,11 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecT
 
 // ======== Receiver ===================
 size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
-	 const rxTimingSpecTable_t& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
+	 const rxTimingSpecTable& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	 RCSWITCH_ASSERT(protocolCandidateIndex < mProtocolCandidates.size());
 	 const size_t protocolIndex = mProtocolCandidates.at(protocolCandidateIndex);
-	 RCSWITCH_ASSERT(protocolIndex < protocol.second);
-	 return protocol.first[protocolIndex].protocolNumber;
+	 RCSWITCH_ASSERT(protocolIndex < protocol.size);
+	 return protocol.start[protocolIndex].protocolNumber;
 }
 
 void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1) {
@@ -187,12 +187,12 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
 // inline attribute, because it is private and called once.
 inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) {
 	PULSE_TYPE result = PULSE_TYPE::UNKNOWN;
-	const rxTimingSpecTable_t protocols = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
+	const rxTimingSpecTable protocols = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	size_t protocolCandidatesIndex = mProtocolCandidates.size();
 	while(protocolCandidatesIndex > 0) {
 		--protocolCandidatesIndex;
-		RCSWITCH_ASSERT(protocolCandidatesIndex < protocols.second);
-		const RxTimingSpec& protocol = protocols.first[mProtocolCandidates[protocolCandidatesIndex]];
+		RCSWITCH_ASSERT(protocolCandidatesIndex < protocols.size);
+		const RxTimingSpec& protocol = protocols.start[mProtocolCandidates[protocolCandidatesIndex]];
 
 		const PulseTypes& pulseTypesPulseA = pulseAtoPulseTypes(protocol, pulseA);
 		const PulseTypes& pulseTypesPulseB = pulseBtoPulseTypes(protocol, pulseB);
@@ -348,7 +348,7 @@ int Receiver::receivedProtocol(const size_t index) const {
 	return -1;
 }
 
-rxTimingSpecTable_t Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const {
+rxTimingSpecTable Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const {
 	switch (protocolGroup) {
 	case PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS:
 		return mRxTimingSpecTableNormal;
@@ -360,22 +360,22 @@ rxTimingSpecTable_t Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) 
 		RCSWITCH_ASSERT(false);
 		break;
 	}
-	return rxTimingSpecTable_t{nullptr, 0};
+	return rxTimingSpecTable{nullptr, 0};
 }
 
-void Receiver::setRxTimingSpecTable(const rxTimingSpecTable_t& rxTimingSpecTable) {
+void Receiver::setRxTimingSpecTable(const rxTimingSpecTable& rxTimingSpecTable) {
 	size_t i = 0;
 	/* The given timing spec table is sorted in a way that inverse level protocols
 	 * reside at the end. */
-	for (; i < rxTimingSpecTable.second; i++) {
-		if (rxTimingSpecTable.first[i].bInverseLevel) {
+	for (; i < rxTimingSpecTable.size; i++) {
+		if (rxTimingSpecTable.start[i].bInverseLevel) {
 			break;
 		}
 	}
-	mRxTimingSpecTableNormal.first = &rxTimingSpecTable.first[0];
-	mRxTimingSpecTableNormal.second = i;
-	mRxTimingSpecTableInverse.first = &rxTimingSpecTable.first[i];
-	mRxTimingSpecTableInverse.second = rxTimingSpecTable.second - i;
+	mRxTimingSpecTableNormal.start = &rxTimingSpecTable.start[0];
+	mRxTimingSpecTableNormal.size = i;
+	mRxTimingSpecTableInverse.start = &rxTimingSpecTable.start[i];
+	mRxTimingSpecTableInverse.size = rxTimingSpecTable.size - i;
 }
 
 } /* namespace RcSwitch */

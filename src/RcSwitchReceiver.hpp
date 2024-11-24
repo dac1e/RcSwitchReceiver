@@ -27,12 +27,11 @@
 #ifndef RCSWITCH_RECEIVER_API_HPP_
 #define RCSWITCH_RECEIVER_API_HPP_
 
-#include "internal/Common.hpp"
+#include "internal/ProtocolDefinition.hpp"
 #include "internal/RcSwitch.hpp"
-#include "ProtocolDefinition.hpp"
 #include <Arduino.h>
 
-using RcSwitch::rxTimingSpecTable_t;
+using RcSwitch::rxTimingSpecTable;
 
 /**
  * This is the library API class for receiving data from a remote control.
@@ -60,7 +59,7 @@ public:
 	 * Sets the protocol timing specification table to be used for receiving data.
 	 * Sets up the receiver to receive interrupts from the IOPIN.
 	 */
-	static void begin(const rxTimingSpecTable_t& rxTimingSpecTable) {
+	static void begin(const rxTimingSpecTable& rxTimingSpecTable) {
 		pinMode(IOPIN, INPUT_PULLUP);
 		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
 		mReceiver.setRxTimingSpecTable(rxTimingSpecTable);
