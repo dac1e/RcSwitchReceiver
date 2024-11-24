@@ -177,7 +177,7 @@ private:
 	const RcSwitch::RxTimingSpec* toArray() const {return &m;}
 public:
 	static constexpr size_t ROW_COUNT =	sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
-	RcSwitch::RxTimingSpec m = T::RX;
+	DATA_ISR_ATTR RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
 
 	// Convert to rxTimingSpecTable
@@ -199,7 +199,7 @@ private:
 	const RcSwitch::RxTimingSpec* toArray() const {return &m;}
 public:
 	static constexpr size_t ROW_COUNT =	sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
-	RcSwitch::RxTimingSpec m = T::RX;
+	DATA_ISR_ATTR RcSwitch::RxTimingSpec m = T::RX;
 
 	// Convert to rxTimingSpecTable
 	inline RcSwitch::rxTimingSpecTable toTimingSpecTable() const {
@@ -221,7 +221,7 @@ private:
 	using T = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::selected;
 	using R = typename typeselect::select<RcSwitch::isRxTimingSpecLower, Ts...>::rest;
 public:
-	RcSwitch::RxTimingSpec m = T::RX;
+	DATA_ISR_ATTR RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
 };
 
@@ -231,7 +231,7 @@ public:
  */
 template<typename T> struct
 RxProtocolTable<std::tuple<T>> {
-	RcSwitch::RxTimingSpec m = T::RX;
+	DATA_ISR_ATTR RcSwitch::RxTimingSpec m = T::RX;
 };
 
 #endif // RCSWITCH_RECEIVER_INTERNAL_PROTOCOL_TIMING_SPEC__INC_
