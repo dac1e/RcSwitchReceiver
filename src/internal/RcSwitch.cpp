@@ -22,11 +22,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#include <limits>
 
 #include "ProtocolTimingSpec.hpp"
 #include "RcSwitch.hpp"
-
 
 #if defined max // max macro is not compatible with limits standard library.
 #undef max
@@ -37,38 +35,6 @@
 #endif
 
 namespace RcSwitch {
-
-#if DEBUG_RCSWITCH
-
-/** Specialize INITIAL_VALUE for DATA_BIT */
-template<> inline const DATA_BIT& INITIAL_VALUE<DATA_BIT>() {
-	static const DATA_BIT value = DATA_BIT::UNKNOWN;
-	return value;
-}
-
-/** Specialize INITIAL_VALUE for Pulse */
-template<> inline const Pulse& INITIAL_VALUE<Pulse>() {
-	static const Pulse value = Pulse{
-		0, PULSE_LEVEL::UNKNOWN
-	};
-	return value;
-}
-
-/** Specialize INITIAL_VALUE for PROTOCOL_CANDIDATE */
-template<> inline const PROTOCOL_CANDIDATE& INITIAL_VALUE<PROTOCOL_CANDIDATE>() {
-	static const PROTOCOL_CANDIDATE value = std::numeric_limits<size_t>::max();
-	return value;
-}
-
-/** Specialize INITIAL_VALUE for MessagePacket */
-template<> inline const MessagePacket& INITIAL_VALUE<MessagePacket>() {
-	static const MessagePacket value;
-	return value;
-}
-
-#endif
-
-
 
 static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protocol, const Pulse &pulse) {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };

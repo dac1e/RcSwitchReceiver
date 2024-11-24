@@ -26,6 +26,7 @@
 #include "../ProtocolDefinition.hpp"
 
 #if ENABLE_RCSWITCH_TEST
+#include <limits.h>
 #include <assert.h>
 
 #if defined max // max macro is not compatible with limits standard library.
@@ -161,11 +162,9 @@ static const TxDataBit invalidMessagePacket_secondPulseTooLong[] = {
 };
 
 #if DEBUG_RCSWITCH
-
-template<> inline const int& INITIAL_VALUE<int>() {
-	static const int value = std::numeric_limits<int>::max();
-	return value;
-}
+template<> struct INITIAL_VALUE<int> {
+	static constexpr int value = INT_MAX;
+};
 #endif
 
 template<size_t protocolNumber> class PulseLength {};

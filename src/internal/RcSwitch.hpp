@@ -27,7 +27,7 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define DEBUG_RCSWITCH false
@@ -122,7 +122,13 @@ constexpr size_t DATA_PULSES_PER_BIT     =  2;
  * A template function declaration providing initial values for
  * particular types. Will be specialized for the types where the
  * initial value is needed. */
-template<typename ELEMENT_TYPE> const ELEMENT_TYPE& INITIAL_VALUE();
+template<typename ELEMENT_TYPE> struct INITIAL_VALUE;
+
+/** Specialize INITIAL_VALUE for size_t */
+template<> struct INITIAL_VALUE<size_t> {
+	static constexpr size_t value = static_cast<size_t>(-1);
+};
+
 #endif
 
 /**
@@ -142,7 +148,7 @@ protected:
 #if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
 		size_t i = 0;
 		for(; i < CAPACITY; i++) {
-			mData[i] = INITIAL_VALUE<ELEMENT_TYPE>();
+			mData[i] = INITIAL_VALUE<ELEMENT_TYPE>::value;
 		}
 #endif
 	}
@@ -251,7 +257,7 @@ public:
 	TEXT_ISR_ATTR_2 void remove(const size_t index) {
 		if(index < baseClass::mSize) {
 #if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
-			baseClass::mData[index] = INITIAL_VALUE<element_type>();
+			baseClass::mData[index] = INITIAL_VALUE<element_type>::value;
 #endif
 			size_t i = index+1;
 			for(;i < baseClass::mSize; i++) {
@@ -259,7 +265,7 @@ public:
 			}
 			--baseClass::mSize;
 #if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
-			baseClass::mData[mSize] = INITIAL_VALUE<element_type>();
+			baseClass::mData[baseClass::mSize] = INITIAL_VALUE<element_type>::value;
 #endif
 		}
 	}
@@ -344,11 +350,18 @@ public:
 	}
 };
 
-enum class DATA_BIT : ssize_t{
+enum class DATA_BIT {
 	UNKNOWN   =-1,
 	LOGICAL_0 = 0,
 	LOGICAL_1 = 1,
 };
+
+#if DEBUG_RCSWITCH
+/** Specialize INITIAL_VALUE for DATA_BIT */
+template<> struct INITIAL_VALUE<DATA_BIT> {
+	static constexpr DATA_BIT value = DATA_BIT::UNKNOWN;
+};
+#endif
 
 enum class PULSE_LEVEL : uint8_t {
 	UNKNOWN = 0,
@@ -375,8 +388,15 @@ struct Pulse {
 	PULSE_LEVEL mPulseLevel;
 };
 
+#if DEBUG_RCSWITCH
+/** Specialize INITIAL_VALUE for Pulse */
+template<> struct INITIAL_VALUE<Pulse> {
+	static constexpr Pulse value = Pulse{0, PULSE_LEVEL::UNKNOWN};
+};
+#endif
 
-enum PROTOCOL_GROUP_ID : ssize_t {
+
+enum PROTOCOL_GROUP_ID {
 	/* Don't change assigned values, because enumerations
 	 * are also used as an index into an array.
 	 */

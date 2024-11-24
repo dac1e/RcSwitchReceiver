@@ -27,14 +27,13 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_PROTOCOL_TIMING_SPEC__INC_
 #define RCSWITCH_RECEIVER_INTERNAL_PROTOCOL_TIMING_SPEC__INC_
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <stdint.h>
 
-#include "common.hpp"
+#include "Common.hpp"
 #include "typeselect.hpp"
+#include <Arduino.h>
 
-// Forward declaration
-class UARTClass;
 
 namespace RcSwitch {
 
@@ -101,7 +100,8 @@ template<typename L, typename R> struct isRxTimingSpecLower {
 };
 
 namespace Debug {
-	void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable &rxtimingSpecTable);
+	typedef typeof(Serial) serial_t;
+	void dumpRxTimingSpecTable(serial_t &serial, const rxTimingSpecTable &rxtimingSpecTable);
 }
 
 } // namespace RcSwitch
@@ -185,7 +185,7 @@ public:
 		constexpr size_t rowCount = ROW_COUNT;
 		return RcSwitch::rxTimingSpecTable{toArray(), rowCount};
 	}
-	inline void dumpTimingSpec(UARTClass &serial) const {
+	inline void dumpTimingSpec(RcSwitch::Debug::serial_t &serial) const {
 		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());
 	}
 };
@@ -206,7 +206,7 @@ public:
 		constexpr size_t rowCount = ROW_COUNT;
 		return RcSwitch::rxTimingSpecTable{toArray(), rowCount};
 	}
-	inline void dumpTimingSpec(UARTClass &serial) const {
+	inline void dumpTimingSpec(RcSwitch::Debug::serial_t &serial) const {
 		RcSwitch::Debug::dumpRxTimingSpecTable(serial, toTimingSpecTable());
 	}
 };

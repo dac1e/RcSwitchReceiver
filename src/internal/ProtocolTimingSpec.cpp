@@ -6,9 +6,8 @@
  */
 
 #include "ProtocolTimingSpec.hpp"
-#include <sys/types.h>
-#include <itoa.h>
-#include <UartClass.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 namespace {
 
@@ -60,14 +59,13 @@ inline size_t sprintTimeRanges(char* string, const RcSwitch::RxPulsePairTimeRang
 	return i;
 }
 
-
 } // anonymous name space
 
 namespace RcSwitch {
 
 namespace Debug {
 
-void dumpRxTimingSpecTable(UARTClass &serial, const rxTimingSpecTable &rxtimingSpecTable) {
+void dumpRxTimingSpecTable(serial_t &serial, const rxTimingSpecTable &rxtimingSpecTable) {
 
 	serial.println(" #,i,{<--------SYNCH----------->}{<--------DATA 0-------->}{<--------DATA 1-------->}");
 	serial.println("      [  PulseA  ][   PulseB   ]  [  PulseA  ][  PulseB  ]  [  PulseA  ][  PulseB  ]");

@@ -49,11 +49,11 @@ static const RxProtocolTable <
 	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)
 > rxProtocolTable;
 
-constexpr int RX433_DATA_PIN = 6;
+constexpr int RX433_DATA_PIN = 2;
 static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 
 // Reference to the serial to be used for printing.
-UARTClass& serial = Serial3;
+typeof(Serial)& serial = Serial;
 
 // The setup function is called once at startup of the sketch
 void setup()

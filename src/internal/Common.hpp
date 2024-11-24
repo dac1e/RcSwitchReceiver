@@ -44,7 +44,7 @@
 #define TEXT_ISR_ATTR_1 TEXT_ISR_ATTR // attibute functions called by handleInterrupt()
 #define TEXT_ISR_ATTR_2 TEXT_ISR_ATTR // attibute functions called by functions called by handleInterrupt()
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <stdint.h>
 
 namespace RcSwitch {
