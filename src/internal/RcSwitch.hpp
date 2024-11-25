@@ -119,8 +119,8 @@ constexpr size_t DATA_PULSES_PER_BIT     =  2;
 
 #if DEBUG_RCSWITCH
 /**
- * A template function declaration providing initial values for
- * particular types. Will be specialized for the types where the
+ * A template function structure providing initial values for
+ * the particular types. Will be specialized for the types where
  * initial value is needed. */
 template<typename ELEMENT_TYPE> struct INITIAL_VALUE;
 
@@ -145,7 +145,7 @@ protected:
 	size_t mSize;
 
 	TEXT_ISR_ATTR_1 inline void init() {
-#if DEBUG_RCSWITCH // Initialize only if debugging support is enabled
+#if DEBUG_RCSWITCH // Initialize only if debugging is enabled
 		size_t i = 0;
 		for(; i < CAPACITY; i++) {
 			mData[i] = INITIAL_VALUE<ELEMENT_TYPE>::value;
@@ -169,7 +169,7 @@ public:
 /**
  * A container that encapsulates a fixed size stack. Elements can be
  * pushed onto the stack as long as the actual size is smaller than
- * the capacity. Otherwise, the pushed element is dropped, and an
+ * the capacity. Otherwise, the pushed element is dropped, and the
  * overflow counter is incremented.
  */
 template<typename ELEMENT_TYPE, size_t CAPACITY>
@@ -284,7 +284,7 @@ template<typename ELEMENT_TYPE, size_t CAPACITY>
 class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
 	/**
-	 * The index of the bottom element of the stack.
+	 * The index of the bottom element of the ring buffer.
 	 */
 	size_t mBegin;
 	TEXT_ISR_ATTR_2 static size_t inline squashedIndex(const size_t i)
@@ -295,7 +295,7 @@ protected:
 	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
 	using element_type = typename baseClass::element_type;
 
-	/** Set the actual size of this stack to zero. */
+	/** Set the actual size of this ring buffer to zero. */
 	TEXT_ISR_ATTR_2 inline void reset() {baseClass::reset(); mBegin = 0;}
 
 	/** Default constructor */
@@ -305,7 +305,7 @@ public:
 
 	/**
 	 * Return a pointer to the memory, that stores the element
-	 * beyond the top stack element.
+	 * beyond the top ring buffer element.
 	 */
 	TEXT_ISR_ATTR_2 inline element_type* beyondTop() {
 		const size_t index = squashedIndex(mBegin + baseClass::mSize);
@@ -313,8 +313,8 @@ public:
 	}
 
 	/**
-	 * Make the beyond top stack element to the top element. If
-	 * the stack size has already reached the capacity, the
+	 * Make the beyond top ring buffer element to the top element. If
+	 * the ring buffer size has already reached the capacity, the
 	 * bottom element will be dropped.
 	 */
 	TEXT_ISR_ATTR_2 inline void selectNext() {
@@ -397,9 +397,6 @@ template<> struct INITIAL_VALUE<Pulse> {
 
 
 enum PROTOCOL_GROUP_ID {
-	/* Don't change assigned values, because enumerations
-	 * are also used as an index into an array.
-	 */
 	UNKNOWN_PROTOCOL       = -1,
 	NORMAL_LEVEL_PROTOCOLS  = 0,
 	INVERSE_LEVEL_PROTOCOLS = 1,
