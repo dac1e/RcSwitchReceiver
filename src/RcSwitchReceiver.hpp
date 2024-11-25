@@ -50,11 +50,25 @@ using RcSwitch::rxTimingSpecTable;
 template<int IOPIN> class RcSwitchReceiver {
 	static RcSwitch::Receiver mReceiver;
 
-	static void handleInterrupt() {
-		mReceiver.handleInterrupt(digitalRead(IOPIN), micros());
+	TEXT_ISR_ATTR_0 static void handleInterrupt() {
+		const unsigned long time = micros();
+		const int pinLevel = digitalRead(IOPIN);
+		mReceiver.handleInterrupt(pinLevel, time);
 	}
 public:
+#if DEBUG_RCSWITCH
+	void enableTrace() {
+		mReceiver.mPulseTracerEnabled = true;
+	}
 
+	void disableTrace() {
+		mReceiver.mPulseTracerEnabled = false;
+	}
+
+	void dumpPulseTracer(typeof(Serial)& serial) {
+		mReceiver.dumpPulseTracer(serial);
+	}
+#endif
 	/**
 	 * Sets the protocol timing specification table to be used for receiving data.
 	 * Sets up the receiver to receive interrupts from the IOPIN.

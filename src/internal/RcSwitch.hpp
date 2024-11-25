@@ -450,6 +450,17 @@ public:
 class PulseTracer : public RingBuffer<Pulse, MAX_PULSE_TRACES> {
 	using baseClass = RingBuffer<Pulse, MAX_PULSE_TRACES>;
 public:
+	template<typename T>
+	void dump(T& s) {
+		const size_t n = size();
+		size_t i = 0;
+		for(;i < n; i++) {
+			const Pulse& pulse = at(i);
+			s.print(pulse.mMicroSecDuration);
+			s.print(", ");
+			s.println(static_cast<uint8_t>(pulse.mPulseLevel)-1);
+		}
+	}
 
 	PulseTracer() {
 		/* Initialize pulse tracer elements. */
@@ -517,11 +528,22 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	 */
 #if DEBUG_RCSWITCH
 	PulseTracer mPulseTracer;
+	volatile bool mPulseTracerEnabled = false;
+	volatile bool mPulseTracerDumping = false;
 	/** Store a new pulse in the trace buffer of this message packet. */
 	TEXT_ISR_ATTR_1 inline void tracePulse(uint32_t microSecDuration, const int pinLevel) {
-		Pulse * const currentPulse = mPulseTracer.beyondTop();
-		*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
-		mPulseTracer.selectNext();
+		if(mPulseTracerEnabled && not mPulseTracerDumping) {
+			Pulse * const currentPulse = mPulseTracer.beyondTop();
+			*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
+			mPulseTracer.selectNext();
+		}
+	}
+
+	template <typename T>
+	void dumpPulseTracer(T& serial) {
+		mPulseTracerDumping = true;
+		mPulseTracer.dump(serial);
+		mPulseTracerDumping = false;
 	}
 #endif
 
