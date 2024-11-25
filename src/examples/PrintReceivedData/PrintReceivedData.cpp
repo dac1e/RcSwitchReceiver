@@ -63,12 +63,13 @@ void setup()
 #endif
 
 	serial.begin(9600);
-	delay(100);
 
 #if DUMP_TIMING_SPEC_TABLE
 	serial.println();
 	rxProtocolTable.dumpTimingSpec(serial);
 	serial.println();
+
+	// Allow time to finalize printing the table.
 	delay(500);
 #endif
 
