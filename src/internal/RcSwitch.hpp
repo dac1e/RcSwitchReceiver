@@ -453,13 +453,13 @@ public:
 		return "??";
 	}
 
-	template<typename T>
-	void dump(T& s) {
+	template<typename T> void dumpBackward(T& s) {
 		const size_t n = baseClass::size();
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
-		for(;i < n; i++) {
-			const Pulse& pulse = baseClass::at(i);
+		while(i < n) {
+			++i;
+			const Pulse& pulse = baseClass::at(n-i);
 
 			{	// print index
 				char buffer[16];
@@ -649,7 +649,7 @@ class ReceiverWithPulseTracer : public Receiver {
 	 */
 	template <typename T> void dumpPulseTracer(T& serial) {
 		mPulseTracerDumping = true;
-		mPulseTracer.dump(serial);
+		mPulseTracer.dumpBackward(serial);
 		mPulseTracerDumping = false;
 	}
 };

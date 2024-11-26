@@ -146,7 +146,7 @@ public:
 	static void resume() {mReceiver.resume();}
 
 	/**
-	 * Dump the most recent received pulses.
+	 * Dump the most recent received pulses, starting with the youngest pulse.
 	 */
 	static void dumpPulseTracer(typeof(Serial)& serial) {
 		mReceiver.dumpPulseTracer(serial);

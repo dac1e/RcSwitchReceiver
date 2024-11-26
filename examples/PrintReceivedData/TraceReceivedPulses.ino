@@ -30,7 +30,7 @@
 #include <Arduino.h>
 
 // Trace the last 64 received pulses from the remote control.
-constexpr size_t TRACE_BUFFER_SIZE = 64;
+constexpr size_t TRACE_BUFFER_SIZE = 128;
 constexpr int RX433_DATA_PIN = 2;
 
 // Passing a trace buffer size greater 0 will enable RcSwitchReceiver tracing capability.
@@ -72,6 +72,9 @@ void loop()
 	const int buttonState = digitalRead(TRIGGER_BUTTON);
 	if(lastbuttonState == HIGH && buttonState == LOW) {
 		output.println("===========================");
+		//
+		// Dump the most recent received pulses, starting with the youngest pulse.
+		//
 		rcSwitchReceiver.dumpPulseTracer(output);
 	}
 	lastbuttonState = buttonState;
