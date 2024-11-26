@@ -186,9 +186,6 @@ inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& p
 void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
 	if(!mSuspended) {
 		const uint32_t microSecDuration = microSecInterruptTime - mMicrosecLastInterruptTime;
-#if DEBUG_RCSWITCH
-		tracePulse(microSecDuration, pinLevel);
-#endif
 		push(microSecDuration, pinLevel);
 
 		switch(state()) {

@@ -47,8 +47,11 @@ using RcSwitch::rxTimingSpecTable;
  * RcSwitchReceiver<6> rcSwitchReceiver315;
  */
 
-template<int IOPIN> class RcSwitchReceiver {
-	static RcSwitch::Receiver mReceiver;
+template<int IOPIN, size_t PULSE_TRACES_COUNT = 0> class RcSwitchReceiver {
+public:
+	using receiver_t = typename RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::receiver_t;
+private:
+	static receiver_t mReceiver;
 
 	TEXT_ISR_ATTR_0 static void handleInterrupt() {
 		const unsigned long time = micros();
@@ -56,19 +59,6 @@ template<int IOPIN> class RcSwitchReceiver {
 		mReceiver.handleInterrupt(pinLevel, time);
 	}
 public:
-#if DEBUG_RCSWITCH
-	void enableTrace() {
-		mReceiver.mPulseTracerEnabled = true;
-	}
-
-	void disableTrace() {
-		mReceiver.mPulseTracerEnabled = false;
-	}
-
-	void dumpPulseTracer(typeof(Serial)& serial) {
-		mReceiver.dumpPulseTracer(serial);
-	}
-#endif
 	/**
 	 * Sets the protocol timing specification table to be used for receiving data.
 	 * Sets up the receiver to receive interrupts from the IOPIN.
@@ -155,9 +145,16 @@ public:
 	 */
 	static void resume() {mReceiver.resume();}
 
+	/**
+	 * Dump the most recent received pulses.
+	 */
+	static void dumpPulseTracer(typeof(Serial)& serial) {
+		mReceiver.dumpPulseTracer(serial);
+	}
 };
 
 /** The receiver instance for this IO pin. */
-template<int IOPIN> RcSwitch::Receiver RcSwitchReceiver<IOPIN>::mReceiver;
+template<int IOPIN, size_t PULSE_TRACES_COUNT> typename RcSwitchReceiver<IOPIN, PULSE_TRACES_COUNT>::receiver_t
+	RcSwitchReceiver<IOPIN, PULSE_TRACES_COUNT>::mReceiver;
 
 #endif /* RCSWITCH_RECEIVER_API_HPP_ */

@@ -56,6 +56,9 @@ struct rxTimingSpecTable {
 	size_t size;
 };
 
+size_t digitCount(size_t value);
+void sprintUint(char *string, const size_t value, const size_t width);
+
 }
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_ */

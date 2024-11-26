@@ -39,7 +39,7 @@
 #include "internal/Common.hpp"
 
 /** Forward declaration of the class providing the API. */
-template<int IOPIN> class RcSwitchReceiver;
+template<int IOPIN, size_t PULSE_TRACES_COUNT> class RcSwitchReceiver;
 
 namespace RcSwitch {
 
@@ -70,15 +70,11 @@ namespace RcSwitch {
  */
 
 #if DEBUG_RCSWITCH
-/**
- * The size of the pulse tracer.
- * Can be changed.
- */
-constexpr size_t MAX_PULSE_TRACES = 64;
 #define RCSWITCH_ASSERT assert
 #else
 #define RCSWITCH_ASSERT(expr)
 #endif
+
 
 /**
  * The maximum number of protocols that can be collected.
@@ -443,25 +439,53 @@ public:
 /**
  * This container stores received pulses for debugging purpose. The
  * purpose is to view the pulses in a debugging session. */
-#if DEBUG_RCSWITCH
-class PulseTracer : public RingBuffer<Pulse, MAX_PULSE_TRACES> {
-	using baseClass = RingBuffer<Pulse, MAX_PULSE_TRACES>;
+template<size_t PULSE_TRACES_COUNT>
+class PulseTracer : public RingBuffer<Pulse, PULSE_TRACES_COUNT> {
+	using baseClass = RingBuffer<Pulse, PULSE_TRACES_COUNT>;
 public:
+	static const char* pulseTypeToString(const Pulse& pulse) {
+		switch(pulse.mPulseLevel) {
+		case PULSE_LEVEL::LO:
+			return " LOW";
+		case PULSE_LEVEL::HI:
+			return "HIGH";
+		}
+		return "??";
+	}
+
 	template<typename T>
 	void dump(T& s) {
-		const size_t n = size();
+		const size_t n = baseClass::size();
 		size_t i = 0;
+		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		for(;i < n; i++) {
-			const Pulse& pulse = at(i);
-			s.print(pulse.mMicroSecDuration);
-			s.print(", ");
-			s.println(static_cast<uint8_t>(pulse.mPulseLevel)-1);
+			const Pulse& pulse = baseClass::at(i);
+
+			{	// print index
+				char buffer[16];
+				size_t b = 0;
+				buffer[b++] = ('[');
+				sprintUint(&buffer[b++], i, indexWidth);
+				s.print(buffer);
+				s.print("] ");
+			}
+
+			s.print(pulseTypeToString(pulse));
+			s.print(" after ");
+
+			{ // print pulse length
+				char buffer[16];
+				sprintUint(buffer, pulse.mMicroSecDuration, 6);
+				s.print(buffer);
+			}
+
+			s.println(" usec");
 		}
 	}
 
 	PulseTracer() {
 		/* Initialize pulse tracer elements. */
-		Array::init();
+		Array<Pulse, PULSE_TRACES_COUNT>::init();
 	}
 
 	/**
@@ -470,7 +494,6 @@ public:
 	// Make the base class reset() method public.
 	using baseClass::reset;
 };
-#endif
 
 /**
  * This container stores the received data bits of a single message packet
@@ -511,38 +534,14 @@ using RcSwitch::rxTimingSpecTable;
  * function is called.
  */
 class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
+private:
 	/** =========================================================================== */
 	/** == Privately used types, enumerations, variables and methods ============== */
 	using baseClass = RingBuffer<Pulse, DATA_PULSES_PER_BIT>;
 	friend class RcSwitch_test;
 
 	/** API class becomes friend. */
-	template<int IOPIN> friend class ::RcSwitchReceiver;
-
-	/**
-	 * The most recent received pulses are stored in the pulse tracer for
-	 * debugging purpose.
-	 */
-#if DEBUG_RCSWITCH
-	PulseTracer mPulseTracer;
-	volatile bool mPulseTracerEnabled = false;
-	volatile bool mPulseTracerDumping = false;
-	/** Store a new pulse in the trace buffer of this message packet. */
-	TEXT_ISR_ATTR_1 inline void tracePulse(uint32_t microSecDuration, const int pinLevel) {
-		if(mPulseTracerEnabled && not mPulseTracerDumping) {
-			Pulse * const currentPulse = mPulseTracer.beyondTop();
-			*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
-			mPulseTracer.selectNext();
-		}
-	}
-
-	template <typename T>
-	void dumpPulseTracer(T& serial) {
-		mPulseTracerDumping = true;
-		mPulseTracer.dump(serial);
-		mPulseTracerDumping = false;
-	}
-#endif
+	template<int IOPIN, size_t PULSE_TRACES_COUNT> friend class ::RcSwitchReceiver;
 
 	rxTimingSpecTable mRxTimingSpecTableNormal;
 	rxTimingSpecTable mRxTimingSpecTableInverse;
@@ -554,7 +553,6 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 
 	ProtocolCandidates mProtocolCandidates;
 	size_t mDataModePulseCount;
-	uint32_t mMicrosecLastInterruptTime;
 
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
 	enum STATE state() const;
@@ -565,6 +563,12 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 	TEXT_ISR_ATTR_1 PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
 	TEXT_ISR_ATTR_1 void retry();
 
+protected:
+	uint32_t mMicrosecLastInterruptTime;
+	/**
+	 * Evaluate a new pulse that has been received. Will only be called from within interrupt context.
+	 */
+	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
 
 	/** ========================================================================== */
 	/** ========= Methods used by API class RcSwitchReceiver ===================== */
@@ -582,64 +586,80 @@ class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 			Array::init();
 	}
 
+private:
 	/**
 	 * Set the protocol table for receiving data.
 	 */
 	void setRxTimingSpecTable(const rxTimingSpecTable& rxTimingSpecTable);
 
 	/**
-	 * Evaluate a new pulse that has been received. Will only
-	 * be called from within interrupt context.
-	 */
-	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
-
-	/**
-	 * Remove protocol candidates
-	 * for the mProtocolCandidates buffer.
+	 * Remove protocol candidates for the mProtocolCandidates buffer.
 	 * Remove the all data pulses from this container.
 	 * Reset the available flag.
 	 *
-	 * Will be called from inside and outside of the
-	 * interrupt handler context.
+	 * Will be called from outside of the interrupt handler context.
 	 */
 	void reset();
 
 	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
+	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
 	 */
 	inline bool available() const {return state() == AVAILABLE_STATE;}
-
-	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
-	 */
 	uint32_t receivedValue() const;
-
-	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
-	 */
 	size_t receivedBitsCount() const;
-
-	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
-	 */
 	inline size_t receivedProtocolCount() const {return mProtocolCandidates.size();}
-
-	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
-	 */
 	int receivedProtocol(const size_t index) const;
-
-	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
-	 */
 	void suspend() {mSuspended = true;}
+	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
+	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
+	template <typename T> void dumpPulseTracer(T& serial) {/* do nothing. */}
+};
+
+template<size_t PULSE_TRACES_COUNT>
+class ReceiverWithPulseTracer : public Receiver {
+	/** API class becomes friend. */
+	template<int IOPIN> friend class ::RcSwitchReceiver;
 
 	/**
-	 * Refer to corresponding API class RcSwitchReceiver;
+	 * The most recent received pulses are stored in the pulse tracer for
+	 * debugging purpose.
 	 */
-	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
+	PulseTracer<PULSE_TRACES_COUNT> mPulseTracer;
+	volatile bool mPulseTracerDumping = false;
 
-	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
+	/**
+	 * Evaluate a new pulse that has been received. Will only be called from within interrupt context.
+	 */
+	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
+		tracePulse(microSecInterruptTime - mMicrosecLastInterruptTime, pinLevel);
+		Receiver::handleInterrupt(pinLevel, microSecInterruptTime);
+	}
+
+	/** Store a new pulse in the trace buffer of this message packet. */
+	TEXT_ISR_ATTR_1 void tracePulse(uint32_t microSecDuration, const int pinLevel) {
+		if(not mPulseTracerDumping) {
+			Pulse * const currentPulse = mPulseTracer.beyondTop();
+			*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
+			mPulseTracer.selectNext();
+		}
+	}
+
+	/**
+	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
+	 */
+	template <typename T> void dumpPulseTracer(T& serial) {
+		mPulseTracerDumping = true;
+		mPulseTracer.dump(serial);
+		mPulseTracerDumping = false;
+	}
+};
+
+template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
+	using receiver_t = ReceiverWithPulseTracer<PULSE_TRACES_COUNT>;
+};
+
+template<> struct ReceiverSelector<0> {
+	using receiver_t = Receiver;
 };
 
 } /* namespace RcSwitch */

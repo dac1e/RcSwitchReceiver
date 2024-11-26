@@ -23,6 +23,10 @@
 */
 
 
+/**
+ * Please read "hints on remote operating distance" in README.md
+ */
+
 //#include "test/RcSwitch_test.hpp" // Comment in, if you want to run the test.
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
@@ -35,7 +39,7 @@
 // However, the number of normal level protocols as well as the number of inverse level
 // Protocols should not exceed 7 in this table. Refer to MAX_PROTOCOL_CANDIDATES in RcSwitch.hpp.
 static const RxProtocolTable <
-//                 #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
+//                  #, clk,  %, syA,  syB,  d0A,d0B,  d1A, d1B, inverseLevel
 	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // ()
 	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1, false>, // ()
 	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6, false>, // ()
@@ -53,7 +57,7 @@ constexpr int RX433_DATA_PIN = 2;
 static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 
 // Reference to the serial to be used for printing.
-typeof(Serial)& serial = Serial;
+typeof(Serial)& output = Serial;
 
 // The setup function is called once at startup of the sketch
 void setup()
@@ -62,12 +66,12 @@ void setup()
 	RcSwitch::RcSwitch_test::theTest.run();
 #endif
 
-	serial.begin(9600);
+	output.begin(9600);
 
 #if DUMP_TIMING_SPEC_TABLE
-	serial.println();
-	rxProtocolTable.dumpTimingSpec(serial);
-	serial.println();
+	output.println();
+	rxProtocolTable.dumpTimingSpec(output);
+	output.println();
 
 	// Allow time to finalize printing the table.
 	delay(500);
@@ -81,25 +85,25 @@ void loop()
 {
 	if (rcSwitchReceiver.available()) {
 		const uint32_t value = rcSwitchReceiver.receivedValue();
-		serial.print("Received ");
-		serial.print(value);
+		output.print("Received ");
+		output.print(value);
 
 
 		const size_t n = rcSwitchReceiver.receivedProtocolCount();
-		serial.print(" / Protocol number");
+		output.print(" / Protocol number");
 		if(n > 1) {
-			serial.print("s:");
+			output.print("s:");
 		} else {
-			serial.print(':');
+			output.print(':');
 		}
 
 		for(size_t i = 0; i < n; i++) {
 			const int protocolNumber = rcSwitchReceiver.receivedProtocol(i);
-			serial.print(' ');
-			serial.print(protocolNumber);
+			output.print(' ');
+			output.print(protocolNumber);
 		}
 
-		serial.println();
+		output.println();
 
 		rcSwitchReceiver.resetAvailable();
 	}

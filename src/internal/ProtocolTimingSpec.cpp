@@ -5,39 +5,20 @@
  *      Author: Wolfgang
  */
 
+#include "Common.hpp"
 #include "ProtocolTimingSpec.hpp"
 #include <stddef.h>
 #include <stdlib.h>
 
 namespace {
 
-size_t getDigitCount(size_t num) {
-	size_t result = 0;
-	do {
-		++result;
-		num /=10;
-	} while(num > 0);
-	return result;
-}
-
-void sprintNumber(char *string, const size_t num, const size_t width) {
-	const size_t digitCnt = getDigitCount(num);
-	const size_t spacesCnt = width > digitCnt ? width - digitCnt : 0;
-	size_t i = 0;
-	while(i < spacesCnt) {
-		string[i] = ' ';
-		++i;
-	}
-	itoa(num, &string[i], 10);
-}
-
 size_t sprintRange(char *string, const size_t begin, const size_t end, const size_t width) {
 	size_t i=0;
 	string[i++] = '[';
-	sprintNumber(&string[i], begin, width); // adds a null terminated string
+	RcSwitch::sprintUint(&string[i], begin, width); // adds a null terminated string
 	strcat(string, "..");
 	i = strlen(string);
-	sprintNumber(&string[i], end, width); // adds a null terminated string
+	RcSwitch::sprintUint(&string[i], end, width); // adds a null terminated string
 	i = strlen(string);
 	string[i++] = ']';
 	string[i] = '\0'; // ensure null termination
@@ -73,7 +54,7 @@ void dumpRxTimingSpecTable(serial_t &serial, const rxTimingSpecTable &rxtimingSp
 
 	for (size_t i = 0; i < rxtimingSpecTable.size; i++) {
 		const RxTimingSpec &p = rxtimingSpecTable.start[i];
-		sprintNumber(buffer, p.protocolNumber, 2);
+		sprintUint(buffer, p.protocolNumber, 2);
 		serial.print(buffer);
 		if (p.bInverseLevel) {
 			serial.print(",1,");
