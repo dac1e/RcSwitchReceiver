@@ -26,6 +26,7 @@
  * Please read "hints on remote operating distance" in README.md
  */
 
+#include "ProtocolDefinition.hpp"
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
