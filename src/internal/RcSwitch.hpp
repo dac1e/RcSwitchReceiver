@@ -54,18 +54,11 @@ namespace RcSwitch {
 /**
  * Setting DEBUG_RCSWITCH to true will:
  *
- * 1) Enable a pulse tracer that stores the last N pulses
- * that were processed by the interrupt handler.
- * For the value of N refer to constexpr MAX_PULSE_TRACES.
- * The contents of the pulse tracer can be viewed in a
- * debugger. JTAG debugging is supported on some
- * arduino variants like arduino due.
- *
- * 2) Initialize elements of arrays within objects upon
+ * 1) Initialize elements of arrays within objects upon
  * reset() calls. This helps to quickly recognize
  * that an array element was explicitly set.
  *
- * 3) Maps macro RCSWITCH_ASSERT to the system function
+ * 2) Map macro RCSWITCH_ASSERT to the system function
  * assert.
  */
 
@@ -156,6 +149,7 @@ protected:
 
 	/** Default constructor */
 	Array() : mSize(0) {
+		init();
 	}
 public:
 	TEXT_ISR_ATTR_1 inline size_t size() const {return mSize;}
