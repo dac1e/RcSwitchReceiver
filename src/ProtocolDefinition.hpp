@@ -33,9 +33,9 @@
 #include "internal/Common.hpp"
 
 /*
- * The protocol is a stream of pulse pairs with different duration and pulse levels.
- * In the context of this documentation, the first pulse will be referenced as
- * "pulse A" and the second one as "pulse B".
+ * The remote control protocol is a stream of pulse pairs with different duration and
+ * pulse levels. In the context of this documentation, the first pulse will be
+ * referred to as "pulse A" and the second one as "pulse B".
  *
  *   Normal level protocols start with a high level:
  *          ___________________
@@ -47,7 +47,7 @@
  *                              ____________________
  *     XXXX|___________________|                    |XXXX
  *
- *	       ^                   ^                    ^
+ *         ^                   ^                    ^
  *         | pulse A duration  | pulse B duration   |
  *
  *

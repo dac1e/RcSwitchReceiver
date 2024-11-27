@@ -16,3 +16,52 @@ properly when powered from the Arduino 5V pin. When the Arduino Due is supplied 
 Due 5V pin, will drop the operating distance by at least 50% compared to the USB powering situation. So when the extra power 
 connector is used for Arduino Due, I recommend suppying the receiver module separately by a linear Voltage regulator like an 
 7805, to achieve best operating distance.
+
+## Remote control protocol
+The remote control protocol is a stream of pulse pairs with different duration and pulse levels. In the context of this library,
+the first pulse will be referred to as "pulse A" and the second one as "pulse B".
+
+  Normal level protocols start with a high level:
+         ___________________
+    XXXX|                   |____________________|XXXX
+
+
+
+  Inverse level protocols start with a low level:
+                             ____________________
+    XXXX|___________________|                    |XXXX
+
+        ^                   ^                    ^
+        | pulse A duration  | pulse B duration   |
+
+
+ In the synchronization phase there is a short pulse followed by a very long pulse:
+    Normal level protocols:
+         ____
+    XXXX|    |_____________________________________________________________|XXXX
+
+
+
+    Inverse level protocols:
+              _____________________________________________________________
+    XXXX|____|                                                             |XXXX
+
+
+ In the data phase there is
+  a short pulse followed by a long pulse for a logical 0 data bit:
+    Normal level protocols:
+          __
+    XXXXX|  |________|XXXX
+
+    Inverse level protocols:
+            ________
+    XXXX|__|        |XXXX
+
+  a long pulse followed by a short pulse for a logical 1 data bit:
+    Normal level protocols:
+         ________
+    XXXX|        |__|XXXX
+
+    Inverse level protocols:
+                  __
+    XXXX|________|  |XXXX
