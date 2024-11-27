@@ -27,7 +27,6 @@
  * Please read "hints on remote operating distance" in README.md
  */
 
-//#include "test/RcSwitch_test.hpp" // Comment in, if you want to run the test.
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
@@ -62,12 +61,7 @@ typeof(Serial)& output = Serial;
 // The setup function is called once at startup of the sketch
 void setup()
 {
-#if ENABLE_RCSWITCH_TEST
-	RcSwitch::RcSwitch_test::theTest.run();
-#endif
-
 	output.begin(9600);
-
 #if DUMP_TIMING_SPEC_TABLE
 	output.println();
 	rxProtocolTable.dumpTimingSpec(output);
@@ -76,7 +70,6 @@ void setup()
 	// Allow time to finalize printing the table.
 	delay(500);
 #endif
-
 	rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
 }
 

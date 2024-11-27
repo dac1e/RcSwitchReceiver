@@ -27,8 +27,8 @@
 #ifndef RCSWITCH_RECEIVER_API_HPP_
 #define RCSWITCH_RECEIVER_API_HPP_
 
-#include "internal/RcSwitch.hpp"
 #include "ProtocolDefinition.hpp"
+#include "internal/RcSwitch.hpp"
 #include <Arduino.h>
 
 using RcSwitch::rxTimingSpecTable;
@@ -36,7 +36,11 @@ using RcSwitch::rxTimingSpecTable;
 /**
  * This is the library API class for receiving data from a remote control.
  * The IO pin to be used is defined at compile time by the template
- * parameter IOPIN.
+ * parameter IOPIN. If template parameter PULSE_TRACES_COUNT is set to a
+ * value greater than 0, the last received pulses can be dumped. This
+ * is helpful for analyzing the protocol of a remote control transmitter.
+ * There is an example sketch TraceReceivedPulses.ino shipped along with
+ * this library to demonstrate how pulses can be traced.
  *
  * Multiple RcSwitchReceiver can be instantiated for different IO pins.
  * E.g. if you have a 433Mhz receiver hardware connected to pin 5 and a

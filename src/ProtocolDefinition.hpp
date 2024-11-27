@@ -84,7 +84,7 @@
  *
  *
  * Pulse durations sent out by a real world transmitter can vary. Hence the
- * timing specification for receiving pulses contain upper and lower boundaries
+ * timing specification for receiving pulses must have a time range
  * for a pulse to be recognized as a valid synchronization pulse respectively
  * data pulse.
  *
@@ -134,12 +134,12 @@ struct makeTimingSpec;
  *  	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6, false>, // ()
  *  	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1, false>, // ()
  *  	makeTimingSpec<  5, 500, 20,   6,   14,    1,  2,    2,  1, false>, // ()
- *  	makeTimingSpec<  6, 450, 20,   1,   23,    1,  2,    2,  1, true>, 	// (HT6P20B)
+ *  	makeTimingSpec<  6, 450, 20,   1,   23,    1,  2,    2,  1, true>,  // (HT6P20B)
  *  	makeTimingSpec<  7, 150, 20,   2,   62,    1,  6,    6,  1, false>, // (HS2303-PT)
  *  	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16, false>, // (Conrad RS-200)
- *  	makeTimingSpec<  9, 365, 20,   1,   18,    3,  1,    1,  3, true>, 	// (1ByOne Doorbell)
- *  	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>, 	// (HT12E)
- *  	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)
+ *  	makeTimingSpec<  9, 365, 20,   1,   18,    3,  1,    1,  3, true>,  // (1ByOne Doorbell)
+ *  	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>,  // (HT12E)
+ *  	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>   // (SM5212)
  *  > rxProtocolTable;
  *
  *  The resulting array of timing specifications can be dumped for debug purpose:

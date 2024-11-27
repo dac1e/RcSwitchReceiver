@@ -29,7 +29,7 @@
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
-// Trace the last 64 received pulses from the remote control.
+// Trace the last 128 received pulses from the remote control.
 constexpr size_t TRACE_BUFFER_SIZE = 128;
 constexpr int RX433_DATA_PIN = 2;
 
