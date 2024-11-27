@@ -1,12 +1,12 @@
 # RcSwitchReceiver
 433Mhz / 315 Mhz remote control receiver and decoder.
 
-## Features:
-This work is based on experience with RcSwitch library https://github.com/sui77/rc-switch. The motivation for developing this 
-library was to provide code that minimizes the interrupt handler runtime. This is achieved by doing timing calculations 
-already at compile time rather than at runtime. A second feature is, that pulses received from a remote control transmitter
-can be analyzed by dumping received pulses. Finally, multiple instances of the API class can operate in parallel on different 
-IO pins. However, this library does currently only receive, but not transmit remote control messages.
+## Description:
+The library receives and decodes the pulses received by a remote control transmitter. It focuses on minimizing the interrupt
+handler runtime. This is achieved by doing many timing calculations already at compile time rather than at runtime. 
+Multiple instances of the API class can operate in parallel on different IO pins.
+Another feature is, that pulses received from a remote control transmitter can be analyzed by dumping them.
+However, this library does currently only receive, but not transmit remote control messages.
 
 ## Hints on remote operating distance:
 The development was done on an Arduino Due. Tests have shown that the operating distance of several 433Mhz receiver modules 
