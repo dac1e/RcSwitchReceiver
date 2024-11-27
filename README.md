@@ -6,7 +6,6 @@ The library receives and decodes the pulses received by a remote control transmi
 handler runtime. This is achieved by doing many timing calculations already at compile time rather than at runtime. 
 Multiple instances of the API class can operate in parallel on different IO pins.
 Another feature is, that pulses received from a remote control transmitter can be analyzed by dumping them.
-However, this library does currently only receive, but not transmit remote control messages.
 
 ## Hints on remote operating distance:
 The development was done on an Arduino Due. Tests have shown that the operating distance of several 433Mhz receiver modules 
