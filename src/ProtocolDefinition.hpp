@@ -66,8 +66,8 @@
  *  In the data phase there is
  *   a short pulse followed by a long pulse for a logical 0 data bit:
  *     Normal level protocols:
- *           __
- *     XXXXX|  |________|XXXX
+ *          __
+ *     XXXX|  |________|XXXX
  *
  *     Inverse level protocols:
  *             ________
