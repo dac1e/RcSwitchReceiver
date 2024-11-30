@@ -29,6 +29,7 @@
 
 #include "ProtocolDefinition.hpp"
 #include "RcSwitchReceiver.hpp"
+#include "RcButtonPressDetector.hpp"
 #include <Arduino.h>
 
 
@@ -57,149 +58,45 @@ static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 // Reference to the serial to be used for printing.
 typeof(Serial)& output = Serial;
 
-
-/**
- * The Remote control transmitter typically repeats sending the message
- * packet for a button as long as the button is pressed. This class
- * filters out the repeated message packages and signals a pressed remote
- * control button only once.
- */
-class RcButtonPressDetector {
-	typeof(rcSwitchReceiver)* mRcSwitchReceiver;
-
-	enum class RC_BUTTON_STATE {
-		OFF,
-		OFF_DELAY,
-		ON,
-	};
-
-	enum class RC_BUTTON {
-		NONE = -1,
-		A = 'A',
-		B = 'B',
-		C = 'C',
-		D = 'D',
-	};
-
-	static constexpr unsigned OFF_DELAY_TIME = 250; // milliseconds
-
-	RC_BUTTON_STATE mRcButtonState = RC_BUTTON_STATE::OFF;
-	RC_BUTTON mLastPressedButton;
-	uint32_t mOffDelayStartTime;
-
-
-	const char buttonToChar(RC_BUTTON rcButton) {
-		if((rcButton != RC_BUTTON::NONE)) {
-			return static_cast<char>(rcButton);
+class MyRcButtonPressDetector : public RcButtonPressDetector { // @suppress("Class has a virtual method and non-virtual destructor")
+	const char buttonToChar(rcButtonCode_t buttonCode) const {
+		if((buttonCode != NO_BUTTON)) {
+			return static_cast<char>(buttonCode);
 		}
 		return '?';
 	}
 
-	static RC_BUTTON rcDataToButton(const uint32_t receivedData) {
-		RC_BUTTON button = RC_BUTTON::NONE;
+	// Here there
+	rcButtonCode_t rcDataToButton(uint32_t receivedData) const override {
+		rcButtonCode_t buttonCode = -1;
 		switch (receivedData) {
-			case 5592332:
-				button = RC_BUTTON::A;
-				break;
-			case 5592512:
-				button = RC_BUTTON::B;
-				break;
-			case 5592323:
-				button = RC_BUTTON::C;
-				break;
-			case 5592368:
-				button = RC_BUTTON::D;
-				break;
-		}
-		return button;
+		case 5592332:
+			buttonCode = 'A';
+			break;
+		case 5592512:
+			buttonCode = 'B';
+			break;
+		case 5592323:
+			buttonCode = 'C';
+			break;
+		case 5592368:
+			buttonCode = 'D';
+			break;
+		default:
+			buttonCode = RcButtonPressDetector::rcDataToButton(receivedData);
+			break;
+	}
+	return buttonCode;
 	}
 
-	RC_BUTTON testRcButtonData() {
-		if(mRcSwitchReceiver->available()) {
-			uint32_t rcButtonValue = mRcSwitchReceiver->receivedValue();
-			mRcSwitchReceiver->resetAvailable();
-			return rcDataToButton(rcButtonValue);
-		}
-		return RC_BUTTON::NONE;
-	}
-
-	// Here the detected button is just printed.
-	void signalButton(const RC_BUTTON button) {
+	// The detected button is printed here. But you can do anything else with the button code.
+	void onButtonPressed(rcButtonCode_t buttonCode) const override {
 		output.print("Detected press for button: ");
-		output.println(buttonToChar(button));
-	}
-public:
-	void begin(typeof(rcSwitchReceiver)& rcSwitchReceiver) {
-		mRcSwitchReceiver = &rcSwitchReceiver;
-	}
-
-	RcButtonPressDetector()
-		: mRcSwitchReceiver(nullptr), mLastPressedButton(RC_BUTTON::NONE), mOffDelayStartTime(0)
-	{
-	}
-
-	void scanRcButtons() {
-		const RC_BUTTON button = testRcButtonData();
-		switch (mRcButtonState) {
-			case RC_BUTTON_STATE::OFF: {
-				if (button != RC_BUTTON::NONE) {
-					// Button pressed, signal it.
-					signalButton(button);
-					mLastPressedButton = button;
-					// Move to ON state
-					mRcButtonState = RC_BUTTON_STATE::ON;
-				}
-				break;
-			}
-			case RC_BUTTON_STATE::ON: {
-				if (button != RC_BUTTON::NONE) {
-					// Button still pressed
-					if (button != mLastPressedButton) {
-						// It is a different button, signal it.
-						signalButton(button);
-						mLastPressedButton = button;
-					}
-					// Stay in ON state.
-				} else {
-					// Button released. Record release time and move to off delay state.
-					mOffDelayStartTime = millis();
-					mRcButtonState = RC_BUTTON_STATE::OFF_DELAY;
-				}
-				break;
-			}
-			case RC_BUTTON_STATE::OFF_DELAY: {
-				if (button != RC_BUTTON::NONE) {
-					// Button pressed again while in OFF_DELAY state.
-					if (button != mLastPressedButton) {
-						// It is a different button, signal it
-						signalButton(button);
-						mLastPressedButton = button;
-					} else {
-						const uint32_t time = millis();
-						if ((time - mOffDelayStartTime) > OFF_DELAY_TIME) {
-							// The same button was pressed again after off
-							// delay has expired, signal it.
-							signalButton(button);
-						}
-					}
-					// Either a different button was pressed, or the same button
-					// was pressed after off delay time expired. Move to ON state.
-					mRcButtonState = RC_BUTTON_STATE::ON;
-				} else {
-					// All buttons still released in OFF delay state.
-					const uint32_t time = millis();
-					if ((time - mOffDelayStartTime) > OFF_DELAY_TIME) {
-						// Off delay time expired, move to OFF state.
-						mRcButtonState = RC_BUTTON_STATE::OFF;
-					}
-				}
-				break;
-			}
-		}
+		output.println(buttonToChar(buttonCode));
 	}
 };
 
-static RcButtonPressDetector rcButtonPressDetector;
+static MyRcButtonPressDetector rcButtonPressDetector;
 
 // The setup function is called once at startup of the sketch
 void setup()

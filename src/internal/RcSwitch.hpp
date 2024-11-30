@@ -596,6 +596,7 @@ private:
 	 */
 	void reset();
 
+public:
 	/**
 	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
 	 */
@@ -607,6 +608,8 @@ private:
 	void suspend() {mSuspended = true;}
 	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
 	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
+	void resetAvailable() {if(available()) {reset();}}
+
 };
 
 template<size_t PULSE_TRACES_COUNT>

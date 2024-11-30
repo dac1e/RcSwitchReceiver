@@ -138,7 +138,7 @@ public:
 	 * Clear the last received value in order to receive a new one.
 	 * Can be called at any time.
 	 */
-	static inline void resetAvailable() {if(mReceiverDelegate.available()) {mReceiverDelegate.reset();}}
+	static inline void resetAvailable() {mReceiverDelegate.resetAvailable();}
 
 	/**
 	 * Suspend receiving new message packets.
@@ -163,7 +163,7 @@ public:
 	 * Return a reference to the internal receiver that this API class forwards
 	 * it's public function calls to.
 	 */
-	static basicReceiver_t getReceiverDelegate() {
+	static basicReceiver_t& getReceiverDelegate() {
 		return mReceiverDelegate;
 	}
 };
