@@ -6,19 +6,19 @@
 ## Description
 This library can
 
-- receive and decode data packets from a remote control transmitter. Refer to example sketch PrintReceivedData.
-- translate data packets from a remote controller into a button - press information. Refer to example sketch DetectRemoteButtonPress.
-- dump received pulses for reverse enginering of the protocol of a remote control transmitter. Refer to example sketch TraceReceivedPulses.
+- receive and decode data packets from a remote control transmitter. Refer to example sketch *PrintReceivedData*.
+- translate data packets from a remote controller into a button - press information. Refer to example sketch *DetectRemoteButtonPress*.
+- dump received pulses for reverse enginering of the protocol of a remote control transmitter. Refer to example sketch *TraceReceivedPulses*.
 
 
 ## Hints on remote operating distance:
-The development was done on an Arduino Due. Tests have shown that the operating distance of several 433Mhz receiver modules 
+The development was done on an Arduino Due. Tests have shown that the working range of several 433Mhz receiver modules 
 strongly depend on the quality of the power supply. When the Arduino Due is supplied via USB port, the receiver module works 
 properly when powered from the Arduino 5V pin. When the Arduino Due is supplied via the extra power connector, the Arduino 
-5V pin is is powered from an Arduino Due internal voltage regulator. A receiver module now powerd from the Arduino 
-Due 5V pin, will drop the operating distance by at least 50% compared to the USB powering situation. So when the extra power 
+5V pin is is powered from an **Arduino Due internal voltage regulator**. A receiver module now powerd from the Arduino 
+Due 5V pin, will **drop the working range by at least 50%** compared to the USB powering situation. So when the extra power 
 connector is used for Arduino Due, I recommend suppying the receiver module separately by a linear Voltage regulator like an 
-7805, to achieve best operating distance.
+7805, to achieve best working range.
 
 ## Remote control protocol
 The remote control protocol is a stream of pulse pairs with different duration and
