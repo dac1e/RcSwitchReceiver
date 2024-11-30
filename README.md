@@ -1,10 +1,11 @@
 # RcSwitchReceiver
 433Mhz / 315 Mhz remote control receiver and decoder.
 
-## Description:
-The library decodes the pulses received by a remote control transmitter. It focuses on minimizing the interrupt
-handler runtime. Multiple instances of the receiver can operate in parallel on different IO pins.
-Another feature is, that pulses received from a remote control transmitter can be dumped.
+## Description
+This library can
+-) receive and decode data packets from a remote control transmitter. Refer to example sketch PrintReceivedData.
+-) translate data packets from a remote controller into a button - press information. Refer to example sketch DetectRemoteButtonPress.
+-) dump received pulses for reverse enginering of the protocol of a remote control transmitter. Refer to example sketch TraceReceivedPulses.
 
 ## Hints on remote operating distance:
 The development was done on an Arduino Due. Tests have shown that the operating distance of several 433Mhz receiver modules 
