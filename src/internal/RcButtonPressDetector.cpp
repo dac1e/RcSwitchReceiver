@@ -55,17 +55,17 @@ RcButtonPressDetector::RcButtonPressDetector(size_t msecDebounceDelayTime)
 void RcButtonPressDetector::scanRcButtons() {
 	const rcButtonCode_t button = testRcButtonData();
 	switch (mRcButtonState) {
-		case RC_BUTTON_STATE::OFF: {
+		case STATE::OFF: {
 			if (button != NO_BUTTON) {
 				// Button pressed, signal it.
 				onButtonPressed(button);
 				mLastPressedButton = button;
 				// Move to ON state
-				mRcButtonState = RC_BUTTON_STATE::ON;
+				mRcButtonState = STATE::ON;
 			}
 			break;
 		}
-		case RC_BUTTON_STATE::ON: {
+		case STATE::ON: {
 			if (button != NO_BUTTON) {
 				// Button still pressed
 				if (button != mLastPressedButton) {
@@ -77,11 +77,11 @@ void RcButtonPressDetector::scanRcButtons() {
 			} else {
 				// Button released. Record release time and move to off delay state.
 				mOffDelayStartTime = millis();
-				mRcButtonState = RC_BUTTON_STATE::OFF_DELAY;
+				mRcButtonState = STATE::OFF_DELAY;
 			}
 			break;
 		}
-		case RC_BUTTON_STATE::OFF_DELAY: {
+		case STATE::OFF_DELAY: {
 			if (button != NO_BUTTON) {
 				// Button pressed again while in OFF_DELAY state.
 				if (button != mLastPressedButton) {
@@ -98,13 +98,13 @@ void RcButtonPressDetector::scanRcButtons() {
 				}
 				// Either a different button was pressed, or the same button
 				// was pressed after off delay time expired. Move to ON state.
-				mRcButtonState = RC_BUTTON_STATE::ON;
+				mRcButtonState = STATE::ON;
 			} else {
 				// All buttons still released in OFF delay state.
 				const uint32_t time = millis();
 				if ((time - mOffDelayStartTime) > mDebounceDelayTime) {
 					// Off delay time expired, move to OFF state.
-					mRcButtonState = RC_BUTTON_STATE::OFF;
+					mRcButtonState = STATE::OFF;
 				}
 			}
 			break;

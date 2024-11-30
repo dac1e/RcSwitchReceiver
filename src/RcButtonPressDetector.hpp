@@ -32,8 +32,8 @@
 /**
  * The Remote control transmitter typically repeats sending the message
  * packet for a button as long as the button is pressed. This class
- * filters out the repeated message packages and signals a pressed remote
- * control button only once.
+ * filters out the repeated message packages and signals a signal pressed
+ * remote control button only once.
  */
 class RcButtonPressDetector { // @suppress("Class has a virtual method and non-virtual destructor")
 public:
@@ -41,7 +41,7 @@ public:
 	static constexpr rcButtonCode_t NO_BUTTON = -1;
 
 private:
-	enum class RC_BUTTON_STATE {
+	enum class STATE {
 		OFF,
 		OFF_DELAY,
 		ON,
@@ -49,7 +49,7 @@ private:
 
 	const size_t mDebounceDelayTime; // in milliseconds
 	RcSwitch::Receiver* mRcSwitchReceiver;
-	RC_BUTTON_STATE mRcButtonState = RC_BUTTON_STATE::OFF;
+	STATE mRcButtonState = STATE::OFF;
 	rcButtonCode_t mLastPressedButton;
 	uint32_t mOffDelayStartTime;
 

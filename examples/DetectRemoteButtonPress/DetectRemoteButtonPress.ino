@@ -32,7 +32,6 @@
 #include "RcButtonPressDetector.hpp"
 #include <Arduino.h>
 
-
 // For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
 // You can add own protocols and remove not needed protocols.
 // However, the number of normal level protocols as well as the number of inverse level
@@ -49,6 +48,7 @@ static const RxProtocolTable <
 	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16, false>, // (Conrad RS-200)
 	makeTimingSpec<  9, 365, 20,   1,   18,    3,  1,    1,  3, true>, 	// (1ByOne Doorbell)
 	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>, 	// (HT12E)
+    // Note that last row must not end with a comma.
 	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)
 > rxProtocolTable;
 
@@ -89,10 +89,17 @@ class MyRcButtonPressDetector : public RcButtonPressDetector { // @suppress("Cla
 	return buttonCode;
 	}
 
-	// The detected button is printed here. But you can do anything else with the button code.
+	// The detected button is printed here and the builtin led is set.
 	void onButtonPressed(rcButtonCode_t buttonCode) const override {
-		output.print("Detected press for button: ");
+		output.print("You pressed button ");
 		output.println(buttonToChar(buttonCode));
+		if(buttonCode == 'A' || buttonCode == 'C') {
+			// Switch on upon button A and C
+			digitalWrite(LED_BUILTIN, HIGH);
+		} else if(buttonCode == 'B' || buttonCode == 'D') {
+			// Switch off upon button B and D
+			digitalWrite(LED_BUILTIN, LOW);
+		}
 	}
 };
 
@@ -102,14 +109,7 @@ static MyRcButtonPressDetector rcButtonPressDetector;
 void setup()
 {
 	output.begin(9600);
-#if DUMP_TIMING_SPEC_TABLE
-	output.println();
-	rxProtocolTable.dumpTimingSpec(output);
-	output.println();
-
-	// Allow time to finalize printing the table.
-	delay(500);
-#endif
+	pinMode(LED_BUILTIN, OUTPUT);
 	rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
 	rcButtonPressDetector.begin(rcSwitchReceiver);
 }
