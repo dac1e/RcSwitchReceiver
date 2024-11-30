@@ -72,11 +72,10 @@ void loop()
 	// you will see random pulses that come from HF noise.
 	const int buttonState = digitalRead(TRIGGER_BUTTON);
 	if(lastbuttonState == HIGH && buttonState == LOW) {
-		output.println("===========================");
 		//
 		// Dump the most recent received pulses, starting with the youngest pulse.
 		//
-		rcSwitchReceiver.dumpPulseTracer(output);
+		rcSwitchReceiver.dumpPulseTracer(output, ',');
 	}
 	lastbuttonState = buttonState;
 }

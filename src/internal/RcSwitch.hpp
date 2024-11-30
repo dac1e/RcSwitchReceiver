@@ -447,7 +447,7 @@ public:
 		return "??";
 	}
 
-	template<typename T> void dumpBackward(T& s) {
+	template<typename T> void dumpBackward(T& s, char separator) {
 		const size_t n = baseClass::size();
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
@@ -461,11 +461,22 @@ public:
 				buffer[b++] = ('[');
 				sprintUint(&buffer[b++], i, indexWidth);
 				s.print(buffer);
-				s.print("] ");
+				s.print("]");
 			}
-
+			s.print(separator);
+			if(separator != '\t') {
+				s.print(" ");
+			}
 			s.print(pulseTypeToString(pulse));
-			s.print(" after ");
+			s.print(separator);
+			if(separator != '\t') {
+				s.print(" ");
+			}
+			s.print("after");
+			s.print(separator);
+			if(separator != '\t') {
+				s.print(" ");
+			}
 
 			{ // print pulse length
 				char buffer[16];
@@ -473,7 +484,12 @@ public:
 				s.print(buffer);
 			}
 
-			s.println(" usec");
+			s.print(separator);
+			if(separator != '\t') {
+				s.print(" ");
+			}
+
+			s.println("usec");
 		}
 	}
 
@@ -647,9 +663,9 @@ class ReceiverWithPulseTracer : public Receiver {
 	/**
 	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
 	 */
-	template <typename T> void dumpPulseTracer(T& serial) {
+	template <typename T> void dumpPulseTracer(T& serial, char separator) {
 		mPulseTracerDumping = true;
-		mPulseTracer.dumpBackward(serial);
+		mPulseTracer.dumpBackward(serial, separator);
 		mPulseTracerDumping = false;
 	}
 };

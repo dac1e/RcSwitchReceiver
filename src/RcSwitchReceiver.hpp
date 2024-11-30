@@ -155,8 +155,8 @@ public:
 	 * Only available if PULSE_TRACES_COUNT is greater than zero. Otherwise
 	 * you'll see a compiler error here.
 	 */
-	static void dumpPulseTracer(typeof(Serial)& serial) {
-		mReceiverDelegate.dumpPulseTracer(serial);
+	static void dumpPulseTracer(typeof(Serial)& serial, char separator = ',') {
+		mReceiverDelegate.dumpPulseTracer(serial, separator);
 	}
 
 	/**
