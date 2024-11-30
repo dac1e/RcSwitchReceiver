@@ -559,13 +559,14 @@ private:
 
 protected:
 	uint32_t mMicrosecLastInterruptTime;
+
+	/** ========================================================================== */
+	/** ========= Methods used by API class RcSwitchReceiver ===================== */
+
 	/**
 	 * Evaluate a new pulse that has been received. Will only be called from within interrupt context.
 	 */
 	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
-
-	/** ========================================================================== */
-	/** ========= Methods used by API class RcSwitchReceiver ===================== */
 
 	/**
 	 * Constructor.
@@ -606,7 +607,6 @@ private:
 	void suspend() {mSuspended = true;}
 	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
 	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
-	template <typename T> void dumpPulseTracer(T& serial) {/* do nothing. */}
 };
 
 template<size_t PULSE_TRACES_COUNT>
@@ -621,14 +621,6 @@ class ReceiverWithPulseTracer : public Receiver {
 	PulseTracer<PULSE_TRACES_COUNT> mPulseTracer;
 	volatile bool mPulseTracerDumping = false;
 
-	/**
-	 * Evaluate a new pulse that has been received. Will only be called from within interrupt context.
-	 */
-	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
-		tracePulse(microSecInterruptTime - mMicrosecLastInterruptTime, pinLevel);
-		Receiver::handleInterrupt(pinLevel, microSecInterruptTime);
-	}
-
 	/** Store a new pulse in the trace buffer of this message packet. */
 	TEXT_ISR_ATTR_1 void tracePulse(uint32_t microSecDuration, const int pinLevel) {
 		if(not mPulseTracerDumping) {
@@ -636,6 +628,17 @@ class ReceiverWithPulseTracer : public Receiver {
 			*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
 			mPulseTracer.selectNext();
 		}
+	}
+
+	/** ========================================================================== */
+	/** ========= Methods used by API class RcSwitchReceiver ===================== */
+
+	/**
+	 * Evaluate a new pulse that has been received. Will only be called from within interrupt context.
+	 */
+	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
+		tracePulse(microSecInterruptTime - mMicrosecLastInterruptTime, pinLevel);
+		Receiver::handleInterrupt(pinLevel, microSecInterruptTime);
 	}
 
 	/**

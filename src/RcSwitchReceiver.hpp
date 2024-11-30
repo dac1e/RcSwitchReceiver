@@ -54,13 +54,14 @@ using RcSwitch::rxTimingSpecTable;
 template<int IOPIN, size_t PULSE_TRACES_COUNT = 0> class RcSwitchReceiver {
 public:
 	using receiver_t = typename RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::receiver_t;
+	using basicReceiver_t = RcSwitch::Receiver;
 private:
-	static receiver_t mReceiver;
+	static receiver_t mReceiverDelegate;
 
 	TEXT_ISR_ATTR_0 static void handleInterrupt() {
 		const unsigned long time = micros();
 		const int pinLevel = digitalRead(IOPIN);
-		mReceiver.handleInterrupt(pinLevel, time);
+		mReceiverDelegate.handleInterrupt(pinLevel, time);
 	}
 public:
 	/**
@@ -70,14 +71,14 @@ public:
 	static void begin(const rxTimingSpecTable& rxTimingSpecTable) {
 		pinMode(IOPIN, INPUT_PULLUP);
 		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
-		mReceiver.setRxTimingSpecTable(rxTimingSpecTable);
+		mReceiverDelegate.setRxTimingSpecTable(rxTimingSpecTable);
 	}
 
 	/**
 	 * Returns true, when a new received value is available.
 	 * Can be called at any time.
 	 */
-	static inline bool available() {return mReceiver.available();}
+	static inline bool available() {return mReceiverDelegate.available();}
 
 	/**
 	 * Return the received value if a value is available. Otherwise 0.
@@ -85,7 +86,7 @@ public:
 	 * significant bit.
 	 * Must not be called, when available returns false.
 	 */
-	static inline uint32_t receivedValue() {return mReceiver.receivedValue();}
+	static inline uint32_t receivedValue() {return mReceiverDelegate.receivedValue();}
 
 	/**
 	 * Return the number of received bits. Can be greater than
@@ -94,14 +95,14 @@ public:
 	 * can be increased to avoid such an overflow.
 	 * Must not be called, when available returns false.
 	 */
-	static inline size_t receivedBitsCount() {return mReceiver.receivedBitsCount();}
+	static inline size_t receivedBitsCount() {return mReceiverDelegate.receivedBitsCount();}
 
 	/**
 	 * Return the number of protocols that matched the synch and
 	 * data pulses for the received value.
 	 * Must not be called, when available returns false.
 	 */
-	static inline 	size_t receivedProtocolCount() {return mReceiver.receivedProtocolCount();}
+	static inline 	size_t receivedProtocolCount() {return mReceiverDelegate.receivedProtocolCount();}
 
 	/**
 	 * Return the protocol number that matched the synch and data
@@ -131,34 +132,44 @@ public:
 	 *
 	 */
 	static inline int receivedProtocol(const size_t index = 0)
-		{return mReceiver.receivedProtocol(index);}
+		{return mReceiverDelegate.receivedProtocol(index);}
 
 	/**
 	 * Clear the last received value in order to receive a new one.
 	 * Can be called at any time.
 	 */
-	static inline void resetAvailable() {if(mReceiver.available()) {mReceiver.reset();}}
+	static inline void resetAvailable() {if(mReceiverDelegate.available()) {mReceiverDelegate.reset();}}
 
 	/**
 	 * Suspend receiving new message packets.
 	 */
-	static void suspend() {mReceiver.suspend();}
+	static void suspend() {mReceiverDelegate.suspend();}
 
 	/**
 	 * Resume receiving new message packets.
 	 */
-	static void resume() {mReceiver.resume();}
+	static void resume() {mReceiverDelegate.resume();}
 
 	/**
 	 * Dump the most recent received pulses, starting with the youngest pulse.
+	 * Only available if PULSE_TRACES_COUNT is greater than zero. Otherwise
+	 * you'll see a compiler error here.
 	 */
 	static void dumpPulseTracer(typeof(Serial)& serial) {
-		mReceiver.dumpPulseTracer(serial);
+		mReceiverDelegate.dumpPulseTracer(serial);
+	}
+
+	/**
+	 * Return a reference to the internal receiver that this API class forwards
+	 * it's public function calls to.
+	 */
+	static basicReceiver_t getReceiverDelegate() {
+		return mReceiverDelegate;
 	}
 };
 
 /** The receiver instance for this IO pin. */
 template<int IOPIN, size_t PULSE_TRACES_COUNT> typename RcSwitchReceiver<IOPIN, PULSE_TRACES_COUNT>::receiver_t
-	RcSwitchReceiver<IOPIN, PULSE_TRACES_COUNT>::mReceiver;
+	RcSwitchReceiver<IOPIN, PULSE_TRACES_COUNT>::mReceiverDelegate;
 
 #endif /* RCSWITCH_RECEIVER_API_HPP_ */
