@@ -52,8 +52,11 @@ static const RxProtocolTable <
 > rxProtocolTable;
 
 constexpr int RX433_DATA_PIN = 2;
+static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
+
 // Reference to the serial to be used for printing.
 typeof(Serial)& output = Serial;
+
 
 /**
  * The Remote control transmitter typically repeats sending the message
@@ -61,7 +64,9 @@ typeof(Serial)& output = Serial;
  * filters out the repeated message packages and signals a pressed remote
  * control button only once.
  */
-class RcButtonPressDetector : public RcSwitchReceiver<RX433_DATA_PIN> {
+class RcButtonPressDetector {
+	typeof(rcSwitchReceiver)* mRcSwitchReceiver;
+
 	enum class RC_BUTTON_STATE {
 		OFF,
 		OFF_DELAY,
@@ -76,18 +81,19 @@ class RcButtonPressDetector : public RcSwitchReceiver<RX433_DATA_PIN> {
 		D = 'D',
 	};
 
+	static constexpr unsigned OFF_DELAY_TIME = 250; // milliseconds
+
+	RC_BUTTON_STATE mRcButtonState = RC_BUTTON_STATE::OFF;
+	RC_BUTTON mLastPressedButton;
+	uint32_t mOffDelayStartTime;
+
+
 	const char buttonToChar(RC_BUTTON rcButton) {
 		if((rcButton != RC_BUTTON::NONE)) {
 			return static_cast<char>(rcButton);
 		}
 		return '?';
 	}
-
-	static constexpr unsigned OFF_DELAY_TIME = 250; // milliseconds
-
-	RC_BUTTON_STATE mRcButtonState = RC_BUTTON_STATE::OFF;
-	RC_BUTTON mLastPressedButton;
-	uint32_t mOffDelayStartTime;
 
 	static RC_BUTTON rcDataToButton(const uint32_t receivedData) {
 		RC_BUTTON button = RC_BUTTON::NONE;
@@ -109,9 +115,9 @@ class RcButtonPressDetector : public RcSwitchReceiver<RX433_DATA_PIN> {
 	}
 
 	RC_BUTTON testRcButtonData() {
-		if(available()) {
-			uint32_t rcButtonValue = receivedValue();
-			resetAvailable();
+		if(mRcSwitchReceiver->available()) {
+			uint32_t rcButtonValue = mRcSwitchReceiver->receivedValue();
+			mRcSwitchReceiver->resetAvailable();
 			return rcDataToButton(rcButtonValue);
 		}
 		return RC_BUTTON::NONE;
@@ -123,8 +129,12 @@ class RcButtonPressDetector : public RcSwitchReceiver<RX433_DATA_PIN> {
 		output.println(buttonToChar(button));
 	}
 public:
+	void begin(typeof(rcSwitchReceiver)& rcSwitchReceiver) {
+		mRcSwitchReceiver = &rcSwitchReceiver;
+	}
+
 	RcButtonPressDetector()
-		: mLastPressedButton(RC_BUTTON::NONE), mOffDelayStartTime(0)
+		: mRcSwitchReceiver(nullptr), mLastPressedButton(RC_BUTTON::NONE), mOffDelayStartTime(0)
 	{
 	}
 
@@ -189,7 +199,7 @@ public:
 	}
 };
 
-static RcButtonPressDetector rcSwitchReceiver;
+static RcButtonPressDetector rcButtonPressDetector;
 
 // The setup function is called once at startup of the sketch
 void setup()
@@ -204,10 +214,11 @@ void setup()
 	delay(500);
 #endif
 	rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
+	rcButtonPressDetector.begin(rcSwitchReceiver);
 }
 
 // The loop function is called in an endless loop
 void loop()
 {
-	rcSwitchReceiver.scanRcButtons();
+	rcButtonPressDetector.scanRcButtons();
 }
