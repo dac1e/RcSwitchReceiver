@@ -40,7 +40,7 @@
 // Protocols should not exceed 7 in this table. Refer to MAX_PROTOCOL_CANDIDATES in RcSwitch.hpp.
 static const RxProtocolTable <
 //                  #, clk,  %, syA,  syB,  d0A,d0B,  d1A, d1B, inverseLevel
-	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // ()
+	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // (PT2262)
 	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1, false>, // ()
 	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6, false>, // ()
 	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1, false>, // ()
@@ -50,8 +50,9 @@ static const RxProtocolTable <
 	makeTimingSpec<  8, 200, 20,   3,  130,    7, 16,    3, 16, false>, // (Conrad RS-200)
 	makeTimingSpec<  9, 365, 20,   1,   18,    3,  1,    1,  3, true>, 	// (1ByOne Doorbell)
 	makeTimingSpec< 10, 270, 20,   1,   36,    1,  2,    2,  1, true>, 	// (HT12E)
-    // Note that last row must not end with a comma.
-	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>  	// (SM5212)
+	makeTimingSpec< 11, 320, 20,   1,   36,    1,  2,    2,  1, true>, 	// (SM5212)
+	// Note that last row must not end with a comma.
+	makeTimingSpec< 12, 300, 20,   2,   23,    2,  4,    4,  2, false>  // (Sygonix)
 > rxProtocolTable;
 
 constexpr int RX433_DATA_PIN = 2;

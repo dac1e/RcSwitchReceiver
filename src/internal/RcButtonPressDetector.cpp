@@ -31,16 +31,28 @@
  * control button only once.
  */
 RcButtonPressDetector::rcButtonCode_t RcButtonPressDetector::testRcButtonData() {
+	rcButtonCode_t result = NO_BUTTON;
 	if(mRcSwitchReceiver->available()) {
-		uint32_t rcButtonValue = mRcSwitchReceiver->receivedValue();
-		mRcSwitchReceiver->resetAvailable();
-		return rcDataToButton(rcButtonValue);
+		const uint32_t rcButtonValue = mRcSwitchReceiver->receivedValue();
+		int i = 0;
+		while(true) { // loop over matching protocols until we get a button code for the received value;
+			const int rcProtocol = mRcSwitchReceiver->receivedProtocol(i);
+			if(rcProtocol < 0) {
+				break;
+			}
+			const rcButtonCode_t rcButtonCode = rcDataToButton(rcProtocol, rcButtonValue);
+			if(rcButtonCode != RcButtonPressDetector::NO_BUTTON) {
+				result = rcButtonCode;
+				break;
+			}
+			++i;
+		}
 	}
-	return NO_BUTTON;
+	mRcSwitchReceiver->resetAvailable();
+	return result;
 }
 
-
-RcButtonPressDetector::rcButtonCode_t RcButtonPressDetector::rcDataToButton(const uint32_t receivedData) const {
+RcButtonPressDetector::rcButtonCode_t RcButtonPressDetector::rcDataToButton(const int rcProtocol, const receivedValue_t receivedData) const {
 	return RcButtonPressDetector::NO_BUTTON;
 }
 

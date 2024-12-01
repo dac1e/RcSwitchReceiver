@@ -73,7 +73,7 @@ void loop()
 	const int buttonState = digitalRead(TRIGGER_BUTTON);
 	if(lastbuttonState == HIGH && buttonState == LOW) {
 		//
-		// Dump the most recent received pulses, starting with the youngest pulse.
+		// Dump from the oldest to the newest pulses.
 		//
 		rcSwitchReceiver.dumpPulseTracer(output, ',');
 	}

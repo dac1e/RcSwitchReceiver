@@ -37,6 +37,7 @@
  */
 class RcButtonPressDetector { // @suppress("Class has a virtual method and non-virtual destructor")
 public:
+	using receivedValue_t = RcSwitch::receivedValue_t;
 	using rcButtonCode_t = int;
 	static constexpr rcButtonCode_t NO_BUTTON = -1;
 
@@ -92,13 +93,13 @@ protected:
 	 *  ...
 	 *  MyRcButtonPressDetector : public RcButtonPressDetector {
 	 *   	...
-	 *  	rcButtonCode_t rcDataToButton(uint32_t receivedData) const override;
+	 *  	rcButtonCode_t rcDataToButton(const int rcProtocol, uint32_t receivedData) const override;
 	 *  	...
 	 *  };
 	 *
 	 *  // MyRcButtonPressDetector cpp file:
 	 *  ...
-	 *	RcButtonPressDetector::rcButtonCode_t MyRcButtonPressDetector::rcDataToButton(uint32_t receivedData) const {
+	 *	RcButtonPressDetector::rcButtonCode_t MyRcButtonPressDetector::rcDataToButton(const int rcProtocol, receivedValue_t receivedData) const {
 	 *		rcButtonCode_t buttonCode = -1;
 	 *		switch (receivedData) {
 	 *			case 5592332:
@@ -114,7 +115,7 @@ protected:
 	 *				buttonCode = 'D';
 	 *				break;
 	 *			default:
-	 *				buttonCode = RcButtonPressDetector::rcDataToButton(receivedData);
+	 *				buttonCode = RcButtonPressDetector::rcDataToButton(rcProtocol, receivedData);
 	 *				break;
 	 *		}
 	 *		return buttonCode;
@@ -122,7 +123,7 @@ protected:
 	 *  ...
 	 *
 	 */
-	virtual rcButtonCode_t rcDataToButton(const uint32_t receivedData) const;
+	virtual rcButtonCode_t rcDataToButton(const int rcProtocol, const receivedValue_t receivedData) const;
 
 public:
 	RcButtonPressDetector(size_t msecDebounceDelayTime = 250);

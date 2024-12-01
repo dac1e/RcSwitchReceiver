@@ -68,6 +68,19 @@ namespace RcSwitch {
 #define RCSWITCH_ASSERT(expr)
 #endif
 
+/**
+ * The type of the value decoded from a received message packet.
+ * If the number of data bits of the message packet is bigger than
+ * this type can store, trailing data bits are dropped.
+ */
+typedef uint32_t receivedValue_t;
+
+/**
+ * Maximum number of data bits from a message packet that can
+ * be stored. If the message packet is bigger, trailing data
+ * bits are dropped.
+ */
+constexpr size_t MAX_MSG_PACKET_BITS     =  8 * sizeof(receivedValue_t);
 
 /**
  * The maximum number of protocols that can be collected.
@@ -87,14 +100,6 @@ constexpr size_t MAX_PROTOCOL_CANDIDATES =  7;
  * Can be changed, but must be greater than 0.
  */
 constexpr size_t MIN_MSG_PACKET_BITS     =  6;
-
-/**
- * Maximum number of data bits from a message packet that can
- * be stored. If the message packet is bigger, trailing data
- * bits are dropped.
- * Can be changed, but must be greater than 0.
- */
-constexpr size_t MAX_MSG_PACKET_BITS     = 32;
 
 /**
  * A high level pulse followed by a low level pulse constitute
@@ -340,7 +345,7 @@ public:
 	}
 };
 
-enum class DATA_BIT {
+enum class DATA_BIT : int8_t {
 	UNKNOWN   =-1,
 	LOGICAL_0 = 0,
 	LOGICAL_1 = 1,
@@ -364,8 +369,12 @@ enum class PULSE_TYPE : uint8_t {
 	SYCH_PULSE,
 	SYNCH_FIRST_PULSE,
 	SYNCH_SECOND_PULSE,
-	DATA_LOGICAL_0,
-	DATA_LOGICAL_1,
+
+	DATA_LOGICAL_00,
+	DATA_LOGICAL_01,
+
+//	DATA_LOGICAL_10,
+//	DATA_LOGICAL_11,
 };
 
 struct PulseTypes {
@@ -447,13 +456,12 @@ public:
 		return "??";
 	}
 
-	template<typename T> void dumpBackward(T& s, char separator) {
+	template<typename T> void dump(T& s, char separator) {
 		const size_t n = baseClass::size();
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		while(i < n) {
-			++i;
-			const Pulse& pulse = baseClass::at(n-i);
+			const Pulse& pulse = baseClass::at(i);
 
 			{	// print index
 				char buffer[16];
@@ -490,6 +498,8 @@ public:
 			}
 
 			s.println("usec");
+
+			++i;
 		}
 	}
 
@@ -529,8 +539,6 @@ public:
 	// Make the base class reset() method public.
 	using baseClass::reset;
 };
-
-using RcSwitch::rxTimingSpecTable;
 
 /**
  * The receiver is a buffer that holds the last 2 received pulses. It analyzes
@@ -617,7 +625,7 @@ public:
 	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
 	 */
 	inline bool available() const {return state() == AVAILABLE_STATE;}
-	uint32_t receivedValue() const;
+	receivedValue_t receivedValue() const;
 	size_t receivedBitsCount() const;
 	inline size_t receivedProtocolCount() const {return mProtocolCandidates.size();}
 	int receivedProtocol(const size_t index) const;
@@ -665,7 +673,7 @@ class ReceiverWithPulseTracer : public Receiver {
 	 */
 	template <typename T> void dumpPulseTracer(T& serial, char separator) {
 		mPulseTracerDumping = true;
-		mPulseTracer.dumpBackward(serial, separator);
+		mPulseTracer.dump(serial, separator);
 		mPulseTracerDumping = false;
 	}
 };

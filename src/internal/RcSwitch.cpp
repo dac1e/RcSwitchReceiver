@@ -53,12 +53,12 @@ static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protoco
 				protocol.data0pulsePair.durationA.compare(pulse.mMicroSecDuration);
 
 		if (log0Compare == TimeRange::IS_WITHIN) {
-			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
+			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_00;
 		} else {
 			const TimeRange::COMPARE_RESULT log1Compare =
 					protocol.data1pulsePair.durationA.compare(pulse.mMicroSecDuration);
 			if (log1Compare == TimeRange::IS_WITHIN) {
-				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
+				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_01;
 			}
 		}
 	}
@@ -82,13 +82,13 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 				protocol.data0pulsePair.durationB.compare(pulse.mMicroSecDuration);
 
 		if (log0Compare == TimeRange::IS_WITHIN) {
-			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_0;
+			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_00;
 		} else {
 			const TimeRange::COMPARE_RESULT log1Compare =
 					protocol.data1pulsePair.durationB.compare(
 					pulse.mMicroSecDuration);
 			if (log1Compare == TimeRange::IS_WITHIN) {
-				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_1;
+				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_01;
 			}
 		}
 	}
@@ -230,9 +230,9 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 							}
 						} else {
 							/* It is a sequence of 2 data pulses */
-							RCSWITCH_ASSERT(pulseType == PULSE_TYPE::DATA_LOGICAL_0
-									|| pulseType == PULSE_TYPE::DATA_LOGICAL_1);
-							const DATA_BIT dataBit = pulseType == PULSE_TYPE::DATA_LOGICAL_0 ?
+							RCSWITCH_ASSERT(pulseType == PULSE_TYPE::DATA_LOGICAL_00
+									|| pulseType == PULSE_TYPE::DATA_LOGICAL_01);
+							const DATA_BIT dataBit = pulseType == PULSE_TYPE::DATA_LOGICAL_00 ?
 											DATA_BIT::LOGICAL_0 : DATA_BIT::LOGICAL_1;
 							mReceivedMessagePacket.push(dataBit);
 						}
@@ -289,11 +289,11 @@ size_t Receiver::receivedBitsCount() const {
 	return 0;
 }
 
-uint32_t Receiver::receivedValue() const {
-	uint32_t result = 0;
+receivedValue_t Receiver::receivedValue() const {
+	receivedValue_t result = 0;
 	if(available()) {
 		const MessagePacket& messagePacket = mReceivedMessagePacket;
-		for(size_t i=0; i< messagePacket.size(); i++) {
+		for(size_t i=0; i < messagePacket.size(); i++) {
 			result = result << 1;
 			RCSWITCH_ASSERT(messagePacket.at(i) != DATA_BIT::UNKNOWN);
 			if(messagePacket.at(i) == DATA_BIT::LOGICAL_1) {

@@ -54,6 +54,7 @@ using RcSwitch::rxTimingSpecTable;
 template<int IOPIN, size_t PULSE_TRACES_COUNT = 0> class RcSwitchReceiver {
 public:
 	using receiver_t = typename RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::receiver_t;
+	using receivedValue_t = RcSwitch::receivedValue_t;
 	using basicReceiver_t = RcSwitch::Receiver;
 private:
 	static receiver_t mReceiverDelegate;
@@ -86,7 +87,7 @@ public:
 	 * significant bit.
 	 * Must not be called, when available returns false.
 	 */
-	static inline uint32_t receivedValue() {return mReceiverDelegate.receivedValue();}
+	static inline receivedValue_t receivedValue() {return mReceiverDelegate.receivedValue();}
 
 	/**
 	 * Return the number of received bits. Can be greater than
@@ -102,7 +103,7 @@ public:
 	 * data pulses for the received value.
 	 * Must not be called, when available returns false.
 	 */
-	static inline 	size_t receivedProtocolCount() {return mReceiverDelegate.receivedProtocolCount();}
+	static inline size_t receivedProtocolCount() {return mReceiverDelegate.receivedProtocolCount();}
 
 	/**
 	 * Return the protocol number that matched the synch and data
@@ -130,13 +131,16 @@ public:
 	 *   Serial.println();
 	 * }
 	 *
+	 * Warning: Call resetAvailable() will clear the receivedProtocols
+	 * of the received value:
 	 */
 	static inline int receivedProtocol(const size_t index = 0)
 		{return mReceiverDelegate.receivedProtocol(index);}
 
 	/**
 	 * Clear the last received value in order to receive a new one.
-	 * Can be called at any time.
+	 * Will also clear the received protocols that the last
+	 * received value is belongs to. Can be called at any time.
 	 */
 	static inline void resetAvailable() {mReceiverDelegate.resetAvailable();}
 
