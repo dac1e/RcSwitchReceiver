@@ -179,6 +179,12 @@ class MyRcButtonPressDetector : public RcButtonPressDetector { // @suppress("Cla
 			digitalWrite(LED_BUILTIN, LOW);
 		}
 	}
+
+public:
+	MyRcButtonPressDetector()
+		: RcButtonPressDetector(400) // Use 400ms instead of 250ms default for debounce
+	{
+	}
 };
 
 static MyRcButtonPressDetector rcButtonPressDetector;
