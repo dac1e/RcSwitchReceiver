@@ -480,7 +480,7 @@ public:
 			if(separator != '\t') {
 				s.print(" ");
 			}
-			s.print("after");
+			s.print("for");
 			s.print(separator);
 			if(separator != '\t') {
 				s.print(" ");
