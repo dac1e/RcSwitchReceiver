@@ -34,6 +34,7 @@
 #include "Common.hpp"
 #include "Container.hpp"
 #include "Pulse.hpp"
+#include "PulseAnalyzer.hpp"
 
 #define DEBUG_RCSWITCH false
 
@@ -164,48 +165,40 @@ public:
 		return "??";
 	}
 
-	template<typename T> void dump(T& s, char separator) {
+	template<typename T> void dump(T& stream, char separator) const {
 		const size_t n = baseClass::size();
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		while(i < n) {
 			const Pulse& pulse = baseClass::at(i);
-
-			{	// print index
+			// print trace buffer index
+			{
 				char buffer[16];
-				size_t b = 0;
-				buffer[b++] = ('[');
-				sprintUint(&buffer[b++], i, indexWidth);
-				s.print(buffer);
-				s.print("]");
+				buffer[0] = ('[');
+				sprintUint(&buffer[1], i, indexWidth);
+				stream.print(buffer);
+				stream.print("]");
 			}
-			s.print(separator);
-			if(separator != '\t') {
-				s.print(" ");
-			}
-			s.print(pulseTypeToString(pulse));
-			s.print(separator);
-			if(separator != '\t') {
-				s.print(" ");
-			}
-			s.print("for");
-			s.print(separator);
-			if(separator != '\t') {
-				s.print(" ");
-			}
+			stream.print(separator);
+			stream.print(" ");
 
-			{ // print pulse length
+			// print pulse type (LOW, HIGH)
+			stream.print(pulseTypeToString(pulse));
+			stream.print(separator);
+			stream.print(" ");
+			stream.print("for");
+			stream.print(separator);
+			stream.print(" ");
+
+			// print pulse length
+			{
 				char buffer[16];
 				sprintUint(buffer, pulse.mMicroSecDuration, 6);
-				s.print(buffer);
+				stream.print(buffer);
 			}
-
-			s.print(separator);
-			if(separator != '\t') {
-				s.print(" ");
-			}
-
-			s.println("usec");
+			stream.print(separator);
+			stream.print(" ");
+			stream.println("usec");
 
 			++i;
 		}
@@ -348,15 +341,24 @@ class ReceiverWithPulseTracer : public Receiver {
 	 * debugging purpose.
 	 */
 	PulseTracer<PULSE_TRACES_COUNT> mPulseTracer;
-//	PulseAnalyzer mPulseAnalyzer;
-	volatile bool mPulseTracerDumping = false;
+	volatile mutable bool mPulseTracingLocked = false;
 
 	/** Store a new pulse in the trace buffer of this message packet. */
 	TEXT_ISR_ATTR_1 void tracePulse(uint32_t microSecDuration, const int pinLevel) {
-		if(not mPulseTracerDumping) {
+		if(not mPulseTracingLocked) {
 			Pulse * const currentPulse = mPulseTracer.beyondTop();
 			*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
 			mPulseTracer.selectNext();
+		}
+	}
+
+	void analyzeTracedPulses(PulseAnalyzer& pulseAnalyzer) const {
+		RCSWITCH_ASSERT(mPulseTracingLocked);
+		pulseAnalyzer.reset();
+		const size_t n = mPulseTracer.size();
+		size_t i = 0;
+		for(; i < n; i++) {
+			pulseAnalyzer.addPulse(mPulseTracer.at(i));
 		}
 	}
 
@@ -371,13 +373,18 @@ class ReceiverWithPulseTracer : public Receiver {
 		Receiver::handleInterrupt(pinLevel, microSecInterruptTime);
 	}
 
+public:
 	/**
 	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
 	 */
-	template <typename T> void dumpPulseTracer(T& serial, char separator) {
-		mPulseTracerDumping = true;
-		mPulseTracer.dump(serial, separator);
-		mPulseTracerDumping = false;
+	template <typename T>
+	void dumpPulseTracer(T& stream, char separator) const {
+		mPulseTracingLocked = true;
+		PulseAnalyzer pulseAnalyzer;
+		analyzeTracedPulses(pulseAnalyzer);
+		mPulseTracer.dump(stream, separator);
+		pulseAnalyzer.dump(stream, separator);
+		mPulseTracingLocked = false;
 	}
 };
 
@@ -385,8 +392,8 @@ template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 	using receiver_t = ReceiverWithPulseTracer<PULSE_TRACES_COUNT>;
 
 	template<typename T>
-	static void dumpPulseTracer(const receiver_t& receiver, T& serial, char separator) {
-		receiver.dumpPulseTracer(serial, separator);
+	static void dumpPulseTracer(const receiver_t& receiver, T& stream, char separator) {
+		receiver.dumpPulseTracer(stream, separator);
 	}
 };
 
@@ -394,7 +401,7 @@ template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 template<> struct ReceiverSelector<0> {
 	using receiver_t = Receiver;
 	template<typename T>
-	static void dumpPulseTracer(const receiver_t& receiver, T& serial, char separator) {
+	static void dumpPulseTracer(const receiver_t& receiver, T& stream, char separator) {
 		// There are no pulses traced.
 	}
 };

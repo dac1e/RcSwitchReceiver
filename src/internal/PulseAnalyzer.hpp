@@ -45,8 +45,40 @@ class PulseAnalyzer : public StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES> {
 	size_t findCategorie(const Pulse &pulse) const;
 
 public:
-	PulseAnalyzer(size_t percentTolerance = 10);
+	PulseAnalyzer(size_t percentTolerance = 20);
 	bool addPulse(const Pulse &pulse);
+	inline void reset() {baseClass::reset();}
+	template <typename T>
+	void dump(T& stream, char separator) {
+		for(size_t i = 0; i < size(); i++) {
+			stream.print("average duration ");
+			{
+				char buffer[16];
+				sprintUint(&buffer[0], at(i).microSecDuration, 5);
+				stream.print(buffer);
+			}
+
+			stream.print("usec");
+			stream.print(separator);
+			stream.print(" ");
+
+			{
+				char buffer[16];
+				sprintUint(&buffer[0], at(i).pulseCountLowLevel, 3);
+				stream.print(buffer);
+			}
+			stream.print(" times LOW");
+			stream.print(separator);
+			stream.print(" ");
+
+			{
+				char buffer[16];
+				sprintUint(&buffer[0], at(i).pulseCountHighLevel, 3);
+				stream.print(buffer);
+			}
+			stream.println(" times HIGH");
+		}
+	}
 };
 
 } /* namespace RcSwitch */
