@@ -22,34 +22,33 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#include <stdlib.h>
-#if defined(ARDUINO_ARCH_SAM)
-	// Don't know why this is not in stdlib.h ?
-	#include <itoa.h>
-#endif
+#pragma once
 
-#include "Common.hpp"
+#ifndef RCSWITCH_RECEIVER_INTERNAL_PULSECATEGORIZER_HPP_
+#define RCSWITCH_RECEIVER_INTERNAL_PULSECATEGORIZER_HPP_
+
+#include <stddef.h>
+
+#include "Pulse.hpp"
+#include "ISR_ATTR.hpp"
+#include "Container.hpp"
 
 namespace RcSwitch {
 
-size_t digitCount(size_t value) {
-	size_t result = 0;
-	do {
-		++result;
-		value /=10;
-	} while(value > 0);
-	return result;
-}
+static constexpr size_t MAX_PULSE_CATEGORIES = 6;
 
-void sprintUint(char *string, const size_t value, const size_t width) {
-	const size_t digitCnt = digitCount(value);
-	const size_t spacesCnt = width > digitCnt ? width - digitCnt : 0;
-	size_t i = 0;
-	while(i < spacesCnt) {
-		string[i] = ' ';
-		++i;
-	}
-	itoa(value, &string[i], 10);
-}
+class PulseCategorizer : public StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES> {
+	using baseClass = StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES>;
+	const size_t mPercentTolerance;
 
-} // namespace RcSwitch
+	bool isOfCategorie(const PulseCategorie &categorie, const Pulse &pulse) const;
+	size_t findCategorie(const Pulse &pulse) const;
+
+public:
+	PulseCategorizer(size_t percentTolerance = 10);
+	bool addPulse(const Pulse &pulse);
+};
+
+} /* namespace RcSwitch */
+
+#endif /* RCSWITCH_RECEIVER_INTERNAL_PULSECATEGORIZER_HPP_ */

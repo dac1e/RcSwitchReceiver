@@ -30,9 +30,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "internal/ISR_ATTR.hpp"
-#include "internal/Container.hpp"
-#include "internal/Common.hpp"
+#include "ISR_ATTR.hpp"
+#include "Common.hpp"
+#include "Container.hpp"
+#include "Pulse.hpp"
 
 #define DEBUG_RCSWITCH false
 
@@ -107,40 +108,6 @@ enum class DATA_BIT : int8_t {
 /** Specialize INITIAL_VALUE for DATA_BIT */
 template<> struct INITIAL_VALUE<DATA_BIT> {
 	static constexpr DATA_BIT value = DATA_BIT::UNKNOWN;
-};
-
-enum class PULSE_LEVEL : uint8_t {
-	UNKNOWN = 0,
-	LO,
-	HI,
-};
-
-enum class PULSE_TYPE : uint8_t {
-	UNKNOWN = 0,
-	SYCH_PULSE,
-	SYNCH_FIRST_PULSE,
-	SYNCH_SECOND_PULSE,
-
-	DATA_LOGICAL_00,
-	DATA_LOGICAL_01,
-
-//	DATA_LOGICAL_10,
-//	DATA_LOGICAL_11,
-};
-
-struct PulseTypes {
-	PULSE_TYPE mPulseTypeSynch;
-	PULSE_TYPE mPulseTypeData;
-};
-
-struct Pulse {
-	uint32_t    mMicroSecDuration;
-	PULSE_LEVEL mPulseLevel;
-};
-
-/** Specialize INITIAL_VALUE for Pulse */
-template<> struct INITIAL_VALUE<Pulse> {
-	static constexpr Pulse value = Pulse{0, PULSE_LEVEL::UNKNOWN};
 };
 
 enum PROTOCOL_GROUP_ID {

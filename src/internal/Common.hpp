@@ -32,16 +32,26 @@
 
 namespace RcSwitch {
 
+/**
+ * A template function structure providing initial values for
+ * the particular types. Will be specialized for the types where
+ * initial value is needed. */
+template<typename ELEMENT_TYPE> struct INITIAL_VALUE;
+
+/** Specialize INITIAL_VALUE for size_t */
+template<> struct INITIAL_VALUE<size_t> {
+	static constexpr size_t value = static_cast<size_t>(-1);
+};
+
 /** Forward declaration */
 class RxTimingSpec;
-
 
 struct rxTimingSpecTable {
 	const RxTimingSpec* start;
 	size_t size;
 };
 
-void   sprintUint(char *string, const size_t value, const size_t width);
+void sprintUint(char *string, const size_t value, const size_t width);
 size_t digitCount(size_t value);
 
 }

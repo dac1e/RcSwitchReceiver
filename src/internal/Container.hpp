@@ -27,7 +27,10 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_
 
-#define DEBUG_RCSWITCH_CONTAINER false
+#define DEBUG_RCSWITCH_CONTAINER true
+
+#include <stddef.h>
+#include <stdint.h>
 
 /**
  * Setting DEBUG_RCSWITCH_CONTAINER to true will:
@@ -46,18 +49,9 @@
 #define RCSWITCH_CONTAINER_ASSERT(expr)
 #endif
 
+#include "Common.hpp"
+
 namespace RcSwitch {
-
-/**
- * A template function structure providing initial values for
- * the particular types. Will be specialized for the types where
- * initial value is needed. */
-template<typename ELEMENT_TYPE> struct INITIAL_VALUE;
-
-/** Specialize INITIAL_VALUE for size_t */
-template<> struct INITIAL_VALUE<size_t> {
-	static constexpr size_t value = static_cast<size_t>(-1);
-};
 
 /**
  * A container that encapsulates fixed size arrays.
@@ -170,6 +164,16 @@ public:
 		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
 		return baseClass::mData[index];
 	}
+
+	/**
+	 * Return a const reference to the element at the specified index.
+	 * The index is validated by assert() system function.
+	 */
+	inline element_type& at(const size_t index) {
+		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
+		return baseClass::mData[index];
+	}
+
 
 	/* Refer to method at() */
 	inline const element_type& operator[](const size_t index) const {
