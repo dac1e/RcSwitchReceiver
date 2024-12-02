@@ -27,6 +27,10 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_ISR_ATTR_HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_ISR_ATTR_HPP_
 
+#if defined (ESP32)
+#include <esp_attr.h>
+#endif
+
 #if not defined(TEXT_ISR_ATTR)
 	#if defined(ESP8266)
 		// interrupt handler and related code must be in RAM on ESP8266,

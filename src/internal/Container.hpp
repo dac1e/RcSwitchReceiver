@@ -279,7 +279,6 @@ public:
 	}
 };
 
-}
-
+} // namespace RcSwitch
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_ */

@@ -41,7 +41,7 @@ size_t constexpr PROTOCOL_SYGONIX =12;
 // You can add own protocols and remove not needed protocols.
 // However, the number of normal level protocols as well as the number of inverse level
 // Protocols should not exceed 7 in this table. Refer to MAX_PROTOCOL_CANDIDATES in RcSwitch.hpp.
-static const RxProtocolTable <
+DATA_ISR_ATTR static const RxProtocolTable <
 //	                                #, clk,  %, syA,  syB,  d0A,d0B, d1A, d1B, inverseLevel
 	makeTimingSpec<  PROTOCOL_PT2262 , 350, 20,   1,   31,    1,  3,    3,  1, false>, // (PT2262)
     // Note that last row must not end with a comma.

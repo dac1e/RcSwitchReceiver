@@ -43,7 +43,7 @@ namespace RcSwitch {
 RcSwitch_test RcSwitch_test::theTest;
 
 static const RxProtocolTable <
-//                 #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
+//                  #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
 	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // ()
 	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1, false>, // ()
 	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6, false>, // ()

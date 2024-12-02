@@ -188,8 +188,8 @@ public:
 
 
 /**
- * This container stores received pulses for debugging purpose. The
- * purpose is to view the pulses in a debugging session. */
+ * This container stores received pulses for debugging and pulse analysis purpose.
+ */
 template<size_t PULSE_TRACES_COUNT>
 class PulseTracer : public RingBuffer<Pulse, PULSE_TRACES_COUNT> {
 	using baseClass = RingBuffer<Pulse, PULSE_TRACES_COUNT>;
