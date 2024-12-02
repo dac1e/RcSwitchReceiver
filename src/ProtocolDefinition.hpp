@@ -27,7 +27,7 @@
 #ifndef RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_
 #define RCSWITCH_RECEIVER_API_PROTOCOLDEFINITION_HPP_
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include "internal/Common.hpp"
