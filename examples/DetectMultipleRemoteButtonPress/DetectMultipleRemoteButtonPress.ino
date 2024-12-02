@@ -22,9 +22,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-
 /**
  * Please read "hints on remote operating distance" in README.md
+ * For wiring diagram refer to https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/RcSwitchReceiverWiring.pdf
+ *
+ * The first sketch you should run is TraceReceviedPulses.ino. With the pulse statistics you get from there, you
+ * should be able to define your own rxProtocolTable for your remote controls.
  */
 
 #include "ProtocolDefinition.hpp"
