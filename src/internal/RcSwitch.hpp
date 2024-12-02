@@ -105,11 +105,6 @@ enum class DATA_BIT : int8_t {
 	LOGICAL_1 = 1,
 };
 
-/** Specialize INITIAL_VALUE for DATA_BIT */
-template<> struct INITIAL_VALUE<DATA_BIT> {
-	static constexpr DATA_BIT value = DATA_BIT::UNKNOWN;
-};
-
 enum PROTOCOL_GROUP_ID {
 	UNKNOWN_PROTOCOL       = -1,
 	NORMAL_LEVEL_PROTOCOLS  = 0,
@@ -129,8 +124,6 @@ class ProtocolCandidates : public StackBuffer<PROTOCOL_CANDIDATE, MAX_PROTOCOL_C
 
 public:
 	inline ProtocolCandidates() : mProtocolGroupId(UNKNOWN_PROTOCOL) {
-		/** Initialize protocol candidates elements. */
-		Array::init();
 	}
 
 	/** Remove all protocol candidates from this container. */
@@ -220,7 +213,6 @@ public:
 
 	PulseTracer() {
 		/* Initialize pulse tracer elements. */
-		Array<Pulse, PULSE_TRACES_COUNT>::init();
 	}
 
 	/**
@@ -244,8 +236,6 @@ class MessagePacket : public StackBuffer<DATA_BIT, MAX_MSG_PACKET_BITS> {
 public:
 	/** Default constructor */
 	inline MessagePacket() {
-		/* Initialize data bit elements. */
-		Array::init();
 	}
 
 	/**
@@ -314,10 +304,7 @@ protected:
 	Receiver()
 		    : mRxTimingSpecTableNormal{nullptr, 0}, mRxTimingSpecTableInverse{nullptr, 0}
 		    , mMessageAvailable(false), mSuspended(false)
-			, mDataModePulseCount(0), mMicrosecLastInterruptTime(0)
-			{
-			/* Initialize pulse elements. */
-			Array::init();
+			, mDataModePulseCount(0), mMicrosecLastInterruptTime(0)	{
 	}
 
 private:

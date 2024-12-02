@@ -59,11 +59,6 @@ struct Pulse {
 	PULSE_LEVEL mPulseLevel;
 };
 
-/** Specialize INITIAL_VALUE for Pulse */
-template<> struct INITIAL_VALUE<Pulse> {
-	static constexpr Pulse value = Pulse{0, PULSE_LEVEL::UNKNOWN};
-};
-
 struct PulseCategorie {
 	size_t microSecDuration;
 	size_t pulseCountLowLevel;
@@ -80,11 +75,6 @@ struct PulseCategorie {
 			++pulseCountHighLevel;
 		}
 	}
-};
-
-/** Specialize INITIAL_VALUE for size_t */
-template<> struct INITIAL_VALUE<PulseCategorie> {
-	static constexpr PulseCategorie value = {0,0,0};
 };
 
 } //  namespace RcSwitch

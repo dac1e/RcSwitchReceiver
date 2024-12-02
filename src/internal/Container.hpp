@@ -27,20 +27,16 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_
 
-#define DEBUG_RCSWITCH_CONTAINER true
+#define DEBUG_RCSWITCH_CONTAINER false
 
 #include <stddef.h>
 #include <stdint.h>
 
+#include "Common.hpp"
+
 /**
- * Setting DEBUG_RCSWITCH_CONTAINER to true will:
- *
- * 1) Initialize elements of arrays within objects upon
- * reset() calls. This helps to quickly recognize
- * that an array element was explicitly set.
- *
- * 2) Map macro RCSWITCH_CONTAINER_ASSERT to the system function
- * assert.
+ * Setting DEBUG_RCSWITCH_CONTAINER to true will map macro
+ * RCSWITCH_CONTAINER_ASSERT to the system function assert.
  */
 #if DEBUG_RCSWITCH_CONTAINER
 #include <assert.h>
@@ -48,8 +44,6 @@
 #else
 #define RCSWITCH_CONTAINER_ASSERT(expr)
 #endif
-
-#include "Common.hpp"
 
 namespace RcSwitch {
 
@@ -66,23 +60,12 @@ protected:
 	/** A variable to store the actual size of the array. */
 	size_t mSize;
 
-	TEXT_ISR_ATTR_1 inline void init() {
-#if DEBUG_RCSWITCH_CONTAINER // Initialize only if debugging is enabled
-		size_t i = 0;
-		for(; i < CAPACITY; i++) {
-			mData[i] = INITIAL_VALUE<ELEMENT_TYPE>::value;
-		}
-#endif
-	}
-
 	TEXT_ISR_ATTR_1 inline void reset() {
 		mSize = 0;
-		init();
 	}
 
 	/** Default constructor */
 	Array() : mSize(0) {
-		init();
 	}
 public:
 	TEXT_ISR_ATTR_1 inline size_t size() const {return mSize;}
@@ -189,17 +172,11 @@ public:
 	 */
 	TEXT_ISR_ATTR_2 void remove(const size_t index) {
 		if(index < baseClass::mSize) {
-#if DEBUG_RCSWITCH_CONTAINER // Initialize only if debugging support is enabled
-			baseClass::mData[index] = INITIAL_VALUE<element_type>::value;
-#endif
 			size_t i = index+1;
 			for(;i < baseClass::mSize; i++) {
 				baseClass::mData[i-1] = baseClass::mData[i];
 			}
 			--baseClass::mSize;
-#if DEBUG_RCSWITCH_CONTAINER // Initialize only if debugging support is enabled
-			baseClass::mData[baseClass::mSize] = INITIAL_VALUE<element_type>::value;
-#endif
 		}
 	}
 
