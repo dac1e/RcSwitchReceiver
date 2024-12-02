@@ -348,6 +348,7 @@ class ReceiverWithPulseTracer : public Receiver {
 	 * debugging purpose.
 	 */
 	PulseTracer<PULSE_TRACES_COUNT> mPulseTracer;
+//	PulseAnalyzer mPulseAnalyzer;
 	volatile bool mPulseTracerDumping = false;
 
 	/** Store a new pulse in the trace buffer of this message packet. */
@@ -382,10 +383,20 @@ class ReceiverWithPulseTracer : public Receiver {
 
 template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 	using receiver_t = ReceiverWithPulseTracer<PULSE_TRACES_COUNT>;
+
+	template<typename T>
+	static void dumpPulseTracer(const receiver_t& receiver, T& serial, char separator) {
+		receiver.dumpPulseTracer(serial, separator);
+	}
 };
 
+// Specialize for PULSE_TRACES_COUNT being zero.
 template<> struct ReceiverSelector<0> {
 	using receiver_t = Receiver;
+	template<typename T>
+	static void dumpPulseTracer(const receiver_t& receiver, T& serial, char separator) {
+		// There are no pulses traced.
+	}
 };
 
 } /* namespace RcSwitch */

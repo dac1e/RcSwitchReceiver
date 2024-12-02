@@ -161,7 +161,7 @@ public:
 	 * you'll see a compiler error here.
 	 */
 	static void dumpPulseTracer(typeof(Serial)& serial, char separator = ',') {
-		mReceiverDelegate.dumpPulseTracer(serial, separator);
+		RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::dumpPulseTracer(mReceiverDelegate, serial, separator);
 	}
 
 	/**
