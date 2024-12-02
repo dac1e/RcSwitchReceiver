@@ -156,9 +156,7 @@ public:
 	static void resume() {mReceiverDelegate.resume();}
 
 	/**
-	 * Dump the most recent received pulses, starting with the youngest pulse.
-	 * Only available if PULSE_TRACES_COUNT is greater than zero. Otherwise
-	 * you'll see a compiler error here.
+	 * Dump the oldest to the youngest pulse.
 	 */
 	static void dumpPulseTracer(typeof(Serial)& serial, char separator = ',') {
 		RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::dumpPulseTracer(mReceiverDelegate, serial, separator);
