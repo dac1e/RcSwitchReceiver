@@ -1,0 +1,285 @@
+/*
+  RcSwitchReceiver - Arduino libary for remote control receiver Copyright (c)
+  2024 Wolfgang Schmieder.  All right reserved.
+
+  Contributors:
+  - Wolfgang Schmieder
+
+  Project home: https://github.com/dac1e/RcSwitchReceiver/
+
+  This library is free software; you can redistribute it and/or modify it
+  the terms of the GNU Lesser General Public License as under published
+  by the Free Software Foundation; either version 3.0 of the License,
+  or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+*/
+
+#pragma once
+
+#ifndef RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_
+#define RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_
+
+#define DEBUG_RCSWITCH_CONTAINER false
+
+/**
+ * Setting DEBUG_RCSWITCH_CONTAINER to true will:
+ *
+ * 1) Initialize elements of arrays within objects upon
+ * reset() calls. This helps to quickly recognize
+ * that an array element was explicitly set.
+ *
+ * 2) Map macro RCSWITCH_CONTAINER_ASSERT to the system function
+ * assert.
+ */
+#if DEBUG_RCSWITCH_CONTAINER
+#include <assert.h>
+#define RCSWITCH_CONTAINER_ASSERT assert
+#else
+#define RCSWITCH_CONTAINER_ASSERT(expr)
+#endif
+
+namespace RcSwitch {
+
+/**
+ * A template function structure providing initial values for
+ * the particular types. Will be specialized for the types where
+ * initial value is needed. */
+template<typename ELEMENT_TYPE> struct INITIAL_VALUE;
+
+/** Specialize INITIAL_VALUE for size_t */
+template<> struct INITIAL_VALUE<size_t> {
+	static constexpr size_t value = static_cast<size_t>(-1);
+};
+
+/**
+ * A container that encapsulates fixed size arrays.
+ */
+template<typename ELEMENT_TYPE, size_t CAPACITY>
+class Array {
+protected:
+	typedef ELEMENT_TYPE element_type;
+	/** The array where data is stored. */
+	element_type mData[CAPACITY];
+
+	/** A variable to store the actual size of the array. */
+	size_t mSize;
+
+	TEXT_ISR_ATTR_1 inline void init() {
+#if DEBUG_RCSWITCH_CONTAINER // Initialize only if debugging is enabled
+		size_t i = 0;
+		for(; i < CAPACITY; i++) {
+			mData[i] = INITIAL_VALUE<ELEMENT_TYPE>::value;
+		}
+#endif
+	}
+
+	TEXT_ISR_ATTR_1 inline void reset() {
+		mSize = 0;
+		init();
+	}
+
+	/** Default constructor */
+	Array() : mSize(0) {
+		init();
+	}
+public:
+	TEXT_ISR_ATTR_1 inline size_t size() const {return mSize;}
+	TEXT_ISR_ATTR_1 inline bool canGrow() const {return mSize < CAPACITY;}
+};
+
+/**
+ * A container that encapsulates a fixed size stack. Elements can be
+ * pushed onto the stack as long as the actual size is smaller than
+ * the capacity. Otherwise, the pushed element is dropped, and the
+ * overflow counter is incremented.
+ */
+template<typename ELEMENT_TYPE, size_t CAPACITY>
+class StackBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
+	friend class RcSwitch_test;
+protected:
+	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
+	using element_type = typename baseClass::element_type;
+	/**
+	 * A counter that will be incremented, when an element couldn't be pushed,
+	 * because this stack was already full. */
+	uint32_t mOverflow;
+
+	/* Set the actual size of this stack to zero and clear
+	 * the overflow counter.
+	 */
+	TEXT_ISR_ATTR_2 inline void reset() {baseClass::reset(), mOverflow = 0;}
+
+	/* Default constructor */
+	inline StackBuffer() : mOverflow(0) {}
+public:
+	/** Make the capacity template argument available as const expression. */
+	static constexpr size_t capacity = CAPACITY;
+
+	/**
+	 * Return a pointer to the memory, that stores the element
+	 * beyond the top stack element. Return null, if there is
+	 * no beyond top stack element available.
+	 */
+	TEXT_ISR_ATTR_2 inline element_type* beyondTop() {
+		if (baseClass::mSize < CAPACITY) {
+			return &baseClass::mData[baseClass::mSize];
+		}
+		return nullptr;
+	}
+
+	/**
+	 * Make the beyond top stack element to the top one, if the
+	 * stack has still space to take a new element. Otherwise
+	 * set increment the overflow counter.
+	 * Returns true if successful, otherwise false.
+	 */
+	TEXT_ISR_ATTR_2 inline bool selectNext() {
+		if (baseClass::mSize < CAPACITY) {
+			++baseClass::mSize;
+			return true;
+		}
+		++mOverflow;
+		return false;
+	}
+
+	/**
+	 * Push an element on top of the stack.
+	 * Returns true if successful, otherwise false.
+	 */
+	TEXT_ISR_ATTR_1 bool push(const element_type &value) {
+		element_type* const storage = beyondTop();
+		if (storage) {
+			*storage = value;
+		}
+		return selectNext();
+	}
+
+	/**
+	 * Return a const reference to the element at the specified index.
+	 * The index is validated by assert() system function.
+	 */
+	inline const element_type& at(const size_t index) const {
+		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
+		return baseClass::mData[index];
+	}
+
+	/* Refer to method at() */
+	inline const element_type& operator[](const size_t index) const {
+		return at(index);
+	}
+
+	/**
+	 * Remove a stack element at the specified index.
+	 * Important: This method may invalidate the element that was
+	 * previously obtained by the at() function respectively the
+	 * operator[]. The function will alter the actual stack size.
+	 * The overflow counter stays untouched.
+	 */
+	TEXT_ISR_ATTR_2 void remove(const size_t index) {
+		if(index < baseClass::mSize) {
+#if DEBUG_RCSWITCH_CONTAINER // Initialize only if debugging support is enabled
+			baseClass::mData[index] = INITIAL_VALUE<element_type>::value;
+#endif
+			size_t i = index+1;
+			for(;i < baseClass::mSize; i++) {
+				baseClass::mData[i-1] = baseClass::mData[i];
+			}
+			--baseClass::mSize;
+#if DEBUG_RCSWITCH_CONTAINER // Initialize only if debugging support is enabled
+			baseClass::mData[baseClass::mSize] = INITIAL_VALUE<element_type>::value;
+#endif
+		}
+	}
+
+	/* Return the value of the overflow counter. */
+	inline size_t overflowCount()const {return mOverflow;}
+};
+
+/**
+ * A container that encapsulates a fixed size stack. Elements can be
+ * pushed onto the stack. When the size of the stack has reached the
+ * capacity, the bottom element will be dropped on cost of the new
+ * pushed element.
+ */
+template<typename ELEMENT_TYPE, size_t CAPACITY>
+class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
+	friend class RcSwitch_test;
+	/**
+	 * The index of the bottom element of the ring buffer.
+	 */
+	size_t mBegin;
+	TEXT_ISR_ATTR_2 static size_t inline squashedIndex(const size_t i)
+	{
+		return (i + CAPACITY) % CAPACITY;
+	}
+protected:
+	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
+	using element_type = typename baseClass::element_type;
+
+	/** Set the actual size of this ring buffer to zero. */
+	TEXT_ISR_ATTR_2 inline void reset() {baseClass::reset(); mBegin = 0;}
+
+	/** Default constructor */
+	inline RingBuffer() : mBegin(0) {}
+public:
+	static constexpr size_t capacity = CAPACITY;
+
+	/**
+	 * Return a pointer to the memory, that stores the element
+	 * beyond the top ring buffer element.
+	 */
+	TEXT_ISR_ATTR_2 inline element_type* beyondTop() {
+		const size_t index = squashedIndex(mBegin + baseClass::mSize);
+		return &baseClass::mData[index];
+	}
+
+	/**
+	 * Make the beyond top ring buffer element to the top element. If
+	 * the ring buffer size has already reached the capacity, the
+	 * bottom element will be dropped.
+	 */
+	TEXT_ISR_ATTR_2 inline void selectNext() {
+		if(baseClass::mSize < capacity) {
+			++baseClass::mSize;
+		} else {
+			mBegin = squashedIndex(mBegin +  baseClass::mSize + 1);
+		}
+	}
+
+	void push(const element_type &value) {
+		element_type* const storage = beyondTop();
+		*storage = value;
+		selectNext();
+	}
+
+	/**
+	 * Return a const reference to the element at the specified index.
+	 * The index is validated by assert() system function.
+	 */
+	TEXT_ISR_ATTR_1 inline const element_type& at(const size_t index) const {
+		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
+		return baseClass::mData[squashedIndex(mBegin + index)];
+	}
+
+	/**
+	 * Return a reference to the element at the specified index.
+	 * The index is validated by assert() system function.
+	 */
+	TEXT_ISR_ATTR_1 inline element_type& at(const size_t index) {
+		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
+		return baseClass::mData[squashedIndex(mBegin + index)];
+	}
+};
+
+}
+
+
+#endif /* RCSWITCH_RECEIVER_INTERNAL_CONTAINER_HPP_ */

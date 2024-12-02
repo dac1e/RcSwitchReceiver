@@ -161,11 +161,9 @@ static const TxDataBit invalidMessagePacket_secondPulseTooLong[] = {
 		{DATA_BIT::UNKNOWN},
 };
 
-#if DEBUG_RCSWITCH
 template<> struct INITIAL_VALUE<int> {
 	static constexpr int value = INT_MAX;
 };
-#endif
 
 template<size_t protocolNumber> class PulseLength {};
 
