@@ -36,6 +36,7 @@
 #include <assert.h>
 #endif
 
+#include "internal/ISR_ATTR.hpp"
 #include "internal/Common.hpp"
 
 /** Forward declaration of the class providing the API. */

@@ -30,6 +30,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "ISR_ATTR.hpp"
 #include "Common.hpp"
 #include "typeselect.hpp"
 #include <Arduino.h>

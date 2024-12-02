@@ -27,34 +27,6 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_
 
-#if not defined(TEXT_ISR_ATTR)
-	#if defined(ESP8266)
-		// interrupt handler and related code must be in RAM on ESP8266,
-		// according to issue #46.
-		#define TEXT_ISR_ATTR ICACHE_RAM_ATTR
-	#elif defined(ESP32)
-		#define TEXT_ISR_ATTR IRAM_ATTR
-	#else
-		#define TEXT_ISR_ATTR
-	#endif
-#endif // not defined(TEXT_ISR_ATTR)
-
-#if not defined(DATA_ISR_ATTR)
-	#if defined(ESP8266)
-		// interrupt handler and related code must be in RAM on ESP8266,
-		// according to issue #46.
-		#define DATA_ISR_ATTR
-	#elif defined(ESP32)
-		#define DATA_ISR_ATTR DRAM_ATTR
-	#else
-		#define DATA_ISR_ATTR
-	#endif
-#endif // not defined(DATA_ISR_ATTR)
-
-#define TEXT_ISR_ATTR_0 TEXT_ISR_ATTR // attibute for handleInterrupt()
-#define TEXT_ISR_ATTR_1 TEXT_ISR_ATTR // attibute functions called by handleInterrupt()
-#define TEXT_ISR_ATTR_2 TEXT_ISR_ATTR // attibute functions called by functions called by handleInterrupt()
-
 #include <stddef.h>
 #include <stdint.h>
 
@@ -62,13 +34,15 @@ namespace RcSwitch {
 
 /** Forward declaration */
 class RxTimingSpec;
+
+
 struct rxTimingSpecTable {
 	const RxTimingSpec* start;
 	size_t size;
 };
 
+void   sprintUint(char *string, const size_t value, const size_t width);
 size_t digitCount(size_t value);
-void sprintUint(char *string, const size_t value, const size_t width);
 
 }
 
