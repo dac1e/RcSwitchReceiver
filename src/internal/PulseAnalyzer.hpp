@@ -24,8 +24,8 @@
 
 #pragma once
 
-#ifndef RCSWITCH_RECEIVER_INTERNAL_PULSECATEGORIZER_HPP_
-#define RCSWITCH_RECEIVER_INTERNAL_PULSECATEGORIZER_HPP_
+#ifndef RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER_HPP_
+#define RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER_HPP_
 
 #include <stddef.h>
 
@@ -37,7 +37,7 @@ namespace RcSwitch {
 
 static constexpr size_t MAX_PULSE_CATEGORIES = 6;
 
-class PulseCategorizer : public StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES> {
+class PulseAnalyzer : public StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES> {
 	using baseClass = StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES>;
 	const size_t mPercentTolerance;
 
@@ -45,10 +45,10 @@ class PulseCategorizer : public StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES
 	size_t findCategorie(const Pulse &pulse) const;
 
 public:
-	PulseCategorizer(size_t percentTolerance = 10);
+	PulseAnalyzer(size_t percentTolerance = 10);
 	bool addPulse(const Pulse &pulse);
 };
 
 } /* namespace RcSwitch */
 
-#endif /* RCSWITCH_RECEIVER_INTERNAL_PULSECATEGORIZER_HPP_ */
+#endif /* RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER_HPP_ */

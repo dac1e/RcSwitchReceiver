@@ -22,12 +22,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#include "PulseCategorizer.hpp"
+#include "PulseAnalyzer.hpp"
 
 namespace RcSwitch {
 
-// PulseCategorizer
-bool PulseCategorizer::isOfCategorie(const PulseCategorie &categorie,
+// PulseAnalyzer
+bool PulseAnalyzer::isOfCategorie(const PulseCategorie &categorie,
 		const Pulse &pulse) const {
 	// size_t is 16 bit on avr. So static cast to uint32_t avoids temporary overflow when multiplying with 100
 	if (static_cast<uint32_t>(pulse.mMicroSecDuration)
@@ -43,7 +43,7 @@ bool PulseCategorizer::isOfCategorie(const PulseCategorie &categorie,
 	return true;
 }
 
-size_t PulseCategorizer::findCategorie(const Pulse &pulse) const {
+size_t PulseAnalyzer::findCategorie(const Pulse &pulse) const {
 	for (size_t i = 0; i < size(); i++) {
 		if (isOfCategorie(at(i), pulse)) {
 			return i;
@@ -52,11 +52,11 @@ size_t PulseCategorizer::findCategorie(const Pulse &pulse) const {
 	return size();
 }
 
-PulseCategorizer::PulseCategorizer(size_t percentTolerance) :
+PulseAnalyzer::PulseAnalyzer(size_t percentTolerance) :
 		mPercentTolerance(percentTolerance) {
 }
 
-bool PulseCategorizer::addPulse(const Pulse &pulse) {
+bool PulseAnalyzer::addPulse(const Pulse &pulse) {
 	bool result = true;
 	const size_t i = findCategorie(pulse);
 	if (i >= size()) {
