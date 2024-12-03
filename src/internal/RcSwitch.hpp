@@ -187,7 +187,7 @@ public:
 			}
 			stream.print(separator);
 			stream.print(" ");
-			stream.println("usec");
+			stream.println("us");
 
 			++i;
 		}
@@ -369,6 +369,7 @@ public:
 		PulseAnalyzer pulseAnalyzer;
 		analyzeTracedPulses(pulseAnalyzer);
 		mPulseTracer.dump(stream, separator);
+		pulseAnalyzer.sort();
 		pulseAnalyzer.dump(stream, separator);
 		mPulseTracingLocked = false;
 	}

@@ -33,7 +33,7 @@
 
 namespace RcSwitch {
 
-enum class PULSE_LEVEL : uint8_t {
+enum class PULSE_LEVEL {
 	UNKNOWN = 0,
 	LO,
 	HI,
@@ -60,20 +60,17 @@ struct Pulse {
 };
 
 struct PulseCategory {
+	PULSE_LEVEL pulseLevel;
 	size_t microSecDuration;
 	size_t microSecMinDuration;
 	size_t microSecMaxDuration;
-	size_t pulseCountLowLevel;
-	size_t pulseCountHighLevel;
-
-	inline size_t pulseCount() const {
-		return pulseCountLowLevel + pulseCountHighLevel;
-	}
+	size_t pulseCount;
 
 	inline void addPulse(const Pulse &pulse) {
 		// Refresh average for the pulse duration and store it.
-		const uint32_t n = pulseCount();
-		microSecDuration = (n * microSecDuration + pulse.mMicroSecDuration) / (n + 1);
+		microSecDuration =
+				( (static_cast<uint32_t>(microSecDuration) * pulseCount) + pulse.mMicroSecDuration)
+					/ (pulseCount + 1);
 
 		if(pulse.mMicroSecDuration < microSecMinDuration) {
 			microSecMinDuration = pulse.mMicroSecDuration;
@@ -83,11 +80,13 @@ struct PulseCategory {
 			microSecMaxDuration = pulse.mMicroSecDuration;
 		}
 
-		if (pulse.mPulseLevel == PULSE_LEVEL::LO) {
-			++pulseCountLowLevel;
-		} else if (pulse.mPulseLevel == PULSE_LEVEL::HI) {
-			++pulseCountHighLevel;
-		}
+		++pulseCount;
+	}
+
+	inline bool operator < (const PulseCategory& other) const {
+		if(microSecDuration < other.microSecDuration) {return true;}
+		if(pulseLevel < other.pulseLevel) {return true;}
+		return false;
 	}
 };
 

@@ -22,18 +22,45 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
+// C++ STL not available for avr. So we can not use <algorithm>
+
+#include "stdlib.h"
 #include "PulseAnalyzer.hpp"
+
+namespace {
+int comparePulseCategory(const void* pa, const void* pb) {
+	const RcSwitch::PulseCategory* a = static_cast<const RcSwitch::PulseCategory*>(pa);
+	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(pb);
+
+	if(*a < *b) return -1;
+	if(*b < *a) return 1;
+	return 0;
+}
+} // anonymous namespace
 
 namespace RcSwitch {
 
+void PulseAnalyzer::sort() {
+	qsort(&at(0), size(), sizeof(PulseCategory), comparePulseCategory);
+}
+
 bool PulseAnalyzer::isOfCategorie(const PulseCategory &categorie,
 		const Pulse &pulse) const {
-	// size_t is 16 bit on avr. So static cast to uint32_t avoids temporary overflow when multiplying with 100
+
+	if(pulse.mPulseLevel != categorie.pulseLevel) {
+		return false;
+	}
+
+	// size_t is 16 bit on avr. So static cast to uint32_t avoids
+	// temporary overflow when multiplying with 100
 	if (static_cast<uint32_t>(pulse.mMicroSecDuration)
 			< ((static_cast<uint32_t>(categorie.microSecDuration)
 					* (100 - mPercentTolerance)) / 100)) {
 		return false;
 	}
+
+	// size_t is 16 bit on avr. So static cast to uint32_t avoids
+	// temporary overflow when multiplying with 100
 	if (static_cast<uint32_t>(pulse.mMicroSecDuration)
 			>= ((static_cast<uint32_t>(categorie.microSecDuration)
 					* (100 + mPercentTolerance)) / 100)) {
@@ -61,11 +88,11 @@ bool PulseAnalyzer::addPulse(const Pulse &pulse) {
 	if (i >= size()) {
 		result = push(
 			{
-				 pulse.mMicroSecDuration
+				 pulse.mPulseLevel
 				,pulse.mMicroSecDuration
 				,pulse.mMicroSecDuration
-				,pulse.mPulseLevel == PULSE_LEVEL::LO ? 1 : 0
-				,pulse.mPulseLevel == PULSE_LEVEL::HI ? 1 : 0
+				,pulse.mMicroSecDuration
+				,1
 			}
 		);
 	} else {

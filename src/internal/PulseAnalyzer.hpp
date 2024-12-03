@@ -52,20 +52,38 @@ public:
 	PulseAnalyzer(size_t percentTolerance = 20);
 	bool addPulse(const Pulse &pulse);
 	inline void reset() {baseClass::reset();}
+	void sort();
 	template <typename T>
 	void dump(T& stream, char separator) {
 		stream.println("Identified pulse categories: ");
 
 		for(size_t i = 0; i < size(); i++) {
 
-			stream.print("\taverage: ");
+			stream.print("\t");
+			{
+				const char* levelText = (at(i).pulseLevel == PULSE_LEVEL::LO ? " LOW" : "HIGH");
+				stream.print(levelText);
+			}
+			stream.print(separator);
+			stream.print(" ");
+
+			{
+				char buffer[16];
+				sprintUint(&buffer[0], at(i).pulseCount, 3);
+				stream.print(buffer);
+			}
+			stream.print(" times");
+			stream.print(separator);
+			stream.print(" ");
+
+			stream.print("average: ");
 			{
 				char buffer[16];
 				sprintUint(&buffer[0], at(i).microSecDuration, 5);
 				stream.print(buffer);
 			}
 
-			stream.print("usec");
+			stream.print("us");
 			stream.print(separator);
 			stream.print(" ");
 
@@ -76,7 +94,7 @@ public:
 				stream.print(buffer);
 			}
 
-			stream.print("usec");
+			stream.print("us");
 			stream.print(separator);
 			stream.print(" ");
 
@@ -87,25 +105,9 @@ public:
 				stream.print(buffer);
 			}
 
-			stream.print("usec");
-			stream.print(separator);
-			stream.print(" ");
+			stream.print("us");
 
-			{
-				char buffer[16];
-				sprintUint(&buffer[0], at(i).pulseCountLowLevel, 3);
-				stream.print(buffer);
-			}
-			stream.print(" times LOW");
-			stream.print(separator);
-			stream.print(" ");
-
-			{
-				char buffer[16];
-				sprintUint(&buffer[0], at(i).pulseCountHighLevel, 3);
-				stream.print(buffer);
-			}
-			stream.println(" times HIGH");
+			stream.println();
 		}
 	}
 };
