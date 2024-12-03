@@ -67,6 +67,25 @@ struct PulseTypes {
 struct Pulse {
 	size_t mMicroSecDuration;
 	PULSE_LEVEL mPulseLevel;
+
+	bool isDurationInRange(size_t value, unsigned percentTolerance) const {
+		// size_t is 16 bit on avr. So static cast to uint32_t avoids
+		// temporary overflow when multiplying with 100
+		if (static_cast<uint32_t>(mMicroSecDuration)
+				< ((static_cast<uint32_t>(value)
+						* (100 - percentTolerance)) / 100)) {
+			return false;
+		}
+
+		// size_t is 16 bit on avr. So static cast to uint32_t avoids
+		// temporary overflow when multiplying with 100
+		if (static_cast<uint32_t>(mMicroSecDuration)
+				>= ((static_cast<uint32_t>(value)
+						* (100 + percentTolerance)) / 100)) {
+			return false;
+		}
+		return true;
+	}
 };
 
 struct PulseCategory {
@@ -75,6 +94,10 @@ struct PulseCategory {
 	size_t microSecMinDuration;
 	size_t microSecMaxDuration;
 	size_t pulseCount;
+
+	inline bool isValid() const {
+		return pulseCount > 0 && pulseLevel != PULSE_LEVEL::UNKNOWN;
+	}
 
 	inline void addPulse(const Pulse &pulse) {
 		// Refresh average for the pulse duration and store it.

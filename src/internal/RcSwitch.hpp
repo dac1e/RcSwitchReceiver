@@ -34,6 +34,7 @@
 #include "Common.hpp"
 #include "Container.hpp"
 #include "Pulse.hpp"
+#include "PulseTracer.hpp"
 #include "PulseAnalyzer.hpp"
 
 #define DEBUG_RCSWITCH false
@@ -134,65 +135,6 @@ public:
 	TEXT_ISR_ATTR_2 PROTOCOL_GROUP_ID getProtocolGroup() const {
 		return mProtocolGroupId;
 	}
-};
-
-
-/**
- * This container stores received pulses for debugging and pulse analysis purpose.
- */
-template<size_t PULSE_TRACES_COUNT>
-class PulseTracer : public RingBuffer<Pulse, PULSE_TRACES_COUNT> {
-	using baseClass = RingBuffer<Pulse, PULSE_TRACES_COUNT>;
-public:
-	static const char* pulseTypeToString(const Pulse& pulse) {
-		return pulseLevelToString(pulse.mPulseLevel);
-	}
-
-	template<typename T> void dump(T& stream, const char* separator) const {
-		const size_t n = baseClass::size();
-		size_t i = 0;
-		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
-		while(i < n) {
-			const Pulse& pulse = baseClass::at(i);
-			// print trace buffer index
-			{
-				char buffer[16];
-				buffer[0] = ('[');
-				sprintUint(&buffer[1], i, indexWidth);
-				stream.print(buffer);
-				stream.print("]");
-			}
-			stream.print(separator);
-			stream.print(" ");
-
-			// print pulse type (LOW, HIGH)
-			stream.print(pulseTypeToString(pulse));
-			stream.print(separator);
-			stream.print(" ");
-			stream.print("for");
-			stream.print(separator);
-			stream.print(" ");
-
-			// print pulse length
-			{
-				char buffer[16];
-				sprintUint(buffer, pulse.mMicroSecDuration, 6);
-				stream.print(buffer);
-			}
-			stream.print(separator);
-			stream.println("us");
-
-			++i;
-		}
-	}
-
-	PulseTracer() {
-	}
-
-	/**
-	 * Remove all pulses from this pulse tracer container.
-	 */
-	using baseClass::reset; // Just  make the base class reset() method public.
 };
 
 /**

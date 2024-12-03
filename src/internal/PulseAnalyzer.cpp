@@ -61,7 +61,7 @@ const PulseCategory& PulseAnalyzer::getLowPulseFromPair(size_t begin) const {
 	if(at(begin).pulseLevel == PULSE_LEVEL::LO) {
 		return at(begin);
 	}
-	assert(at(begin+1).pulseLevel == PULSE_LEVEL::HI);
+	assert(at(begin+1).pulseLevel == PULSE_LEVEL::LO);
 	return at(begin+1);
 }
 
@@ -69,40 +69,47 @@ const PulseCategory& PulseAnalyzer::getHighPulseFromPair(size_t begin) const {
 	if(at(begin).pulseLevel == PULSE_LEVEL::HI) {
 		return at(begin);
 	}
-	assert(at(begin+1).pulseLevel == PULSE_LEVEL::LO);
+	assert(at(begin+1).pulseLevel == PULSE_LEVEL::HI);
 	return at(begin+1);
 }
 
-void PulseAnalyzer::analyze() {
+void PulseAnalyzer::sort() {
 	qsort(&at(0), size(), sizeof(PulseCategory), comparePulseCategory);
+}
 
-	if(size() == 5) {
-		const bool bInverse = at(0).pulseLevel == PULSE_LEVEL::HI;
-		size_t synchB = at(0).microSecDuration;
+void PulseAnalyzer::analyze() {
+//	if(hasCategoryWithLongestDuration()) {
+		sort();
+		if(size() == 5) {
+			const bool bInverse = at(0).pulseLevel == PULSE_LEVEL::HI;
+			size_t synchB = at(0).microSecDuration;
 
-		size_t pulse0A;
-		size_t pulse0B;
-		size_t pulse1A;
-		size_t pulse1B;
+			size_t pulse0A;
+			size_t pulse0B;
+			size_t pulse1A;
+			size_t pulse1B;
 
-		if(not bInverse) {
-			// longer pulse
-			pulse0B = getLowPulseFromPair(1).microSecDuration;
-			pulse1A = getHighPulseFromPair(1).microSecDuration;
+			if(not bInverse) {
+				// longer pulse
+				pulse0B = getLowPulseFromPair(1).microSecDuration;
+				pulse1A = getHighPulseFromPair(1).microSecDuration;
 
-			// shorter pulse
-			pulse0A = getHighPulseFromPair(3).microSecDuration;
-			pulse1B = getLowPulseFromPair(3).microSecDuration;
-		} else {
-			// longer pulse
-			pulse0B = getHighPulseFromPair(1).microSecDuration;
-			pulse1A = getLowPulseFromPair(1).microSecDuration;
+				// shorter pulse
+				pulse0A = getHighPulseFromPair(3).microSecDuration;
+				pulse1B = getLowPulseFromPair(3).microSecDuration;
+			} else {
+				// longer pulse
+				pulse0B = getHighPulseFromPair(1).microSecDuration;
+				pulse1A = getLowPulseFromPair(1).microSecDuration;
 
-			// shorter pulse
-			pulse0A = getLowPulseFromPair(3).microSecDuration;
-			pulse1B = getHighPulseFromPair(3).microSecDuration;
+				// shorter pulse
+				pulse0A = getLowPulseFromPair(3).microSecDuration;
+				pulse1B = getHighPulseFromPair(3).microSecDuration;
+			}
 		}
-	}
+//	} else {
+//		findCategory(pulse);
+//	}
 }
 
 bool PulseAnalyzer::isOfCategorie(const PulseCategory &categorie,
@@ -112,22 +119,7 @@ bool PulseAnalyzer::isOfCategorie(const PulseCategory &categorie,
 		return false;
 	}
 
-	// size_t is 16 bit on avr. So static cast to uint32_t avoids
-	// temporary overflow when multiplying with 100
-	if (static_cast<uint32_t>(pulse.mMicroSecDuration)
-			< ((static_cast<uint32_t>(categorie.microSecDuration)
-					* (100 - mPercentTolerance)) / 100)) {
-		return false;
-	}
-
-	// size_t is 16 bit on avr. So static cast to uint32_t avoids
-	// temporary overflow when multiplying with 100
-	if (static_cast<uint32_t>(pulse.mMicroSecDuration)
-			>= ((static_cast<uint32_t>(categorie.microSecDuration)
-					* (100 + mPercentTolerance)) / 100)) {
-		return false;
-	}
-	return true;
+	return pulse.isDurationInRange(categorie.microSecDuration, mPercentTolerance);;
 }
 
 size_t PulseAnalyzer::findCategory(const Pulse &pulse) const {
@@ -139,8 +131,9 @@ size_t PulseAnalyzer::findCategory(const Pulse &pulse) const {
 	return size();
 }
 
-PulseAnalyzer::PulseAnalyzer(size_t percentTolerance) :
-		mPercentTolerance(percentTolerance) {
+PulseAnalyzer::PulseAnalyzer(unsigned percentTolerance) :
+	 mPercentTolerance(percentTolerance)
+	,mCategoryWithLongestDuration({PULSE_LEVEL::UNKNOWN, 0, 0, 0, 0}) {
 }
 
 bool PulseAnalyzer::addPulse(const Pulse &pulse) {

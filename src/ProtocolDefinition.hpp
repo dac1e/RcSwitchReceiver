@@ -109,7 +109,7 @@ template<
 	/** A protocol specification is given by the following parameters: */
 	size_t protocolNumber,           /* A unique integer identifier of this protocol. */
 	size_t clock,                    /* The clock rate in microseconds.  */
-	size_t percentTolerance,         /* The tolerance for a pulse length to be recognized as a valid. */
+	unsigned percentTolerance,         /* The tolerance for a pulse length to be recognized as a valid. */
 	size_t synchA,  size_t synchB,   /* Number of clocks for the synchronization pulse pair. */
 	size_t data0_A, size_t data0_B,  /* Number of clocks for a logical 0 bit data pulse pair. */
 	size_t data1_A, size_t data1_B,  /* Number of clocks for a logical 1 bit data pulse pair. */

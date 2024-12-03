@@ -43,16 +43,21 @@ static constexpr size_t MAX_PULSE_CATEGORIES = 12;
  */
 class PulseAnalyzer : public StackBuffer<PulseCategory, MAX_PULSE_CATEGORIES> {
 	using baseClass = StackBuffer<PulseCategory, MAX_PULSE_CATEGORIES>;
-	const size_t mPercentTolerance;
+	const unsigned mPercentTolerance;
+	PulseCategory mCategoryWithLongestDuration;
 
 	bool isOfCategorie(const PulseCategory &category, const Pulse &pulse) const;
 	size_t findCategory(const Pulse &pulse) const;
+	inline bool hasCategoryWithLongestDuration() const {
+		return mCategoryWithLongestDuration.isValid();
+	}
 
 	const PulseCategory& getLowPulseFromPair(size_t begin)const;
 	const PulseCategory& getHighPulseFromPair(size_t begin) const;
+	void sort();
 
 public:
-	PulseAnalyzer(size_t percentTolerance = 20);
+	PulseAnalyzer(unsigned percentTolerance = 20);
 	bool addPulse(const Pulse &pulse);
 	inline void reset() {baseClass::reset();}
 	void analyze();

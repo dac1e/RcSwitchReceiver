@@ -93,7 +93,7 @@ namespace Debug {
 template<
 	size_t protocolNumber,
 	size_t clock,
-	size_t percentTolerance,
+	unsigned percentTolerance,
 	size_t synchA,  size_t synchB,
 	size_t data0_A, size_t data0_B,
 	size_t data1_A, size_t data1_B,
