@@ -54,7 +54,7 @@
 
 // Trace the last 128 received pulses from the remote control.
 constexpr size_t TRACE_BUFFER_SIZE = 196;
-constexpr int RX433_DATA_PIN = 6;
+constexpr int RX433_DATA_PIN = 2;
 
 // Passing a trace buffer size greater 0 will enable RcSwitchReceiver tracing capability.
 static RcSwitchReceiver<RX433_DATA_PIN, TRACE_BUFFER_SIZE> rcSwitchReceiver;
