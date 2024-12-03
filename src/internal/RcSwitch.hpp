@@ -145,16 +145,10 @@ class PulseTracer : public RingBuffer<Pulse, PULSE_TRACES_COUNT> {
 	using baseClass = RingBuffer<Pulse, PULSE_TRACES_COUNT>;
 public:
 	static const char* pulseTypeToString(const Pulse& pulse) {
-		switch(pulse.mPulseLevel) {
-		case PULSE_LEVEL::LO:
-			return " LOW";
-		case PULSE_LEVEL::HI:
-			return "HIGH";
-		}
-		return "??";
+		return pulseLevelToString(pulse.mPulseLevel);
 	}
 
-	template<typename T> void dump(T& stream, char separator) const {
+	template<typename T> void dump(T& stream, const char* separator) const {
 		const size_t n = baseClass::size();
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
@@ -186,7 +180,6 @@ public:
 				stream.print(buffer);
 			}
 			stream.print(separator);
-			stream.print(" ");
 			stream.println("us");
 
 			++i;
@@ -194,7 +187,6 @@ public:
 	}
 
 	PulseTracer() {
-		/* Initialize pulse tracer elements. */
 	}
 
 	/**
@@ -364,13 +356,15 @@ public:
 	 * class RcSwitchReceiver.
 	 */
 	template <typename T>
-	void dumpPulseTracer(T& stream, char separator) const {
+	void dumpPulseTracer(T& stream, const char* separator) const {
 		mPulseTracingLocked = true;
-		PulseAnalyzer pulseAnalyzer;
-		analyzeTracedPulses(pulseAnalyzer);
 		mPulseTracer.dump(stream, separator);
-		pulseAnalyzer.sort();
-		pulseAnalyzer.dump(stream, separator);
+		{
+			PulseAnalyzer pulseAnalyzer;
+			analyzeTracedPulses(pulseAnalyzer);
+			pulseAnalyzer.analyze();
+			pulseAnalyzer.dump(stream, separator);
+		}
 		mPulseTracingLocked = false;
 	}
 };
@@ -385,7 +379,7 @@ template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 	using receiver_t = ReceiverWithPulseTracer<PULSE_TRACES_COUNT>;
 
 	template<typename T>
-	static void dumpPulseTracer(const receiver_t& receiver, T& stream, char separator) {
+	static void dumpPulseTracer(const receiver_t& receiver, T& stream, const char* separator) {
 		receiver.dumpPulseTracer(stream, separator);
 	}
 };
@@ -399,7 +393,7 @@ template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 template<> struct ReceiverSelector<0> {
 	using receiver_t = Receiver;
 	template<typename T>
-	static void dumpPulseTracer(const receiver_t& receiver, T& stream, char separator) {
+	static void dumpPulseTracer(const receiver_t& receiver, T& stream, const char* separator) {
 		// There are no pulses traced.
 	}
 };

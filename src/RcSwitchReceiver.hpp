@@ -159,7 +159,7 @@ public:
 	/**
 	 * Dump the oldest to the youngest pulse as well as pulse statistics.
 	 */
-	static void dumpPulseTracer(typeof(Serial)& serial, char separator = ',') {
+	static void dumpPulseTracer(typeof(Serial)& serial, const char* separator = "") {
 		RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::dumpPulseTracer(mReceiverDelegate, serial, separator);
 	}
 

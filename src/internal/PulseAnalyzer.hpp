@@ -35,7 +35,7 @@
 
 namespace RcSwitch {
 
-static constexpr size_t MAX_PULSE_CATEGORIES = 6;
+static constexpr size_t MAX_PULSE_CATEGORIES = 12;
 
 /**
  * The PulseAnalyzer sorts pulses into duration categories and counts how many
@@ -48,20 +48,32 @@ class PulseAnalyzer : public StackBuffer<PulseCategory, MAX_PULSE_CATEGORIES> {
 	bool isOfCategorie(const PulseCategory &category, const Pulse &pulse) const;
 	size_t findCategory(const Pulse &pulse) const;
 
+	const PulseCategory& getLowPulseFromPair(size_t begin)const;
+	const PulseCategory& getHighPulseFromPair(size_t begin) const;
+
 public:
 	PulseAnalyzer(size_t percentTolerance = 20);
 	bool addPulse(const Pulse &pulse);
 	inline void reset() {baseClass::reset();}
-	void sort();
+	void analyze();
 	template <typename T>
-	void dump(T& stream, char separator) {
+	void dump(T& stream, const char* separator) {
 		stream.println("Identified pulse categories: ");
 
 		for(size_t i = 0; i < size(); i++) {
 
 			stream.print("\t");
 			{
-				const char* levelText = (at(i).pulseLevel == PULSE_LEVEL::LO ? " LOW" : "HIGH");
+				char buffer[16];
+				sprintUint(&buffer[0], at(i).pulseCount, 3);
+				stream.print(buffer);
+			}
+			stream.print(" recordings of");
+			stream.print(separator);
+			stream.print(" ");
+
+			{
+				const char* const levelText = pulseLevelToString(at(i).pulseLevel);;
 				stream.print(levelText);
 			}
 			stream.print(separator);
@@ -69,45 +81,47 @@ public:
 
 			{
 				char buffer[16];
-				sprintUint(&buffer[0], at(i).pulseCount, 3);
-				stream.print(buffer);
-			}
-			stream.print(" times");
-			stream.print(separator);
-			stream.print(" ");
-
-			stream.print("average: ");
-			{
-				char buffer[16];
 				sprintUint(&buffer[0], at(i).microSecDuration, 5);
 				stream.print(buffer);
 			}
 
-			stream.print("us");
 			stream.print(separator);
+			stream.print("us");
 			stream.print(" ");
 
-			stream.print("min: ");
+			stream.print("[");
+			stream.print(separator);
 			{
 				char buffer[16];
 				sprintUint(&buffer[0], at(i).microSecMinDuration, 5);
 				stream.print(buffer);
 			}
 
-			stream.print("us");
 			stream.print(separator);
+			stream.print("us");
 			stream.print(" ");
 
-			stream.print("max: ");
+			stream.print("..");
+			stream.print(separator);
 			{
 				char buffer[16];
 				sprintUint(&buffer[0], at(i).microSecMaxDuration, 5);
 				stream.print(buffer);
 			}
 
-			stream.print("us");
+			stream.print(separator);
+			stream.print("us]");
 
 			stream.println();
+		}
+
+		if(overflowCount()) {
+			stream.print("Warning! ");
+			stream.print(overflowCount());
+			stream.print(" more categories could not be recorded.");
+			stream.print(" Category recording capacity is ");
+			stream.print(capacity);
+			stream.println('.');
 		}
 	}
 };

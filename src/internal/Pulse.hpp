@@ -39,6 +39,16 @@ enum class PULSE_LEVEL {
 	HI,
 };
 
+inline const char* pulseLevelToString(const PULSE_LEVEL& pulseLevel) {
+	switch(pulseLevel) {
+	case PULSE_LEVEL::LO:
+		return " LOW";
+	case PULSE_LEVEL::HI:
+		return "HIGH";
+	}
+	return "??";
+}
+
 enum class PULSE_TYPE : uint8_t {
 	UNKNOWN = 0,
 	SYCH_PULSE,
@@ -81,12 +91,6 @@ struct PulseCategory {
 		}
 
 		++pulseCount;
-	}
-
-	inline bool operator < (const PulseCategory& other) const {
-		if(microSecDuration < other.microSecDuration) {return true;}
-		if(pulseLevel < other.pulseLevel) {return true;}
-		return false;
 	}
 };
 

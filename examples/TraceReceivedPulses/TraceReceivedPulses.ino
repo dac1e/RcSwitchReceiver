@@ -89,7 +89,9 @@ void loop()
 		//
 		// Dump from the oldest to the newest pulses.
 		//
-		rcSwitchReceiver.dumpPulseTracer(output, ',');
+//		rcSwitchReceiver.dumpPulseTracer(output, ","); Use this for excel csv format where comma is separator.
+//		rcSwitchReceiver.dumpPulseTracer(output, ";"); Use this for excel csv format where semicolon is separator.
+		rcSwitchReceiver.dumpPulseTracer(output, "");
 	}
 	lastbuttonState = buttonState;
 }
