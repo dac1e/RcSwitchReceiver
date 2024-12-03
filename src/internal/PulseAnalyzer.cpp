@@ -26,6 +26,8 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include "ISR_ATTR.hpp"
+#include "Container.hpp"
 #include "PulseAnalyzer.hpp"
 
 namespace {
@@ -40,7 +42,6 @@ inline bool operator < (const RcSwitch::PulseCategory& this_, const RcSwitch::Pu
 	}
 	return result;
 }
-
 
 int comparePulseCategory(const void* pa, const void* pb) {
 	const RcSwitch::PulseCategory* a = static_cast<const RcSwitch::PulseCategory*>(pa);
@@ -57,59 +58,55 @@ int comparePulseCategory(const void* pa, const void* pb) {
 
 namespace RcSwitch {
 
-const PulseCategory& PulseAnalyzer::getLowPulseFromPair(size_t begin) const {
+const PulseCategory& PulseAnalyzer::getLowPulseFromPair(size_t begin, bool& bOk) const {
 	if(at(begin).pulseLevel == PULSE_LEVEL::LO) {
 		return at(begin);
 	}
-	assert(at(begin+1).pulseLevel == PULSE_LEVEL::LO);
+    bOk &= (at(begin+1).pulseLevel == PULSE_LEVEL::LO);
 	return at(begin+1);
 }
 
-const PulseCategory& PulseAnalyzer::getHighPulseFromPair(size_t begin) const {
+const PulseCategory& PulseAnalyzer::getHighPulseFromPair(size_t begin, bool& bOk) const {
 	if(at(begin).pulseLevel == PULSE_LEVEL::HI) {
 		return at(begin);
 	}
-	assert(at(begin+1).pulseLevel == PULSE_LEVEL::HI);
+	bOk &= (at(begin+1).pulseLevel == PULSE_LEVEL::HI);
 	return at(begin+1);
 }
 
-void PulseAnalyzer::sort() {
+void PulseAnalyzer::sortDescendingByDuration() {
 	qsort(&at(0), size(), sizeof(PulseCategory), comparePulseCategory);
 }
 
 void PulseAnalyzer::analyze() {
-//	if(hasCategoryWithLongestDuration()) {
-		sort();
-		if(size() == 5) {
-			const bool bInverse = at(0).pulseLevel == PULSE_LEVEL::HI;
-			size_t synchB = at(0).microSecDuration;
-
-			size_t pulse0A;
-			size_t pulse0B;
-			size_t pulse1A;
-			size_t pulse1B;
-
-			if(not bInverse) {
+	if(buildCategoriesFromPulses()) {
+		// Guess protocol.
+		if(mCategoryOfSynchPulseA.isValid() && mCategoryOfSynchPulseB.isValid()) {
+			bool bOk = true;
+			mInverse = mCategoryOfSynchPulseA.pulseLevel == PULSE_LEVEL::LO;
+			if(not mInverse) {
 				// longer pulse
-				pulse0B = getLowPulseFromPair(1).microSecDuration;
-				pulse1A = getHighPulseFromPair(1).microSecDuration;
+				mDataPulses[0][B] = &getLowPulseFromPair(0, bOk);
+				mDataPulses[1][A] = &getHighPulseFromPair(0, bOk);
 
 				// shorter pulse
-				pulse0A = getHighPulseFromPair(3).microSecDuration;
-				pulse1B = getLowPulseFromPair(3).microSecDuration;
+				mDataPulses[0][A] = &getHighPulseFromPair(2, bOk);
+				mDataPulses[1][B] = &getLowPulseFromPair(2, bOk);
 			} else {
 				// longer pulse
-				pulse0B = getHighPulseFromPair(1).microSecDuration;
-				pulse1A = getLowPulseFromPair(1).microSecDuration;
+				mDataPulses[0][B] = &getHighPulseFromPair(0, bOk);
+				mDataPulses[1][A] = &getLowPulseFromPair(0, bOk);
 
 				// shorter pulse
-				pulse0A = getLowPulseFromPair(3).microSecDuration;
-				pulse1B = getHighPulseFromPair(3).microSecDuration;
+				mDataPulses[0][A] = &getLowPulseFromPair(2, bOk);
+				mDataPulses[1][B] = &getHighPulseFromPair(2, bOk);
+			}
+
+			if(!bOk) {
+				invalidateProtocolGuess();
 			}
 		}
-//	} else {
-//		findCategory(pulse);
-//	}
+	}
 }
 
 bool PulseAnalyzer::isOfCategorie(const PulseCategory &categorie,
@@ -131,26 +128,114 @@ size_t PulseAnalyzer::findCategory(const Pulse &pulse) const {
 	return size();
 }
 
-PulseAnalyzer::PulseAnalyzer(unsigned percentTolerance) :
-	 mPercentTolerance(percentTolerance)
-	,mCategoryWithLongestDuration({PULSE_LEVEL::UNKNOWN, 0, 0, 0, 0}) {
+PulseAnalyzer::PulseAnalyzer(const RingBufferReadAccess<Pulse>& pulses, unsigned percentTolerance)
+	:mPulses(pulses)
+	,mPercentTolerance(percentTolerance)
+	,mCategoryOfSynchPulseA({PULSE_LEVEL::UNKNOWN, 0, static_cast<size_t>(-1), 0 ,0})
+	,mCategoryOfSynchPulseB({PULSE_LEVEL::UNKNOWN, 0, static_cast<size_t>(-1), 0 ,0})
+	,mDataPulses({{nullptr,nullptr},{nullptr,nullptr}})
+	,mInverse(false)
+{
 }
 
-bool PulseAnalyzer::addPulse(const Pulse &pulse) {
+bool PulseAnalyzer::addPulse(size_t i) {
 	bool result = true;
-	const size_t i = findCategory(pulse);
-	if (i >= size()) {
-		result = push(
-			{
-				 pulse.mPulseLevel
-				,pulse.mMicroSecDuration
-				,pulse.mMicroSecDuration
-				,pulse.mMicroSecDuration
-				,1
-			}
-		);
+	const Pulse &pulse = mPulses.at(i);
+	if(not mCategoryOfSynchPulseB.isValid()) {
+		// This is the first run, where we don't have the synch pulse B yet
+		const size_t i = findCategory(pulse);
+		if (i >= size()) {
+			push(
+				{
+					 pulse.mPulseLevel
+					,pulse.mMicroSecDuration
+					,pulse.mMicroSecDuration
+					,pulse.mMicroSecDuration
+					,1
+				}
+			);
+		} else {
+			result = at(i).addPulse(pulse);
+		}
 	} else {
-		at(i).addPulse(pulse);
+		// Add, if it is not a synch pulse B.
+		if(not pulse.isDurationInRange(mCategoryOfSynchPulseB.microSecDuration, mPercentTolerance)) {
+			// It is not a synch B pulse. So just insert it.
+			const size_t i = findCategory(pulse);
+			if (i >= size()) {
+				push(
+					{
+						 pulse.mPulseLevel
+						,pulse.mMicroSecDuration
+						,pulse.mMicroSecDuration
+						,pulse.mMicroSecDuration
+						,1
+					}
+				);
+			} else {
+				result = at(i).addPulse(pulse);
+			}
+		} else {
+			// It is a synch pulse B, so we grab the synch pulse A
+			if(i > 0) {
+				const Pulse &synchPulseA = mPulses.at(i-1);
+				result = mCategoryOfSynchPulseA.addPulse(synchPulseA);
+			}
+		}
+	}
+	return result;
+}
+
+void PulseAnalyzer::invalidateProtocolGuess() {
+	mCategoryOfSynchPulseA.invalidate();
+	mCategoryOfSynchPulseB.invalidate();
+	mDataPulses[0][A] = nullptr;
+	mDataPulses[0][B] = nullptr;
+	mDataPulses[1][A] = nullptr;
+	mDataPulses[1][B] = nullptr;
+	mInverse = false;
+}
+
+void PulseAnalyzer::reset() {
+	baseClass::reset();
+	invalidateProtocolGuess();
+}
+
+bool PulseAnalyzer::buildCategoriesFromPulses() {
+	bool result = true;
+	const size_t n = mPulses.size();
+	if(n) {
+		// The category with the longest duration will provide the second
+		// synch pulse (synch. pulse B).
+		if(not mCategoryOfSynchPulseB.isValid()) {
+			// This is the first run, which is just for finding the
+			// synch pulse B category.
+			size_t i = 0;
+			for(; i < n; i++) {
+				result &= addPulse(i);
+			}
+			sortDescendingByDuration();
+
+			if(result) {
+				// The first one is the one with the longest duration.
+				mCategoryOfSynchPulseB = at(0);
+
+				// Clear the categories for a second run, but now with the
+				// second synch pulse duration already known.
+				baseClass::reset();
+
+				// Do second run.
+				result = buildCategoriesFromPulses();
+			}
+		} else {
+			// This is the second run, which builds only data pulse
+			// categories and collects the synch pulse A category.
+			size_t i = 0;
+			for(; i < n; i++) {
+				result &= addPulse(i);
+			}
+			sortDescendingByDuration();
+		}
 	}
 	return result;
 }

@@ -79,24 +79,6 @@ public:
 	 * Get a pulse located at a particular index.
 	 */
 	using baseClass::at;
-
-	/**
-	 * Find the index of a pulse which is within range of msecPulseDuration +- tolerance.
-	 * Start searching form parameter startIndex. If such a pulse isn't found, the
-	 * returned index is the actual size of this pulse tracer.
-	 */
-	size_t find(size_t startIndex, size_t msecPulseDuration, unsigned percentTolerance) {
-		size_t i = startIndex;
-		while(i < size()) {
-			const Pulse& pulse = at(i);
-
-			if(pulse.isDurationInRange(msecPulseDuration, percentTolerance)) {
-				break;
-			}
-			++i;
-		}
-		return i;
-	}
 };
 
 } // namespace RcSwitch

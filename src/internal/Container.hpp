@@ -187,6 +187,11 @@ public:
 };
 
 /**
+ * Forward declaration of RingBufferReadAccess.
+ */
+template<typename ELEMENT_TYPE> class RingBufferReadAccess;
+
+/**
  * A container that encapsulates a fixed size ring buffer.
  * Elements can be pushed on the ring buffer. When the
  * size of the stack has reached the capacity, the bottom
@@ -195,6 +200,8 @@ public:
 template<typename ELEMENT_TYPE, size_t CAPACITY>
 class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
+	friend class RingBufferReadAccess<ELEMENT_TYPE>;
+
 	/** The index of the bottom element of the ring buffer. */
 	size_t mBegin;
 
@@ -262,6 +269,39 @@ public:
 		return baseClass::mData[squashedIndex(mBegin + index)];
 	}
 };
+
+/**
+ * This class allows indexed read access to a ring buffer of any size.
+ */
+template<typename ELEMENT_TYPE> class RingBufferReadAccess {
+	const ELEMENT_TYPE* mData;
+	const size_t mCapacity;
+	const size_t mSize;
+	const size_t mBegin;
+
+	inline size_t squashedIndex(const size_t i) const
+	{
+		return (i + mCapacity) % mCapacity;
+	}
+
+public:
+	template<size_t CAPACITY>
+	RingBufferReadAccess(const RingBuffer<ELEMENT_TYPE, CAPACITY>& ringBuffer)
+		: mData(ringBuffer.mData), mCapacity(CAPACITY), mSize(ringBuffer.size()), mBegin(ringBuffer.mBegin) {
+	}
+
+	/**
+	 * Return a const reference to the element at the specified index.
+	 * The index is validated by the assert() system function.
+	 */
+	inline const ELEMENT_TYPE& at(const size_t index) const {
+		RCSWITCH_CONTAINER_ASSERT(index < mSize);
+		return mData[squashedIndex(mBegin + index)];
+	}
+
+	size_t size() const {return mSize;}
+};
+
 
 } // namespace RcSwitch
 

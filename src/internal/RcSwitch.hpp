@@ -270,16 +270,6 @@ class ReceiverWithPulseTracer : public Receiver {
 		}
 	}
 
-	void analyzeTracedPulses(PulseAnalyzer& pulseAnalyzer) const {
-		RCSWITCH_ASSERT(mPulseTracingLocked);
-		pulseAnalyzer.reset();
-		const size_t n = mPulseTracer.size();
-		size_t i = 0;
-		for(; i < n; i++) {
-			pulseAnalyzer.addPulse(mPulseTracer.at(i));
-		}
-	}
-
 	/** ========================================================================== */
 	/** ========= Methods used by API class RcSwitchReceiver ===================== */
 
@@ -302,8 +292,8 @@ public:
 		mPulseTracingLocked = true;
 		mPulseTracer.dump(stream, separator);
 		{
-			PulseAnalyzer pulseAnalyzer;
-			analyzeTracedPulses(pulseAnalyzer);
+			const RingBufferReadAccess<Pulse> readAccess(mPulseTracer);
+			PulseAnalyzer pulseAnalyzer(readAccess);
 			pulseAnalyzer.analyze();
 			pulseAnalyzer.dump(stream, separator);
 		}

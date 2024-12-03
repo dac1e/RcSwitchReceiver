@@ -28,6 +28,7 @@
 #define RCSWITCH_RECEIVER_INTERNAL_PULSE_HPP_
 
 #include <stdint.h>
+#include <assert.h>
 
 #include "Common.hpp"
 
@@ -96,10 +97,21 @@ struct PulseCategory {
 	size_t pulseCount;
 
 	inline bool isValid() const {
-		return pulseCount > 0 && pulseLevel != PULSE_LEVEL::UNKNOWN;
+		return pulseCount > 0 &&
+				pulseLevel != PULSE_LEVEL::UNKNOWN;
 	}
 
-	inline void addPulse(const Pulse &pulse) {
+	bool invalidate() {
+		return pulseCount = 0;
+		pulseLevel = PULSE_LEVEL::UNKNOWN;
+		microSecDuration = 0;
+		microSecMinDuration = static_cast<size_t>(-1);
+		microSecMaxDuration = 0;
+	}
+
+	bool addPulse(const Pulse &pulse) {
+		bool result = true;
+
 		// Refresh average for the pulse duration and store it.
 		microSecDuration =
 				( (static_cast<uint32_t>(microSecDuration) * pulseCount) + pulse.mMicroSecDuration)
@@ -113,7 +125,15 @@ struct PulseCategory {
 			microSecMaxDuration = pulse.mMicroSecDuration;
 		}
 
+		if(pulseLevel == PULSE_LEVEL::UNKNOWN) {
+			pulseLevel = pulse.mPulseLevel;
+		} else {
+			result = (pulseLevel == pulse.mPulseLevel);
+		}
+
 		++pulseCount;
+
+		return result;
 	}
 };
 

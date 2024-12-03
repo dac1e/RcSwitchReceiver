@@ -43,81 +43,107 @@ static constexpr size_t MAX_PULSE_CATEGORIES = 12;
  */
 class PulseAnalyzer : public StackBuffer<PulseCategory, MAX_PULSE_CATEGORIES> {
 	using baseClass = StackBuffer<PulseCategory, MAX_PULSE_CATEGORIES>;
+
+	/**
+	 * Indexed access to the pulses ring buffer where the oldest pulse is at index 0.
+	 */
+	const RingBufferReadAccess<Pulse> mPulses;
 	const unsigned mPercentTolerance;
-	PulseCategory mCategoryWithLongestDuration;
+	PulseCategory mCategoryOfSynchPulseA;
+	PulseCategory mCategoryOfSynchPulseB;
+
+	const PulseCategory* mDataPulses[2][2];
+	bool mInverse;
+	static constexpr size_t A = 0;
+	static constexpr size_t B = 1;
 
 	bool isOfCategorie(const PulseCategory &category, const Pulse &pulse) const;
 	size_t findCategory(const Pulse &pulse) const;
-	inline bool hasCategoryWithLongestDuration() const {
-		return mCategoryWithLongestDuration.isValid();
-	}
 
-	const PulseCategory& getLowPulseFromPair(size_t begin)const;
-	const PulseCategory& getHighPulseFromPair(size_t begin) const;
-	void sort();
+	const PulseCategory& getLowPulseFromPair(size_t begin, bool& bOk)const;
+	const PulseCategory& getHighPulseFromPair(size_t begin, bool& bOk) const;
+	bool addPulse(size_t i);
+	bool buildCategoriesFromPulses();
+
+	/** Sort the categories in descending order of pulse duration */
+	void sortDescendingByDuration();
+	void invalidateProtocolGuess();
 
 public:
-	PulseAnalyzer(unsigned percentTolerance = 20);
-	bool addPulse(const Pulse &pulse);
-	inline void reset() {baseClass::reset();}
+	PulseAnalyzer(const RingBufferReadAccess<Pulse>& pulses, unsigned percentTolerance = 20);
+	void reset();
+
 	void analyze();
+
+	template <typename T>
+	void dumpPulseCategory(T& stream, const PulseCategory& pulseCategory, const char* separator) {
+		stream.print("\t");
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], pulseCategory.pulseCount, 3);
+			stream.print(buffer);
+		}
+		stream.print(" recordings of");
+		stream.print(separator);
+		stream.print(" ");
+
+		{
+			const char* const levelText = pulseLevelToString(pulseCategory.pulseLevel);;
+			stream.print(levelText);
+		}
+		stream.print(separator);
+		stream.print(" ");
+
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], pulseCategory.microSecDuration, 5);
+			stream.print(buffer);
+		}
+
+		stream.print(separator);
+		stream.print("us");
+		stream.print(" ");
+
+		stream.print("[");
+		stream.print(separator);
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], pulseCategory.microSecMinDuration, 5);
+			stream.print(buffer);
+		}
+
+		stream.print(separator);
+		stream.print("us");
+		stream.print(" ");
+
+		stream.print("..");
+		stream.print(separator);
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], pulseCategory.microSecMaxDuration, 5);
+			stream.print(buffer);
+		}
+
+		stream.print(separator);
+		stream.print("us]");
+
+		stream.println();
+	}
+
 	template <typename T>
 	void dump(T& stream, const char* separator) {
-		stream.println("Identified pulse categories: ");
+
+		stream.println("Identified pulse categories:");
+		if(mCategoryOfSynchPulseA.isValid()) {
+			dumpPulseCategory(stream, mCategoryOfSynchPulseA, separator);
+			if(mCategoryOfSynchPulseB.isValid()) {
+				dumpPulseCategory(stream, mCategoryOfSynchPulseB, separator);
+			}
+		}
 
 		for(size_t i = 0; i < size(); i++) {
-
-			stream.print("\t");
-			{
-				char buffer[16];
-				sprintUint(&buffer[0], at(i).pulseCount, 3);
-				stream.print(buffer);
-			}
-			stream.print(" recordings of");
-			stream.print(separator);
-			stream.print(" ");
-
-			{
-				const char* const levelText = pulseLevelToString(at(i).pulseLevel);;
-				stream.print(levelText);
-			}
-			stream.print(separator);
-			stream.print(" ");
-
-			{
-				char buffer[16];
-				sprintUint(&buffer[0], at(i).microSecDuration, 5);
-				stream.print(buffer);
-			}
-
-			stream.print(separator);
-			stream.print("us");
-			stream.print(" ");
-
-			stream.print("[");
-			stream.print(separator);
-			{
-				char buffer[16];
-				sprintUint(&buffer[0], at(i).microSecMinDuration, 5);
-				stream.print(buffer);
-			}
-
-			stream.print(separator);
-			stream.print("us");
-			stream.print(" ");
-
-			stream.print("..");
-			stream.print(separator);
-			{
-				char buffer[16];
-				sprintUint(&buffer[0], at(i).microSecMaxDuration, 5);
-				stream.print(buffer);
-			}
-
-			stream.print(separator);
-			stream.print("us]");
-
-			stream.println();
+			const PulseCategory& pulseCategory = at(i);
+			dumpPulseCategory(stream, pulseCategory, separator);
 		}
 
 		if(overflowCount()) {
@@ -128,6 +154,30 @@ public:
 			stream.print(capacity);
 			stream.println('.');
 		}
+
+		if(mCategoryOfSynchPulseA.isValid() && mCategoryOfSynchPulseB.isValid()) {
+			stream.println("Protocol guess: ");
+			stream.print("inverse: ");
+			stream.println((mInverse ? "true" : "false"));
+
+			stream.print("SynchA: ");
+			dumpPulseCategory(stream, mCategoryOfSynchPulseA, separator);
+			stream.print("SynchB: ");
+			dumpPulseCategory(stream, mCategoryOfSynchPulseB, separator);
+
+			if(mDataPulses[0][A] && mDataPulses[0][B] && mDataPulses[1][A] && mDataPulses[1][B]) {
+				stream.print("data0_A: ");
+				dumpPulseCategory(stream, *mDataPulses[0][A], separator);
+				stream.print("data0_B: ");
+				dumpPulseCategory(stream, *mDataPulses[0][B], separator);
+				stream.print("data1_A: ");
+				dumpPulseCategory(stream, *mDataPulses[1][A], separator);
+				stream.print("data1_B: ");
+				dumpPulseCategory(stream, *mDataPulses[1][B], separator);
+			}
+		}
+
+
 	}
 };
 
