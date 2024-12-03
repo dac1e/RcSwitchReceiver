@@ -62,6 +62,8 @@ bool PulseAnalyzer::addPulse(const Pulse &pulse) {
 		result = push(
 			{
 				 pulse.mMicroSecDuration
+				,pulse.mMicroSecDuration
+				,pulse.mMicroSecDuration
 				,pulse.mPulseLevel == PULSE_LEVEL::LO ? 1 : 0
 				,pulse.mPulseLevel == PULSE_LEVEL::HI ? 1 : 0
 			}

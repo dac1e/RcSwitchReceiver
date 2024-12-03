@@ -54,11 +54,36 @@ public:
 	inline void reset() {baseClass::reset();}
 	template <typename T>
 	void dump(T& stream, char separator) {
+		stream.println("Identified pulse categories: ");
+
 		for(size_t i = 0; i < size(); i++) {
-			stream.print("average duration ");
+
+			stream.print("\taverage: ");
 			{
 				char buffer[16];
 				sprintUint(&buffer[0], at(i).microSecDuration, 5);
+				stream.print(buffer);
+			}
+
+			stream.print("usec");
+			stream.print(separator);
+			stream.print(" ");
+
+			stream.print("min: ");
+			{
+				char buffer[16];
+				sprintUint(&buffer[0], at(i).microSecMinDuration, 5);
+				stream.print(buffer);
+			}
+
+			stream.print("usec");
+			stream.print(separator);
+			stream.print(" ");
+
+			stream.print("max: ");
+			{
+				char buffer[16];
+				sprintUint(&buffer[0], at(i).microSecMaxDuration, 5);
 				stream.print(buffer);
 			}
 

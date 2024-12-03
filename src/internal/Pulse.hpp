@@ -55,12 +55,14 @@ struct PulseTypes {
 };
 
 struct Pulse {
-	uint32_t    mMicroSecDuration;
+	size_t mMicroSecDuration;
 	PULSE_LEVEL mPulseLevel;
 };
 
 struct PulseCategory {
 	size_t microSecDuration;
+	size_t microSecMinDuration;
+	size_t microSecMaxDuration;
 	size_t pulseCountLowLevel;
 	size_t pulseCountHighLevel;
 
@@ -72,6 +74,14 @@ struct PulseCategory {
 		// Refresh average for the pulse duration and store it.
 		const uint32_t n = pulseCount();
 		microSecDuration = (n * microSecDuration + pulse.mMicroSecDuration) / (n + 1);
+
+		if(pulse.mMicroSecDuration < microSecMinDuration) {
+			microSecMinDuration = pulse.mMicroSecDuration;
+		}
+
+		if(pulse.mMicroSecDuration > microSecMaxDuration) {
+			microSecMaxDuration = pulse.mMicroSecDuration;
+		}
 
 		if (pulse.mPulseLevel == PULSE_LEVEL::LO) {
 			++pulseCountLowLevel;
