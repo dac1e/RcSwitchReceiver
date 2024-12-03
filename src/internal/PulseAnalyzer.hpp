@@ -37,12 +37,16 @@ namespace RcSwitch {
 
 static constexpr size_t MAX_PULSE_CATEGORIES = 6;
 
-class PulseAnalyzer : public StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES> {
-	using baseClass = StackBuffer<PulseCategorie, MAX_PULSE_CATEGORIES>;
+/**
+ * The PulseAnalyzer sorts pulses into duration categories and counts how many
+ * pulses belong to this category.
+ */
+class PulseAnalyzer : public StackBuffer<PulseCategory, MAX_PULSE_CATEGORIES> {
+	using baseClass = StackBuffer<PulseCategory, MAX_PULSE_CATEGORIES>;
 	const size_t mPercentTolerance;
 
-	bool isOfCategorie(const PulseCategorie &categorie, const Pulse &pulse) const;
-	size_t findCategorie(const Pulse &pulse) const;
+	bool isOfCategorie(const PulseCategory &category, const Pulse &pulse) const;
+	size_t findCategory(const Pulse &pulse) const;
 
 public:
 	PulseAnalyzer(size_t percentTolerance = 20);

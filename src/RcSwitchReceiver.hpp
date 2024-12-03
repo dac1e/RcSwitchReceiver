@@ -38,10 +38,11 @@ using RcSwitch::rxTimingSpecTable;
  * This is the library API class for receiving data from a remote control.
  * The IO pin to be used is defined at compile time by the template
  * parameter IOPIN. If template parameter PULSE_TRACES_COUNT is set to a
- * value greater than 0, the last received pulses can be dumped. This
- * is helpful for analyzing the protocol of a remote control transmitter.
+ * value greater than 0, the last received pulses can be dumped and
+ * analyzed. This helpful for determining the pulse timing of a remote
+ * control transmitter.
  * There is an example sketch TraceReceivedPulses.ino shipped along with
- * this library to demonstrate how pulses can be traced.
+ * this library to demonstrate how pulses can be analyzed.
  *
  * Multiple RcSwitchReceiver can be instantiated for different IO pins.
  * E.g. if you have a 433Mhz receiver hardware connected to pin 5 and a
@@ -141,7 +142,7 @@ public:
 	/**
 	 * Clear the last received value in order to receive a new one.
 	 * Will also clear the received protocols that the last
-	 * received value is belongs to. Can be called at any time.
+	 * received value belongs to. Can be called at any time.
 	 */
 	static inline void resetAvailable() {mReceiverDelegate.resetAvailable();}
 
@@ -156,7 +157,7 @@ public:
 	static void resume() {mReceiverDelegate.resume();}
 
 	/**
-	 * Dump the oldest to the youngest pulse.
+	 * Dump the oldest to the youngest pulse as well as pulse statistics.
 	 */
 	static void dumpPulseTracer(typeof(Serial)& serial, char separator = ',') {
 		RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::dumpPulseTracer(mReceiverDelegate, serial, separator);

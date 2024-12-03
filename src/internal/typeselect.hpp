@@ -25,6 +25,10 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_TYPESELECT_HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_TYPESELECT_HPP_
 
+/**
+ * These are helper classes to sort the row entries of RxProtocolTable at compile time.
+ */
+
 namespace typeselect {
 
 template<typename ...Ts> struct tuple;

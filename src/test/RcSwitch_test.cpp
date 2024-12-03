@@ -26,16 +26,9 @@
 #include "../ProtocolDefinition.hpp"
 
 #if ENABLE_RCSWITCH_TEST
+
 #include <limits.h>
 #include <assert.h>
-
-#if defined max // max macro is not compatible with limits standard library.
-#undef max
-#endif
-
-#if defined min // min macro is not compatible with limits standard library.
-#undef min
-#endif
 
 namespace RcSwitch {
 
@@ -43,8 +36,8 @@ namespace RcSwitch {
 RcSwitch_test RcSwitch_test::theTest;
 
 static const RxProtocolTable <
-//                  #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
-	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // ()
+	//               #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
+	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // (PT2262)
 	makeTimingSpec<  2, 650, 20,   1,   10,    1,  3,    3,  1, false>, // ()
 	makeTimingSpec<  3, 100, 20,  30,   71,    4, 11,    9,  6, false>, // ()
 	makeTimingSpec<  4, 380, 20,   1,    6,    1,  3,    3,  1, false>, // ()

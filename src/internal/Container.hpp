@@ -85,7 +85,8 @@ protected:
 	using baseClass = Array<ELEMENT_TYPE, CAPACITY>;
 	using element_type = typename baseClass::element_type;
 	/**
-	 * A counter that will be incremented, when an element couldn't be pushed,
+	 * A counter that will be incremented
+	 * when an element couldn't be pushed,
 	 * because this stack was already full. */
 	uint32_t mOverflow;
 
@@ -97,7 +98,8 @@ protected:
 	/* Default constructor */
 	inline StackBuffer() : mOverflow(0) {}
 public:
-	/** Make the capacity template argument available as const expression. */
+	/** Make the capacity template argument available as
+	 * const expression. */
 	static constexpr size_t capacity = CAPACITY;
 
 	/**
@@ -141,7 +143,7 @@ public:
 
 	/**
 	 * Return a const reference to the element at the specified index.
-	 * The index is validated by assert() system function.
+	 * The index is validated by the assert() system function.
 	 */
 	inline const element_type& at(const size_t index) const {
 		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
@@ -150,7 +152,7 @@ public:
 
 	/**
 	 * Return a const reference to the element at the specified index.
-	 * The index is validated by assert() system function.
+	 * The index is validated by the assert() system function.
 	 */
 	inline element_type& at(const size_t index) {
 		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
@@ -185,18 +187,17 @@ public:
 };
 
 /**
- * A container that encapsulates a fixed size stack. Elements can be
- * pushed onto the stack. When the size of the stack has reached the
- * capacity, the bottom element will be dropped on cost of the new
- * pushed element.
+ * A container that encapsulates a fixed size ring buffer.
+ * Elements can be pushed on the ring buffer. When the
+ * size of the stack has reached the capacity, the bottom
+ * element will be dropped on cost of a new pushed element.
  */
 template<typename ELEMENT_TYPE, size_t CAPACITY>
 class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	friend class RcSwitch_test;
-	/**
-	 * The index of the bottom element of the ring buffer.
-	 */
+	/** The index of the bottom element of the ring buffer. */
 	size_t mBegin;
+
 	TEXT_ISR_ATTR_2 static size_t inline squashedIndex(const size_t i)
 	{
 		return (i + CAPACITY) % CAPACITY;
@@ -211,6 +212,8 @@ protected:
 	/** Default constructor */
 	inline RingBuffer() : mBegin(0) {}
 public:
+	/** Make the capacity template argument available as
+	 * const expression. */
 	static constexpr size_t capacity = CAPACITY;
 
 	/**
@@ -223,9 +226,9 @@ public:
 	}
 
 	/**
-	 * Make the beyond top ring buffer element to the top element. If
-	 * the ring buffer size has already reached the capacity, the
-	 * bottom element will be dropped.
+	 * Make the beyond top ring buffer element to the top element.
+	 * If the ring buffer size has already reached the capacity,
+	 * the bottom element will be dropped.
 	 */
 	TEXT_ISR_ATTR_2 inline void selectNext() {
 		if(baseClass::mSize < capacity) {
@@ -243,7 +246,7 @@ public:
 
 	/**
 	 * Return a const reference to the element at the specified index.
-	 * The index is validated by assert() system function.
+	 * The index is validated by the assert() system function.
 	 */
 	TEXT_ISR_ATTR_1 inline const element_type& at(const size_t index) const {
 		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);
@@ -252,7 +255,7 @@ public:
 
 	/**
 	 * Return a reference to the element at the specified index.
-	 * The index is validated by assert() system function.
+	 * The index is validated by the assert() system function.
 	 */
 	TEXT_ISR_ATTR_1 inline element_type& at(const size_t index) {
 		RCSWITCH_CONTAINER_ASSERT(index < baseClass::mSize);

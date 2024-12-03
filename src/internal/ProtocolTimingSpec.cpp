@@ -33,7 +33,6 @@ inline size_t sprintTimeRanges(char* string, const RcSwitch::RxPulsePairTimeRang
 	size_t i=0;
 	string[i++] = '{';
 	i += sprintTimeRange(&string[i], timeRanges.durationA, widthA); // adds a null terminated string
-//	string[i++] = ',';
 	i += sprintTimeRange(&string[i], timeRanges.durationB, widthB); // adds a null terminated string
 	string[i++] = '}';
 	string[i] = '\0'; // ensure null termination

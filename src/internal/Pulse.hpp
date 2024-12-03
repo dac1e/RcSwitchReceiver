@@ -59,7 +59,7 @@ struct Pulse {
 	PULSE_LEVEL mPulseLevel;
 };
 
-struct PulseCategorie {
+struct PulseCategory {
 	size_t microSecDuration;
 	size_t pulseCountLowLevel;
 	size_t pulseCountHighLevel;
@@ -69,7 +69,7 @@ struct PulseCategorie {
 	}
 
 	inline void addPulse(const Pulse &pulse) {
-		// Calculate new average for the pulse duration and store it.
+		// Refresh average for the pulse duration and store it.
 		const uint32_t n = pulseCount();
 		microSecDuration = (n * microSecDuration + pulse.mMicroSecDuration) / (n + 1);
 

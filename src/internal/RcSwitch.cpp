@@ -26,14 +26,6 @@
 #include "ProtocolTimingSpec.hpp"
 #include "RcSwitch.hpp"
 
-#if defined max // max macro is not compatible with limits standard library.
-#undef max
-#endif
-
-#if defined min // min macro is not compatible with limits standard library.
-#undef min
-#endif
-
 namespace RcSwitch {
 
 static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protocol, const Pulse &pulse) {

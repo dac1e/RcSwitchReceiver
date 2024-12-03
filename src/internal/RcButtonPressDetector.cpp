@@ -24,6 +24,7 @@
 
 #include "RcButtonPressDetector.hpp"
 #include <Arduino.h>
+
 /**
  * The Remote control transmitter typically repeats sending the message
  * packet for a button as long as the button is pressed. This class
@@ -52,7 +53,8 @@ RcButtonPressDetector::rcButtonCode_t RcButtonPressDetector::testRcButtonData() 
 	return result;
 }
 
-RcButtonPressDetector::rcButtonCode_t RcButtonPressDetector::rcDataToButton(const int rcProtocol, const receivedValue_t receivedData) const {
+RcButtonPressDetector::rcButtonCode_t RcButtonPressDetector::rcDataToButton(
+		const int rcProtocol, const receivedValue_t receivedData) const {
 	return RcButtonPressDetector::NO_BUTTON;
 }
 

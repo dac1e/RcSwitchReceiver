@@ -65,34 +65,14 @@ struct RxPulsePairTimeRanges {
 struct RxTimingSpec {
 	size_t   protocolNumber;
 	bool bInverseLevel;
-	RxPulsePairTimeRanges  synchronizationPulsePair; // synch
+	RxPulsePairTimeRanges  synchronizationPulsePair;
 	RxPulsePairTimeRanges  data0pulsePair;
 	RxPulsePairTimeRanges  data1pulsePair;
-
-	/** Return true, if this protocol is an inverse level protocol.
-	 * Otherwise false. */
-	bool isInverseLevelProtocol() const {
-		return bInverseLevel;
-	}
-
-	/** Return true, if this protocol is a normal level protocol.
-	 * Otherwise false. */
-	bool isNormalLevelProtocol() const {
-		return not bInverseLevel;
-	}
 };
 
 struct TxPulsePairTiming {
 	size_t durationA;
 	size_t durationB;
-};
-
-struct TxTimingSpec { /* Currently only required for test */
-	size_t   protocolNumber;
-	bool bInverseLevel;
-	TxPulsePairTiming	 synchPulsePair;    // pulse pair for synch
-	TxPulsePairTiming	 data0PulsePair;	// pulse pair for logical 0
-	TxPulsePairTiming	 data1PulsePair;    // pulse pair for logical 1
 };
 
 template<typename L, typename R> struct isRxTimingSpecLower {
@@ -149,11 +129,11 @@ struct makeTimingSpec { // Calculate the timing specification from the protocol 
 		{	/* synch pulses */
 			{usecSynchA_lowerBound, usecSynchA_upperBound},     {usecSynchB_lowerBound, usecSynchB_upperBound}
 		},
-		{   /* LOGICAL_0 data bit logical pulses */
+		{   /* LOGICAL_0 data bit pulses */
 			{uSecData0_A_lowerBound, uSecData0_A_upperBound}, {uSecData0_B_lowerBound, uSecData0_B_upperBound}
 		},
 		{
-			/* LOGICAL_1 data bit logical pulses */
+			/* LOGICAL_1 data bit pulses */
 			{uSecData1_A_lowerBound, uSecData1_A_upperBound}, {uSecData1_B_lowerBound, uSecData1_B_upperBound}
 		},
 	};
@@ -181,7 +161,7 @@ public:
 	RcSwitch::RxTimingSpec m = T::RX;
 	RxProtocolTable<R> r;
 
-	// Convert to rxTimingSpecTable
+	/* Convert to rxTimingSpecTable */
 	inline RcSwitch::rxTimingSpecTable toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
 		return RcSwitch::rxTimingSpecTable{toArray(), rowCount};
@@ -202,7 +182,7 @@ public:
 	static constexpr size_t ROW_COUNT =	sizeof(RxProtocolTable) / sizeof(RcSwitch::RxTimingSpec);
 	RcSwitch::RxTimingSpec m = T::RX;
 
-	// Convert to rxTimingSpecTable
+	/* Convert to rxTimingSpecTable */
 	inline RcSwitch::rxTimingSpecTable toTimingSpecTable() const {
 		constexpr size_t rowCount = ROW_COUNT;
 		return RcSwitch::rxTimingSpecTable{toArray(), rowCount};

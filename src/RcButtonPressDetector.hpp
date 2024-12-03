@@ -35,7 +35,7 @@
  * filters out the repeated message packages and signals a signal pressed
  * remote control button only once.
  */
-class RcButtonPressDetector { // @suppress("Class has a virtual method and non-virtual destructor")
+class RcButtonPressDetector {
 public:
 	using receivedValue_t = RcSwitch::receivedValue_t;
 	using rcButtonCode_t = int;
@@ -57,7 +57,8 @@ private:
 	rcButtonCode_t testRcButtonData();
 
 	/**
-	 * This pure virtual function will be called, when a button press has been detected.
+	 * This pure virtual function will be called, when a button
+	 * press has been detected.
 	 * It must be overridden by the derived class.
 	 *
 	 *  Example of an override function:
@@ -93,13 +94,15 @@ protected:
 	 *  ...
 	 *  MyRcButtonPressDetector : public RcButtonPressDetector {
 	 *   	...
-	 *  	rcButtonCode_t rcDataToButton(const int rcProtocol, uint32_t receivedData) const override;
+	 *  	rcButtonCode_t rcDataToButton(const int rcProtocol,
+	 *  		uint32_t receivedData) const override;
 	 *  	...
 	 *  };
 	 *
 	 *  // MyRcButtonPressDetector cpp file:
 	 *  ...
-	 *	RcButtonPressDetector::rcButtonCode_t MyRcButtonPressDetector::rcDataToButton(const int rcProtocol, receivedValue_t receivedData) const {
+	 *	RcButtonPressDetector::rcButtonCode_t MyRcButtonPressDetector::rcDataToButton(
+	 *		const int rcProtocol, receivedValue_t receivedData) const {
 	 *		rcButtonCode_t buttonCode = -1;
 	 *		switch (receivedData) {
 	 *			case 5592332:
@@ -115,7 +118,8 @@ protected:
 	 *				buttonCode = 'D';
 	 *				break;
 	 *			default:
-	 *				buttonCode = RcButtonPressDetector::rcDataToButton(rcProtocol, receivedData);
+	 *				buttonCode =
+	 *					RcButtonPressDetector::rcDataToButton(rcProtocol, receivedData);
 	 *				break;
 	 *		}
 	 *		return buttonCode;
@@ -134,9 +138,8 @@ public:
 	 *
 	 * Example:
 	 *	static const RxProtocolTable <
-	 * 	// This time only interested in a single protocol, therefore just one entry in the table:
-	 *	//                  #, clk,  %, syA,  syB,  d0A,d0B,  d1A, d1B, inverseLevel
-	 *		makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false> // ()
+	 *	//                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A, d1B, inverseLevel
+	 *		makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>
 	 *	> rxProtocolTable;
 	 *
 	 *	constexpr int RX433_DATA_PIN = 2;

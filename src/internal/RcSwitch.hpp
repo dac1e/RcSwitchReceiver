@@ -51,17 +51,9 @@ template<int IOPIN, size_t PULSE_TRACES_COUNT> class RcSwitchReceiver;
 namespace RcSwitch {
 
 /**
- * Note: Virtual methods would make sense in some introduced
- * classes, but they are not necessary.
- * Since the code is running in an embedded environment,
- * virtual methods have been avoided on purpose.
- */
-
-
-/**
  * The type of the value decoded from a received message packet.
- * If the number of data bits of the message packet is bigger than
- * this type can store, trailing data bits are dropped.
+ * If the number of data bits of the message packet is bigger
+ * than this type can store, trailing data bits are dropped.
  */
 typedef uint32_t receivedValue_t;
 
@@ -70,34 +62,32 @@ typedef uint32_t receivedValue_t;
  * be stored. If the message packet is bigger, trailing data
  * bits are dropped.
  */
-constexpr size_t MAX_MSG_PACKET_BITS     =  8 * sizeof(receivedValue_t);
+constexpr size_t MAX_MSG_PACKET_BITS = 8 * sizeof(receivedValue_t);
 
 /**
  * The maximum number of protocols that can be collected.
  *
  * When a synchronization pulse pair is received it can fulfill the
  * policy of multiple protocols. All those protocols are collected
- * and further narrowed down during data phase. I.e. collected protocols
- * that do not match the received data pulses will be dropped.
- * Finally when a message packet has been received, there can be multiple
- * protocols left over. Those can be queried by an API function.
+ * and further narrowed down during data phase. I.e. collected
+ * protocols that do not match the received data pulses will be
+ * dropped.  Finally when a message packet has been received, there
+ * can be multiple protocols left over.
  */
-constexpr size_t MAX_PROTOCOL_CANDIDATES =  7;
+constexpr size_t MAX_PROTOCOL_CANDIDATES = 7;
 
 /**
  * Minimum number of data bits for accepting a message packet
  * to be valid.
- * Can be changed, but must be greater than 0.
  */
-constexpr size_t MIN_MSG_PACKET_BITS     =  6;
+constexpr size_t MIN_MSG_PACKET_BITS = 6;
 
 /**
  * A high level pulse followed by a low level pulse constitute
  * a data bit. For inverse protocols, a low level pulse
  * followed by a high level pulse constitute a data bit.
- * Must not be changed.
  */
-constexpr size_t DATA_PULSES_PER_BIT     =  2;
+constexpr size_t DATA_PULSES_PER_BIT = 2;
 
 
 enum class DATA_BIT : int8_t {
@@ -136,8 +126,7 @@ public:
 	/**
 	 * Push another protocol candidate onto the stack.
 	 */
-	// Make the base class push() method public.
-	using baseClass::push;
+	using baseClass::push; // Just make the base class push() method public.
 
 	TEXT_ISR_ATTR_2 void setProtocolGroup(const PROTOCOL_GROUP_ID protocolGroup) {
 		mProtocolGroupId = protocolGroup;
@@ -211,25 +200,20 @@ public:
 	/**
 	 * Remove all pulses from this pulse tracer container.
 	 */
-	// Make the base class reset() method public.
-	using baseClass::reset;
+	using baseClass::reset; // Just  make the base class reset() method public.
 };
 
 /**
- * This container stores the received data bits of a single message packet
- * sent by the transmitter.
+ * This container stores the received data bits of a single message packet.
  * If the transmitter sends more data bits than MAX_MSG_PACKET_BITS,
  * the overflow counter of this container will be incremented.
- * The MAX_MSG_PACKET_BITS constant can be increased and the code
- * can be re-compiled to avoid overflows.
  */
 class MessagePacket : public StackBuffer<DATA_BIT, MAX_MSG_PACKET_BITS> {
 	using baseClass = StackBuffer<DATA_BIT, MAX_MSG_PACKET_BITS>;
 
 public:
 	/** Default constructor */
-	inline MessagePacket() {
-	}
+	inline MessagePacket() {}
 
 	/**
 	 * Remove all data bits from this message packet container.
@@ -239,15 +223,15 @@ public:
 };
 
 /**
- * The receiver is a buffer that holds the last 2 received pulses. It analyzes
- * these last pulses, whenever a new pulse arrives by a new interrupt.
- * When detecting valid synchronization pulse pair the
- * receiver's state changes to DATA_STATE and converts subsequent pulses into
+ * The receiver is a buffer that holds the last 2 received pulses.
+ * It analyzes these last pulses, whenever a new pulse arrives.
+ * When detecting valid synchronization pulse pair the receiver's
+ * state changes to DATA_STATE and converts subsequent pulses into
  * data bits that will be added to the message packet buffer.
- * In case of receiving unexpected pulses, the
- * receiver goes back to synch state. When a complete message
- * package has been received the state becomes AVAILABLE until the reset
- * function is called.
+ * In case of receiving unexpected pulses, the receiver goes back
+ * to the synch state. When a complete message package has been
+ * received the state becomes AVAILABLE until the reset function
+ * is called.
  */
 class Receiver : public RingBuffer<Pulse, DATA_PULSES_PER_BIT> {
 private:
@@ -286,14 +270,14 @@ protected:
 	/** ========= Methods used by API class RcSwitchReceiver ===================== */
 
 	/**
-	 * Evaluate a new pulse that has been received. Will only be called from within interrupt context.
+	 * Evaluate a new pulse that has been received.
+	 * Will only be called from within interrupt context.
 	 */
 	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
 
 	/**
-	 * Constructor.
+	 * Default constructor.
 	 */
-
 	Receiver()
 		    : mRxTimingSpecTableNormal{nullptr, 0}, mRxTimingSpecTableInverse{nullptr, 0}
 		    , mMessageAvailable(false), mSuspended(false)
@@ -338,7 +322,7 @@ class ReceiverWithPulseTracer : public Receiver {
 
 	/**
 	 * The most recent received pulses are stored in the pulse tracer for
-	 * debugging purpose.
+	 * analyzing purpose.
 	 */
 	PulseTracer<PULSE_TRACES_COUNT> mPulseTracer;
 	volatile mutable bool mPulseTracingLocked = false;
@@ -366,7 +350,8 @@ class ReceiverWithPulseTracer : public Receiver {
 	/** ========= Methods used by API class RcSwitchReceiver ===================== */
 
 	/**
-	 * Evaluate a new pulse that has been received. Will only be called from within interrupt context.
+	 * Evaluate a new pulse that has been received. Will
+	 * only be called from within interrupt context.
 	 */
 	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
 		tracePulse(microSecInterruptTime - mMicrosecLastInterruptTime, pinLevel);
@@ -375,7 +360,8 @@ class ReceiverWithPulseTracer : public Receiver {
 
 public:
 	/**
-	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
+	 * For the following methods, refer to corresponding API
+	 * class RcSwitchReceiver.
 	 */
 	template <typename T>
 	void dumpPulseTracer(T& stream, char separator) const {
@@ -388,6 +374,12 @@ public:
 	}
 };
 
+/**
+ * ReceiverSelector is used to select a Receiver class as receiver_t,
+ * depending on the PULSE_TRACES_COUNT. This default implementation
+ * will select class ReceiverWithPulseTracer<PULSE_TRACES_COUNT> as
+ * receiver_t.
+ */
 template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 	using receiver_t = ReceiverWithPulseTracer<PULSE_TRACES_COUNT>;
 
@@ -397,7 +389,12 @@ template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 	}
 };
 
-// Specialize for PULSE_TRACES_COUNT being zero.
+/**
+ * Specialize ReceiverSelector for PULSE_TRACES_COUNT being zero.
+ * This implementation will select class Receiver as receiver_t.
+ * Class Receiver does not have a mPulseTracer member. Hence
+ * this will save some memory.
+ */
 template<> struct ReceiverSelector<0> {
 	using receiver_t = Receiver;
 	template<typename T>

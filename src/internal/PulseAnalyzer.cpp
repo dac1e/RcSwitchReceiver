@@ -26,8 +26,7 @@
 
 namespace RcSwitch {
 
-// PulseAnalyzer
-bool PulseAnalyzer::isOfCategorie(const PulseCategorie &categorie,
+bool PulseAnalyzer::isOfCategorie(const PulseCategory &categorie,
 		const Pulse &pulse) const {
 	// size_t is 16 bit on avr. So static cast to uint32_t avoids temporary overflow when multiplying with 100
 	if (static_cast<uint32_t>(pulse.mMicroSecDuration)
@@ -43,7 +42,7 @@ bool PulseAnalyzer::isOfCategorie(const PulseCategorie &categorie,
 	return true;
 }
 
-size_t PulseAnalyzer::findCategorie(const Pulse &pulse) const {
+size_t PulseAnalyzer::findCategory(const Pulse &pulse) const {
 	for (size_t i = 0; i < size(); i++) {
 		if (isOfCategorie(at(i), pulse)) {
 			return i;
@@ -58,7 +57,7 @@ PulseAnalyzer::PulseAnalyzer(size_t percentTolerance) :
 
 bool PulseAnalyzer::addPulse(const Pulse &pulse) {
 	bool result = true;
-	const size_t i = findCategorie(pulse);
+	const size_t i = findCategory(pulse);
 	if (i >= size()) {
 		result = push(
 			{
