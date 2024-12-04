@@ -135,6 +135,66 @@ struct PulseCategory {
 
 		return result;
 	}
+
+	inline bool operator < (const RcSwitch::PulseCategory& other) const {
+		return (microSecDuration < other.microSecDuration);
+	}
+
+	template <typename T>
+	void dump(T& stream, const char* separator) const {
+		stream.print("\t");
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], pulseCount, 3);
+			stream.print(buffer);
+		}
+		stream.print(" recordings of");
+		stream.print(separator);
+		stream.print(" ");
+
+		{
+			const char* const levelText = pulseLevelToString(pulseLevel);;
+			stream.print(levelText);
+		}
+		stream.print(separator);
+		stream.print(" ");
+
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], microSecDuration, 5);
+			stream.print(buffer);
+		}
+
+		stream.print(separator);
+		stream.print("us");
+		stream.print(" ");
+
+		stream.print("[");
+		stream.print(separator);
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], microSecMinDuration, 5);
+			stream.print(buffer);
+		}
+
+		stream.print(separator);
+		stream.print("us");
+		stream.print(" ");
+
+		stream.print("..");
+		stream.print(separator);
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], microSecMaxDuration, 5);
+			stream.print(buffer);
+		}
+
+		stream.print(separator);
+		stream.print("us]");
+
+		stream.println();
+	}
+
 };
 
 } //  namespace RcSwitch

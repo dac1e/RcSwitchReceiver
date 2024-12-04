@@ -35,7 +35,7 @@
 #include "Container.hpp"
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
-#include "PulseAnalyzer.hpp"
+#include "PulseAnalyzer2.hpp"
 
 #define DEBUG_RCSWITCH false
 
@@ -293,7 +293,7 @@ public:
 		mPulseTracer.dump(stream, separator);
 		{
 			const RingBufferReadAccess<Pulse> readAccess(mPulseTracer);
-			PulseAnalyzer pulseAnalyzer(readAccess);
+			PulseAnalyzer2 pulseAnalyzer(readAccess);
 			pulseAnalyzer.analyze();
 			pulseAnalyzer.dump(stream, separator);
 		}

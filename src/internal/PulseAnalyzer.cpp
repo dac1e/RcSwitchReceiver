@@ -32,17 +32,6 @@
 
 namespace {
 
-inline bool operator < (const RcSwitch::PulseCategory& this_, const RcSwitch::PulseCategory& other) {
-	bool result = false;
-	// Order criteria is duration and then the level.
-	if(this_.microSecDuration < other.microSecDuration) {
-		result = true;
-	} else if(this_.microSecDuration == other.microSecDuration) {
-		result = this_.pulseLevel < other.pulseLevel;
-	}
-	return result;
-}
-
 int comparePulseCategory(const void* pa, const void* pb) {
 	const RcSwitch::PulseCategory* a = static_cast<const RcSwitch::PulseCategory*>(pa);
 	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(pb);
