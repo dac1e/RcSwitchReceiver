@@ -31,8 +31,8 @@ int comparePulseCategoryByDuration(const void* left, const void* right) {
 	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(right);
 
 	// This is for ascending order
-	if(a->microSecDuration < b->microSecDuration) return -1;
-	if(b->microSecDuration < a->microSecDuration) return 1;
+	if(a->getDuration() < b->getDuration()) return -1;
+	if(b->getDuration() < a->getDuration()) return 1;
 	return 0;
 }
 
@@ -41,8 +41,8 @@ int comparePulseCategoryByLevel(const void* left, const void* right) {
 	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(right);
 
 	// This is for ascending order
-	if(a->pulseLevel < b->pulseLevel) return -1;
-	if(b->pulseLevel < a->pulseLevel) return 1;
+	if(a->getPulseLevel() < b->getPulseLevel()) return -1;
+	if(b->getPulseLevel() < a->getPulseLevel()) return 1;
 	return 0;
 }
 
@@ -63,7 +63,7 @@ void PulseAnalyzer2::buildSynchAndDataCategories() {
 	mSynchPulseCategories.reset();
 	if (mAllPulseCategories.size() >= 0) {
 		mDataPulseCategories.build(mDataPulses, mInput, mPercentTolerance, mSynchPulseCategories,
-			mAllPulseCategories.at(mAllPulseCategories.size()-1).microSecDuration);
+			mAllPulseCategories.at(mAllPulseCategories.size()-1).getDuration());
 	}
 }
 

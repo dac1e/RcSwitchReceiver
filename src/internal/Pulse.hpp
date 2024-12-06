@@ -92,12 +92,39 @@ struct Pulse {
 	}
 };
 
-struct PulseCategory {
+class PulseCategory {
 	PULSE_LEVEL pulseLevel;
 	size_t microSecDuration;
 	size_t microSecMinDuration;
 	size_t microSecMaxDuration;
 	size_t pulseCount;
+
+public:
+	PulseCategory()
+		: pulseLevel(PULSE_LEVEL::UNKNOWN)
+		, microSecDuration(0)
+		, microSecMinDuration(0)
+		, microSecMaxDuration(0)
+		, pulseCount(0)
+	{
+	}
+
+	PulseCategory(const Pulse& pulse)
+		: pulseLevel(pulse.mPulseLevel)
+		, microSecDuration(pulse.mMicroSecDuration)
+		, microSecMinDuration(pulse.mMicroSecDuration)
+		, microSecMaxDuration(pulse.mMicroSecDuration)
+		, pulseCount(1)
+	{
+	}
+
+	PULSE_LEVEL getPulseLevel() const {
+		return pulseLevel;
+	}
+
+	size_t getDuration() const {
+		return microSecDuration;
+	}
 
 	inline bool isValid() const {
 		return pulseCount > 0 &&
