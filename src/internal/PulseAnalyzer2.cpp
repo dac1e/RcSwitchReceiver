@@ -53,17 +53,18 @@ PulseAnalyzer2::PulseAnalyzer2(const RingBufferReadAccess<Pulse>& input, unsigne
 }
 
 void PulseAnalyzer2::buildAllCategories() {
+	mAllPulseCategories.reset();
 	mAllPulseCategories.build(mInput, mPercentTolerance);
 }
 
-bool PulseAnalyzer2::buildSynchAndDataCategories() {
-	bool result = false;
+void PulseAnalyzer2::buildSynchAndDataCategories() {
+	mDataPulses.reset();
+	mDataPulseCategories.reset();
+	mSynchPulseCategories.reset();
 	if (mAllPulseCategories.size() >= 0) {
-		mDataPulseCategories.build(mInput, mPercentTolerance, mSynchPulseCategories,
+		mDataPulseCategories.build(mDataPulses, mInput, mPercentTolerance, mSynchPulseCategories,
 			mAllPulseCategories.at(mAllPulseCategories.size()-1).microSecDuration);
-		result = true;
 	}
-	return result;
 }
 
 } /* namespace RcSwitch */
