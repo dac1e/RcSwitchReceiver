@@ -93,16 +93,15 @@ struct Pulse {
 };
 
 class PulseCategory {
-	PULSE_LEVEL pulseLevel;
-	size_t microSecDuration;
+	// mPulse holds the level and the average of all pulses that constitute this category.
+	Pulse  mPulse;
 	size_t microSecMinDuration;
 	size_t microSecMaxDuration;
 	size_t pulseCount;
 
 public:
 	PulseCategory()
-		: pulseLevel(PULSE_LEVEL::UNKNOWN)
-		, microSecDuration(0)
+		: mPulse{0, PULSE_LEVEL::UNKNOWN}
 		, microSecMinDuration(0)
 		, microSecMaxDuration(0)
 		, pulseCount(0)
@@ -110,31 +109,48 @@ public:
 	}
 
 	PulseCategory(const Pulse& pulse)
-		: pulseLevel(pulse.mPulseLevel)
-		, microSecDuration(pulse.mMicroSecDuration)
+		: mPulse{pulse.mMicroSecDuration, pulse.mPulseLevel}
 		, microSecMinDuration(pulse.mMicroSecDuration)
 		, microSecMaxDuration(pulse.mMicroSecDuration)
 		, pulseCount(1)
 	{
 	}
 
-	PULSE_LEVEL getPulseLevel() const {
-		return pulseLevel;
+	inline PULSE_LEVEL getPulseLevel() const {
+		return mPulse.mPulseLevel;
 	}
 
-	size_t getDuration() const {
-		return microSecDuration;
+	/**
+	 * Get the average of the duration of all pulses.
+	 */
+	inline size_t getWeightedAverage() const {
+		return mPulse.mMicroSecDuration;
+	}
+
+	/**
+	 * Get the average of the minimum and maximum duration.
+	 */
+	inline size_t getMinMaxAverage() const {
+		return (microSecMaxDuration + microSecMinDuration) / 2;
+	}
+
+	/**
+	 * Return the deviation of the minimum and the maximum from MinMax average.
+	 * Note that those values are identical.
+	 */
+	inline unsigned getPercentMinMaxDeviation() const {
+		return 100 * (microSecMaxDuration - getMinMaxAverage()) / getMinMaxAverage();
 	}
 
 	inline bool isValid() const {
 		return pulseCount > 0 &&
-				pulseLevel != PULSE_LEVEL::UNKNOWN;
+				getPulseLevel() != PULSE_LEVEL::UNKNOWN;
 	}
 
 	bool invalidate() {
 		return pulseCount = 0;
-		pulseLevel = PULSE_LEVEL::UNKNOWN;
-		microSecDuration = 0;
+		mPulse.mPulseLevel = PULSE_LEVEL::UNKNOWN;
+		mPulse.mMicroSecDuration = 0;
 		microSecMinDuration = static_cast<size_t>(-1);
 		microSecMaxDuration = 0;
 	}
@@ -143,8 +159,8 @@ public:
 		bool result = true;
 
 		// Refresh average for the pulse duration and store it.
-		microSecDuration =
-				( (static_cast<uint32_t>(microSecDuration) * pulseCount) + pulse.mMicroSecDuration)
+		mPulse.mMicroSecDuration =
+				( (static_cast<uint32_t>(getWeightedAverage()) * pulseCount) + pulse.mMicroSecDuration)
 					/ (pulseCount + 1);
 
 		if(pulse.mMicroSecDuration < microSecMinDuration) {
@@ -155,10 +171,10 @@ public:
 			microSecMaxDuration = pulse.mMicroSecDuration;
 		}
 
-		if(pulseLevel == PULSE_LEVEL::UNKNOWN) {
-			pulseLevel = pulse.mPulseLevel;
+		if(getPulseLevel() == PULSE_LEVEL::UNKNOWN) {
+			mPulse.mPulseLevel = pulse.mPulseLevel;
 		} else {
-			result = (pulseLevel == pulse.mPulseLevel);
+			result = (getPulseLevel() == pulse.mPulseLevel);
 		}
 
 		++pulseCount;
@@ -167,10 +183,10 @@ public:
 	}
 
 	void merge(PulseCategory& result, const PulseCategory& other) const {
-		result.pulseLevel = pulseLevel == other.pulseLevel ? pulseLevel : PULSE_LEVEL::LO_or_HI;
+		result.mPulse.mPulseLevel = getPulseLevel() == other.getPulseLevel() ? getPulseLevel() : PULSE_LEVEL::LO_or_HI;
 		result.pulseCount = pulseCount + other.pulseCount;
-		result.microSecDuration = ((pulseCount * microSecDuration)
-			+ (other.pulseCount * other.microSecDuration)) / result.pulseCount;
+		result.mPulse.mMicroSecDuration = ((pulseCount * getWeightedAverage())
+			+ (other.pulseCount * other.getWeightedAverage())) / result.pulseCount;
 		result.microSecMinDuration = microSecMinDuration < other.microSecMinDuration ?
 				microSecMinDuration : other.microSecMinDuration;
 		result.microSecMaxDuration = microSecMaxDuration > other.microSecMaxDuration ?
@@ -185,28 +201,17 @@ public:
 			sprintUint(&buffer[0], pulseCount, 3);
 			stream.print(buffer);
 		}
+		stream.print(separator);
 		stream.print(" recordings of");
 		stream.print(separator);
 		stream.print(" ");
 
 		{
-			const char* const levelText = pulseLevelToString(pulseLevel);;
+			const char* const levelText = pulseLevelToString(getPulseLevel());
 			stream.print(levelText);
 		}
 		stream.print(separator);
-		stream.print(" ");
-
-		{
-			char buffer[16];
-			sprintUint(&buffer[0], microSecDuration, 5);
-			stream.print(buffer);
-		}
-
-		stream.print(separator);
-		stream.print("us");
-		stream.print(" ");
-
-		stream.print("[");
+		stream.print(" [");
 		stream.print(separator);
 		{
 			char buffer[16];
@@ -228,6 +233,31 @@ public:
 
 		stream.print(separator);
 		stream.print("us]");
+		stream.print(separator);
+		stream.print(" ");
+
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], getMinMaxAverage(), 5);
+			stream.print(buffer);
+		}
+
+		stream.print(separator);
+		stream.print("us");
+		stream.print(" ");
+
+		stream.print("+-");
+		stream.print(separator);
+
+		{
+			char buffer[16];
+			sprintUint(&buffer[0], getPercentMinMaxDeviation(), 2);
+			stream.print(buffer);
+			stream.print("%");
+		}
+
+		stream.print(" ");
+		stream.print(separator);
 
 		stream.println();
 	}

@@ -91,30 +91,17 @@ struct DataPulses {
 	}
 
 	uint32_t getDurationD0A(uint16_t scaleBase = 1) {
-		return scale(d0A->getDuration(), scaleBase); // short pulse
+		return scale(d0A->getWeightedAverage(), scaleBase); // short pulse
 	}
 	uint32_t getDurationD0B(uint16_t scaleBase = 1) {
-		return scale(d0B->getDuration(), scaleBase); // long pulse
+		return scale(d0B->getWeightedAverage(), scaleBase); // long pulse
 	}
 	uint32_t getDurationD1A(uint16_t scaleBase = 1) {
-		return scale(d1A->getDuration(), scaleBase); // long pulse
+		return scale(d1A->getWeightedAverage(), scaleBase); // long pulse
 	}
 	uint32_t getDurationD1B(uint16_t scaleBase = 1) {
-		return scale(d1B->getDuration(), scaleBase); // short pulse
+		return scale(d1B->getWeightedAverage(), scaleBase); // short pulse
 	}
-
-//	uint32_t getShortPulseAverage(uint16_t scaleBase = 1) {
-//		const uint32_t pulseCount = d0A->pulseCount + d1B->pulseCount;
-//		const uint32_t average = ((d0A->pulseCount * d0A->microSecDuration)
-//				+ (d1B->pulseCount * d1B->microSecDuration)) / pulseCount;
-//		return scale(average, scaleBase); // short pulse
-//	}
-//	uint32_t getLongPulseAverage(uint16_t scaleBase = 1) {
-//		const uint32_t pulseCount = d0B->pulseCount + d1A->pulseCount;
-//		const uint32_t average = ((d0B->pulseCount * d0B->microSecDuration)
-//				+ (d1A->pulseCount * d1A->microSecDuration)) / pulseCount;
-//		return scale(average, scaleBase); // short pulse
-//	}
 
 	bool checkRatio() {
 		if(100 * getDurationD0B() // long pulse
@@ -148,7 +135,7 @@ class PulseCategoryCollection : public StackBuffer<PulseCategory, PULSE_CATEGORI
 		if(pulse.mPulseLevel != category.getPulseLevel()) {
 			return false;
 		}
-		return pulse.isDurationInRange(category.getDuration()
+		return pulse.isDurationInRange(category.getWeightedAverage()
 				, percentTolerance);
 	}
 
@@ -279,7 +266,7 @@ public:
 			// Note that synch pulses are sorted in ascending order of duration.
 			const PulseCategory& shorterPulse = at(0);
 			const PulseCategory& longerPulse = at(1);
-			if(static_cast<uint32_t>(longerPulse.getDuration()) > SYNCH_PULSES_MIN_RATIO * shorterPulse.getDuration()) {
+			if(static_cast<uint32_t>(longerPulse.getWeightedAverage()) > SYNCH_PULSES_MIN_RATIO * shorterPulse.getWeightedAverage()) {
 				return true;
 			}
 		}
@@ -289,13 +276,13 @@ public:
 	uint32_t getDurationSyA(uint16_t scaleBase = 1) {
 		assert(capacity == SYNCH_PULSE_CATEGORIY_COUNT); // This must be the synch pulse category collection
 		const PulseCategory& pulseCategorySyA = at(0);
-		return scale(pulseCategorySyA.getDuration(), scaleBase);
+		return scale(pulseCategorySyA.getWeightedAverage(), scaleBase);
 	}
 
 	uint32_t getDurationSyB(uint16_t scaleBase = 1) {
 		assert(capacity == SYNCH_PULSE_CATEGORIY_COUNT); // This must be the synch pulse category collection
 		const PulseCategory& pulseCategorySyB = at(1);
-		return scale(pulseCategorySyB.getDuration(), scaleBase);
+		return scale(pulseCategorySyB.getWeightedAverage(), scaleBase);
 	}
 
 	static constexpr uint32_t DATA_PULSES_MIN_RATIO_PERCENT = 100 * DATA_PULSES_MIN_RATIO;
@@ -393,18 +380,23 @@ public:
 
 		if(mDataPulses.isValid()) {
 			{
-				stream.println("\t..all SHORT data pulses together:");
+				stream.println("All SHORT DATA pulse categories together:");
 				PulseCategory shortPulses;
 				mDataPulses.d0A->merge(shortPulses, *mDataPulses.d1B);
 				shortPulses.dump(stream, separator);
 			}
 
 			{
-				stream.println("\t..all LONG data pulses together:");
+				stream.println("All LONG DATA pulse categories together:");
 				PulseCategory longPulses;
 				mDataPulses.d1A->merge(longPulses, *mDataPulses.d0B);
 				longPulses.dump(stream, separator);
 			}
+
+
+
+
+
 
 			stream.println("\nTiming spec guess:");
 			dumpProposedTimings(stream, 10);
