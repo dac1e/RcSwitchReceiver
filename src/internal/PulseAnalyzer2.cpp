@@ -26,13 +26,23 @@
 
 namespace RcSwitch {
 
-int comparePulseCategory(const void* left, const void* right) {
+int comparePulseCategoryByDuration(const void* left, const void* right) {
 	const RcSwitch::PulseCategory* a = static_cast<const RcSwitch::PulseCategory*>(left);
 	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(right);
 
 	// This is for ascending order
-	if(*a < *b) return -1;
-	if(*b < *a) return 1;
+	if(a->microSecDuration < b->microSecDuration) return -1;
+	if(b->microSecDuration < a->microSecDuration) return 1;
+	return 0;
+}
+
+int comparePulseCategoryByLevel(const void* left, const void* right) {
+	const RcSwitch::PulseCategory* a = static_cast<const RcSwitch::PulseCategory*>(left);
+	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(right);
+
+	// This is for ascending order
+	if(a->pulseLevel < b->pulseLevel) return -1;
+	if(b->pulseLevel < a->pulseLevel) return 1;
 	return 0;
 }
 

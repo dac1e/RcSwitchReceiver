@@ -36,15 +36,31 @@
 
 namespace RcSwitch {
 
+/**
+ * The 6 potential different categories are:
+ *
+ * synch A
+ * synch B
+ *
+ * synch data0 A
+ * synch data0 B
+ *
+ * synch data0 A
+ * synch data0 B
+ */
 static constexpr size_t SYNCH_PULSE_CATEGORIY_COUNT = 2;
+static constexpr size_t DATA_PULSE_CATEGORIY_COUNT  = 4;
+static constexpr size_t ALL_PULSE_CATEGORy_COUNT =
+	SYNCH_PULSE_CATEGORIY_COUNT + DATA_PULSE_CATEGORIY_COUNT;
+
 
 // C++ STL not available for avr. So we can not use <algorithm>
-int comparePulseCategory(const void* left, const void* right);
+int comparePulseCategoryByDuration(const void* left, const void* right);
+int comparePulseCategoryByLevel(const void* left, const void* right);
 
 template<size_t PULSE_CATEGORIY_COUNT>
 class PulseCategoryCollection : public StackBuffer<PulseCategory, PULSE_CATEGORIY_COUNT> {
 	using baseClass = StackBuffer<PulseCategory, PULSE_CATEGORIY_COUNT>;
-	using baseClass::capacity;
 	using baseClass::push;
 
 	using synchPulseCategories_t = PulseCategoryCollection<SYNCH_PULSE_CATEGORIY_COUNT>;;
@@ -60,11 +76,16 @@ class PulseCategoryCollection : public StackBuffer<PulseCategory, PULSE_CATEGORI
 
 public:
 	using baseClass::overflowCount;
+	using baseClass::capacity;
 	using baseClass::size;
 	using baseClass::at;
 
 	void sortByDuration() {
-		qsort(&at(0), size(), sizeof(PulseCategory), comparePulseCategory);
+		qsort(&at(0), size(), sizeof(PulseCategory), comparePulseCategoryByDuration);
+	}
+
+	void sortByLevel(PulseCategory& first, const size_t size) {
+		qsort(&first, size, sizeof(PulseCategory), comparePulseCategoryByLevel);
 	}
 
 	size_t findCategoryForPulse(const Pulse &pulse, unsigned percentTolerance) const {
@@ -80,13 +101,7 @@ public:
 	void putPulseInCategory(size_t categoryIndex, const Pulse &pulse) {
 		if (categoryIndex >= size()) {
 			push(
-				{
-					 pulse.mPulseLevel
-					,pulse.mMicroSecDuration
-					,pulse.mMicroSecDuration
-					,pulse.mMicroSecDuration
-					,1
-				}
+				{pulse.mPulseLevel,pulse.mMicroSecDuration,pulse.mMicroSecDuration,pulse.mMicroSecDuration,1}
 			);
 		} else {
 			at(categoryIndex).addPulse(pulse);
@@ -141,12 +156,18 @@ public:
 		}
 		synchPulseCategories.sortByDuration();
 		sortByDuration();
+
+		if(size() >= 2) {
+			sortByLevel(at(0), 2);
+		}
+
+		if(size() >= 4) {
+			sortByLevel(at(2), 2);
+		}
 	}
 
 	template <typename T>
 	void dump(T& stream, const char* separator) const {
-		stream.println("Identified pulse categories:");
-
 		for(size_t i = 0; i < size(); i++) {
 			const PulseCategory& pulseCategory = at(i);
 			pulseCategory.dump(stream, separator);
@@ -165,14 +186,11 @@ public:
 };
 
 class PulseAnalyzer2 {
-	static constexpr size_t MAX_PULSE_CATEGORIES = 6;
-	static constexpr size_t DATA_PULSE_CATEGORIY_COUNT =
-			MAX_PULSE_CATEGORIES - SYNCH_PULSE_CATEGORIY_COUNT;
 
 	const unsigned mPercentTolerance;
 	const RingBufferReadAccess<Pulse> mInput;
 
-	PulseCategoryCollection<MAX_PULSE_CATEGORIES> mAllPulseCategories;
+	PulseCategoryCollection<ALL_PULSE_CATEGORy_COUNT> mAllPulseCategories;
 	PulseCategoryCollection<SYNCH_PULSE_CATEGORIY_COUNT> mSynchPulseCategories;
 	PulseCategoryCollection<DATA_PULSE_CATEGORIY_COUNT> mDataPulseCategories;
 
@@ -183,18 +201,25 @@ public:
 
 	void analyze() {
 		buildAllCategories();
-		if(not mAllPulseCategories.overflowCount()) {
-			buildSynchAndDataCategories();
+		if(mAllPulseCategories.size()) {
+			if(not mAllPulseCategories.overflowCount()) {
+				buildSynchAndDataCategories();
+			}
 		}
 	}
 
 	template <typename T>
 	void dump(T& stream, const char* separator) {
+		stream.println("Identified pulse categories:");
 		mAllPulseCategories.dump(stream, separator);
+
 		if(mSynchPulseCategories.size()) {
+			stream.println("Identified synch pulse categories:");
 			mSynchPulseCategories.dump(stream, separator);
 		}
+
 		if(mDataPulseCategories.size()) {
+			stream.println("Identified data pulse categories:");
 			mDataPulseCategories.dump(stream, separator);
 		}
 	}

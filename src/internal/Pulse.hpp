@@ -136,10 +136,6 @@ struct PulseCategory {
 		return result;
 	}
 
-	inline bool operator < (const RcSwitch::PulseCategory& other) const {
-		return (microSecDuration < other.microSecDuration);
-	}
-
 	template <typename T>
 	void dump(T& stream, const char* separator) const {
 		stream.print("\t");
