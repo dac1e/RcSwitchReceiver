@@ -42,6 +42,7 @@ struct rxTimingSpecTable {
 
 void sprintUint(char *string, const size_t value, const size_t width);
 size_t digitCount(size_t value);
+uint32_t scale(uint32_t value, uint16_t base);
 
 }
 

@@ -38,6 +38,7 @@ enum class PULSE_LEVEL {
 	UNKNOWN = 0,
 	LO,
 	HI,
+	LO_or_HI,
 };
 
 inline const char* pulseLevelToString(const PULSE_LEVEL& pulseLevel) {
@@ -46,6 +47,8 @@ inline const char* pulseLevelToString(const PULSE_LEVEL& pulseLevel) {
 		return " LOW";
 	case PULSE_LEVEL::HI:
 		return "HIGH";
+	case PULSE_LEVEL::LO_or_HI:
+		return " ANY";
 	}
 	return "??";
 }
@@ -134,6 +137,17 @@ struct PulseCategory {
 		++pulseCount;
 
 		return result;
+	}
+
+	void merge(PulseCategory& result, const PulseCategory& other) const {
+		result.pulseLevel = pulseLevel == other.pulseLevel ? pulseLevel : PULSE_LEVEL::LO_or_HI;
+		result.pulseCount = pulseCount + other.pulseCount;
+		result.microSecDuration = ((pulseCount * microSecDuration)
+			+ (other.pulseCount * other.microSecDuration)) / result.pulseCount;
+		result.microSecMinDuration = microSecMinDuration < other.microSecMinDuration ?
+				microSecMinDuration : other.microSecMinDuration;
+		result.microSecMaxDuration = microSecMaxDuration > other.microSecMaxDuration ?
+				microSecMaxDuration : other.microSecMaxDuration;
 	}
 
 	template <typename T>

@@ -32,6 +32,14 @@
 
 namespace RcSwitch {
 
+uint32_t scale(uint32_t value, uint16_t base) {
+	if(base) {
+		uint32_t x = (value + (base / 2)) / base;
+		return x;
+	}
+	return value;
+}
+
 size_t digitCount(size_t value) {
 	size_t result = 0;
 	do {

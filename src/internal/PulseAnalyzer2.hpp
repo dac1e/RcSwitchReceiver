@@ -32,6 +32,7 @@
 
 #include "ISR_ATTR.hpp"
 #include "Pulse.hpp"
+#include "Common.hpp"
 #include "Container.hpp"
 
 namespace RcSwitch {
@@ -89,26 +90,39 @@ struct DataPulses {
 		bIsInverseLevel = false;
 	}
 
-	size_t getDurationD0A() {
-		return d0A->microSecDuration; // short pulse
+	uint32_t getDurationD0A(uint16_t scaleBase = 1) {
+		return scale(d0A->microSecDuration, scaleBase); // short pulse
 	}
-	size_t getDurationD0B() {
-		return d0B->microSecDuration; // long pulse
+	uint32_t getDurationD0B(uint16_t scaleBase = 1) {
+		return scale(d0B->microSecDuration, scaleBase); // long pulse
 	}
-	size_t getDurationD1A() {
-		return d1A->microSecDuration; // long pulse
+	uint32_t getDurationD1A(uint16_t scaleBase = 1) {
+		return scale(d1A->microSecDuration, scaleBase); // long pulse
 	}
-	size_t getDurationD1B() {
-		return d1B->microSecDuration; // short pulse
+	uint32_t getDurationD1B(uint16_t scaleBase = 1) {
+		return scale(d1B->microSecDuration, scaleBase); // short pulse
 	}
 
+//	uint32_t getShortPulseAverage(uint16_t scaleBase = 1) {
+//		const uint32_t pulseCount = d0A->pulseCount + d1B->pulseCount;
+//		const uint32_t average = ((d0A->pulseCount * d0A->microSecDuration)
+//				+ (d1B->pulseCount * d1B->microSecDuration)) / pulseCount;
+//		return scale(average, scaleBase); // short pulse
+//	}
+//	uint32_t getLongPulseAverage(uint16_t scaleBase = 1) {
+//		const uint32_t pulseCount = d0B->pulseCount + d1A->pulseCount;
+//		const uint32_t average = ((d0B->pulseCount * d0B->microSecDuration)
+//				+ (d1A->pulseCount * d1A->microSecDuration)) / pulseCount;
+//		return scale(average, scaleBase); // short pulse
+//	}
+
 	bool checkRatio() {
-		if(100 * static_cast<uint32_t>(d0B->microSecDuration) // long pulse
-				< PERCENT_DATA_PULSES_MIN_RATIO * static_cast<uint32_t>(d0A->microSecDuration)) {
+		if(100 * getDurationD0B() // long pulse
+				< PERCENT_DATA_PULSES_MIN_RATIO * getDurationD0A()) {
 			return false;
 		}
-		if(100 * static_cast<uint32_t>(d1A->microSecDuration) // long pulse
-				< PERCENT_DATA_PULSES_MIN_RATIO * static_cast<uint32_t>(d1B->microSecDuration)) {
+		if(100 * getDurationD1A() // long pulse
+				< PERCENT_DATA_PULSES_MIN_RATIO * getDurationD1B()) {
 			return false;
 		}
 		return true;
@@ -274,6 +288,18 @@ public:
 		return false;
 	}
 
+	uint32_t getDurationSyA(uint16_t scaleBase = 1) {
+		assert(capacity == SYNCH_PULSE_CATEGORIY_COUNT); // This must be the synch pulse category collection
+		const PulseCategory& pulseCategorySyA = at(0);
+		return scale(pulseCategorySyA.microSecDuration, scaleBase);
+	}
+
+	uint32_t getDurationSyB(uint16_t scaleBase = 1) {
+		assert(capacity == SYNCH_PULSE_CATEGORIY_COUNT); // This must be the synch pulse category collection
+		const PulseCategory& pulseCategorySyB = at(1);
+		return scale(pulseCategorySyB.microSecDuration, scaleBase);
+	}
+
 	static constexpr uint32_t DATA_PULSES_MIN_RATIO_PERCENT = 100 * DATA_PULSES_MIN_RATIO;
 
 	template <typename T>
@@ -321,37 +347,72 @@ public:
 	}
 
 	template <typename T>
+	void dumpProposedTimings(T& stream, uint16_t clock) {
+		if(mSynchPulseCategories.isValidSynchPulsePair()) {
+			if(mDataPulses.isValid()) {
+
+				stream.print("makeTimingSpec< #, ");
+				stream.print(mPercentTolerance);
+				stream.print(", ");
+				stream.print(clock);
+				stream.print(", ");
+
+				stream.print(mSynchPulseCategories.getDurationSyA(clock));
+				stream.print(", ");
+				stream.print(mSynchPulseCategories.getDurationSyB(clock));
+				stream.print(", ");
+
+
+				stream.print(mDataPulses.getDurationD0A(clock));
+				stream.print(", ");
+				stream.print(mDataPulses.getDurationD0B(clock));
+				stream.print(", ");
+				stream.print(mDataPulses.getDurationD1A(clock));
+				stream.print(", ");
+				stream.print(mDataPulses.getDurationD1B(clock));
+				stream.print(", ");
+				stream.print(mDataPulses.bIsInverseLevel);
+				stream.println(">");
+			}
+		}
+	}
+
+	template <typename T>
 	void dump(T& stream, const char* separator) {
-		stream.println("Identified pulse categories:");
+		stream.println("\nIdentified COMMON pulse categories:");
 		mAllPulseCategories.dump(stream, separator);
 
 		if(mSynchPulseCategories.size()) {
-			stream.println("Identified synch pulse categories:");
+			stream.println("\nIdentified SYNCH pulse categories:");
 			mSynchPulseCategories.dump(stream, separator);
 		}
 
 		if(mDataPulseCategories.size()) {
-			stream.println("Identified data pulse categories:");
+			stream.println("\nIdentified DATA pulse categories:");
 			mDataPulseCategories.dump(stream, separator);
+
 		}
 
-//		 *  //                   #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
-//		 *  	makeTimingSpec<  1, 350, 20,   1,   31,    1,  3,    3,  1, false>, // (PT2262)
-
 		if(mDataPulses.isValid()) {
-			stream.print("makeTimingSpec< #, ");
-			stream.print(mPercentTolerance);
-			stream.print(", ");
-			stream.print(mDataPulses.d0A->microSecDuration);
-			stream.print(", ");
-			stream.print(mDataPulses.d0B->microSecDuration);
-			stream.print(", ");
-			stream.print(mDataPulses.d1A->microSecDuration);
-			stream.print(", ");
-			stream.print(mDataPulses.d1B->microSecDuration);
-			stream.print(", ");
-			stream.print(mDataPulses.bIsInverseLevel);
-			stream.println(">");
+			{
+				stream.println("\t..all SHORT data pulses together:");
+				PulseCategory shortPulses;
+				mDataPulses.d0A->merge(shortPulses, *mDataPulses.d1B);
+				shortPulses.dump(stream, separator);
+			}
+
+			{
+				stream.println("\t..all LONG data pulses together:");
+				PulseCategory longPulses;
+				mDataPulses.d1A->merge(longPulses, *mDataPulses.d0B);
+				longPulses.dump(stream, separator);
+			}
+
+			stream.println("\nTiming spec guess:");
+			dumpProposedTimings(stream, 10);
+			dumpProposedTimings(stream, 20);
+			dumpProposedTimings(stream, 50);
+			dumpProposedTimings(stream,100);
 		}
 	}
 };
