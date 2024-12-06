@@ -90,17 +90,30 @@ struct DataPulses {
 		bIsInverseLevel = false;
 	}
 
-	uint32_t getDurationD0A(uint16_t scaleBase = 1) {
-		return scale(d0A->getWeightedAverage(), scaleBase); // short pulse
+	inline uint32_t getDurationD0A() {
+		return d0A->getWeightedAverage(); // short pulse
 	}
-	uint32_t getDurationD0B(uint16_t scaleBase = 1) {
-		return scale(d0B->getWeightedAverage(), scaleBase); // long pulse
+	inline uint32_t getDurationD0B(uint16_t scaleBase = 1) {
+		return d0B->getWeightedAverage(); // long pulse
 	}
-	uint32_t getDurationD1A(uint16_t scaleBase = 1) {
-		return scale(d1A->getWeightedAverage(), scaleBase); // long pulse
+	inline uint32_t getDurationD1A(uint16_t scaleBase = 1) {
+		return d1A->getWeightedAverage(); // long pulse
 	}
-	uint32_t getDurationD1B(uint16_t scaleBase = 1) {
-		return scale(d1B->getWeightedAverage(), scaleBase); // short pulse
+	inline uint32_t getDurationD1B(uint16_t scaleBase = 1) {
+		return d1B->getWeightedAverage(); // short pulse
+	}
+
+	inline uint32_t getMinMaxAverageD0A(uint16_t scaleBase = 1) {
+		return scale(d0A->getMinMaxAverage(), scaleBase); // short pulse
+	}
+	inline uint32_t getMinMaxAverageD0B(uint16_t scaleBase = 1) {
+		return scale(d0B->getMinMaxAverage(), scaleBase); // long pulse
+	}
+	inline uint32_t getMinMaxAverageD1A(uint16_t scaleBase = 1) {
+		return scale(d1A->getMinMaxAverage(), scaleBase); // long pulse
+	}
+	inline uint32_t getMinMaxAverageD1B(uint16_t scaleBase = 1) {
+		return scale(d1B->getMinMaxAverage(), scaleBase); // short pulse
 	}
 
 	bool checkRatio() {
@@ -144,6 +157,7 @@ public:
 	using baseClass::capacity;
 	using baseClass::size;
 	using baseClass::at;
+	using baseClass::isAtTheEdge;
 	using baseClass::reset;
 
 	inline void sortByDuration(PulseCategory& first, const size_t size) {
@@ -293,15 +307,6 @@ public:
 			const PulseCategory& pulseCategory = at(i);
 			pulseCategory.dump(stream, separator);
 		}
-
-		if(overflowCount()) {
-			stream.print("Warning! ");
-			stream.print(overflowCount());
-			stream.print(" more categories could not be recorded.");
-			stream.print(" Category recording capacity is ");
-			stream.print(capacity);
-			stream.println('.');
-		}
 	}
 
 };
@@ -322,7 +327,7 @@ class PulseAnalyzer2 {
 public:
 	PulseAnalyzer2(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance = 20);
 
-	void analyze() {
+	void dedcuceProtocol() {
 		buildAllCategories();
 		if(mAllPulseCategories.size()) {
 			if(not mAllPulseCategories.overflowCount()) {
@@ -347,24 +352,27 @@ public:
 				stream.print(mSynchPulseCategories.getDurationSyB(clock));
 				stream.print(", ");
 
+				stream.print(mDataPulses.getMinMaxAverageD0A(clock));
+				stream.print(", ");
+				stream.print(mDataPulses.getMinMaxAverageD0B(clock));
+				stream.print(", ");
+				stream.print(mDataPulses.getMinMaxAverageD1A(clock));
+				stream.print(", ");
+				stream.print(mDataPulses.getMinMaxAverageD1B(clock));
+				stream.print(", ");
 
-				stream.print(mDataPulses.getDurationD0A(clock));
-				stream.print(", ");
-				stream.print(mDataPulses.getDurationD0B(clock));
-				stream.print(", ");
-				stream.print(mDataPulses.getDurationD1A(clock));
-				stream.print(", ");
-				stream.print(mDataPulses.getDurationD1B(clock));
-				stream.print(", ");
-				stream.print(mDataPulses.bIsInverseLevel);
+				stream.print(((mDataPulses.bIsInverseLevel) ? "true" : "false"));
 				stream.println(">");
+
+				stream.println("------- Replace the '#' above by a unique identifier -------");
+
 			}
 		}
 	}
 
 	template <typename T>
 	void dump(T& stream, const char* separator) {
-		stream.println("\nIdentified COMMON pulse categories:");
+		stream.println("Identified COMMON pulse categories:");
 		mAllPulseCategories.dump(stream, separator);
 
 		if(mSynchPulseCategories.size()) {
@@ -372,13 +380,36 @@ public:
 			mSynchPulseCategories.dump(stream, separator);
 		}
 
+#if false
+		if(mSynchPulseCategories.overflowCount()) {
+			stream.print("Warning! ");
+			stream.print(mSynchPulseCategories.overflowCount());
+			stream.print(" more categories could not be recorded.");
+			stream.print(" Category recording capacity is ");
+			stream.print(mSynchPulseCategories.capacity);
+			stream.println('.');
+		}
+#endif
+
 		if(mDataPulseCategories.size()) {
 			stream.println("\nIdentified DATA pulse categories:");
 			mDataPulseCategories.dump(stream, separator);
-
 		}
 
-		if(mDataPulses.isValid()) {
+#if false
+		if(mDataPulseCategories.overflowCount()) {
+			stream.print("Warning! ");
+			stream.print(mDataPulseCategories.overflowCount());
+			stream.print(" more categories could not be recorded.");
+			stream.print(" Category recording capacity is ");
+			stream.print(mDataPulseCategories.capacity);
+			stream.println('.');
+		}
+#endif
+
+		const bool bOk = mSynchPulseCategories.isAtTheEdge() && mDataPulseCategories.isAtTheEdge() && mDataPulses.isValid();
+		if(bOk) {
+#if false
 			{
 				stream.println("All SHORT DATA pulse categories together:");
 				PulseCategory shortPulses;
@@ -392,17 +423,18 @@ public:
 				mDataPulses.d1A->merge(longPulses, *mDataPulses.d0B);
 				longPulses.dump(stream, separator);
 			}
-
-
-
-
-
-
-			stream.println("\nTiming spec guess:");
+#endif
+			stream.println("\n"
+						   "Protocol detection succeeded. Protocol proposal:");
+			stream.println("************************************************************");
 			dumpProposedTimings(stream, 10);
-			dumpProposedTimings(stream, 20);
-			dumpProposedTimings(stream, 50);
-			dumpProposedTimings(stream,100);
+			stream.println("************************************************************");
+		} else {
+			stream.println("\n"
+					       "Protocol detection failed. Please try again. You may\n"
+						   "reposition your Remote Control a bit or use a different\n"
+						   "RC button. Be sure that you press the RC button at\n"
+						   "least for 3 seconds, before you start the pulse trace.");
 		}
 	}
 };

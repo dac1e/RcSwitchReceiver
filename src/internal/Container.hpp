@@ -98,9 +98,17 @@ protected:
 	/* Default constructor */
 	inline StackBuffer() : mOverflow(0) {}
 public:
-	/** Make the capacity template argument available as
+	/**
+	 * Make the capacity template argument available as
 	 * const expression. */
 	static constexpr size_t capacity = CAPACITY;
+
+	/**
+	 * Check whether this stack buffer is full, without any overflow
+	 */
+	inline bool isAtTheEdge() const {
+		return not mOverflow && (baseClass::size() == capacity);
+	}
 
 	/**
 	 * Return a pointer to the memory, that stores the element

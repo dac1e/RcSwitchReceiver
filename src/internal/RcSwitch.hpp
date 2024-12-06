@@ -290,12 +290,16 @@ public:
 	template <typename T>
 	void dumpPulseTracer(T& stream, const char* separator) const {
 		mPulseTracingLocked = true;
+		stream.println("\n==== Dumping traced pulses: ==== ");
 		mPulseTracer.dump(stream, separator);
+		stream.println("==== done!                 ===== ");
 		{
 			const RingBufferReadAccess<Pulse> readAccess(mPulseTracer);
 			PulseAnalyzer2 pulseAnalyzer(readAccess);
-			pulseAnalyzer.analyze();
+			stream.println("\n==== Deducing RC protocol: ===== ");
+			pulseAnalyzer.dedcuceProtocol();
 			pulseAnalyzer.dump(stream, separator);
+			stream.println("==== done!                 ===== ");
 		}
 		mPulseTracingLocked = false;
 	}

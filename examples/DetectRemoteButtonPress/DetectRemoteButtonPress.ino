@@ -25,9 +25,6 @@
 /**
  * Please read "hints on remote operating distance" in README.md
  * For wiring diagram refer to https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/RcSwitchReceiverWiring.pdf
- *
- * The first sketch you should run is TraceReceviedPulses.ino. With the pulse statistics you get from there, you
- * should be able to define your own rxProtocolTable for your remote controls.
  */
 
 #include "ProtocolDefinition.hpp"
@@ -40,7 +37,7 @@ size_t constexpr PROTOCOL_PT2262  = 1;
 // For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
 // You can add own protocols and remove not needed protocols.
 // However, the number of normal level protocols as well as the number of inverse level
-// Protocols should not exceed 7 in this table. Refer to MAX_PROTOCOL_CANDIDATES in RcSwitch.hpp.
+// Protocols should not exceed 7 in this table.
 DATA_ISR_ATTR static const RxProtocolTable <
 	//                              #, clk,  %, syA,  syB,  d0A,d0B,  d1A,d1B, inverseLevel
 	makeTimingSpec< PROTOCOL_PT2262  , 350, 20,   1,   31,    1,  3,    3,  1, false> // (PT2262)

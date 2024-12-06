@@ -25,25 +25,24 @@
 /**
  * Please read "hints on remote operating distance" in README.md
  * For wiring diagram refer to https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/RcSwitchReceiverWiring.pdf
- *
- * The first sketch you should run is TraceReceviedPulses.ino. With the pulse statistics you get from there, you
- * should be able to define your own rxProtocolTable for your remote controls.
  */
 
 /**
- * This sketch helps you to analyze the pulses of a remote control. It can be used to
- * create an RxProtocolTable, as you need for the final application sketch as
- * Demonstrated in the other example sketches. Follow the steps below:
+ * This sketch helps you to analyze the pulses of your remote control. It can be used to
+ * determine what needs to be entered in an RxProtocolTable to operate your remote control.
+ * If you don't know, what an RxProtocolTable is, you may want to have a look in the
+ * other example sketches.
  */
+
 // The remote control typically repeats its message package as long as a remote
 // control button is pressed.
 // The following procedure helps you to analyze the pulses of a remote control:
 // 0) Wire a push button (TRIGGER_BUTTON) between pin13 an GND of your Arduino.
-// 1) Place the remote control very closed to the receiver, so that you get clean pulses.
+// 1) Place the remote control closed to the receiver, so that you get record clean pulses.
 // 2) Press any remote control button and keep it pressed.
-// 3) After 2 seconds, push the TRIGGER_BUTTON to watch the received pulses on the serial monitor.
+// 3) After 3 seconds, push the TRIGGER_BUTTON and watch the received pulses on the serial monitor.
 // 4) Release the remote control button even while pulses are still dumped on the serial monitor.
-// 5) See statistics at the end of the dump.
+// 5) See the proposal for the RxProtocolTable at the end of the dump.
 
 // Note: If you just press the TRIGGER_BUTTON without any transmission from a remote control,
 // you will see random pulses that come from HF noise.
