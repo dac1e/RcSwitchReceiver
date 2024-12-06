@@ -28,18 +28,21 @@
  */
 
 /**
- * This sketch helps you to analyze the pulses of your remote control as a debugging feature.
+ * This sketch helps you to analyze the pulses of your remote control. It can be used to
+ * determine what needs to be entered in an RxProtocolTable to operate your remote control.
+ * If you don't know, what an RxProtocolTable is, you may want to have a look in the
+ * example sketch PrintReceivedData or DetectRemoteButtonPress.
  */
 
 // The remote control typically repeats its message package as long as a remote
 // control button is pressed.
-// The following procedure helps you to record the pulses of a remote control:
+// The following procedure helps you to analyze the pulses of a remote control:
 // 0) Wire a push button (TRIGGER_BUTTON) between pin13 an GND of your Arduino.
 // 1) Place the remote control closed to the receiver, so that you get record clean pulses.
 // 2) Press any remote control button and keep it pressed.
 // 3) After 3 seconds, push the TRIGGER_BUTTON and watch the received pulses on the serial monitor.
 // 4) Release the remote control button even while pulses are still dumped on the serial monitor.
-
+// 5) See the proposal for the RxProtocolTable at the end of the dump.
 
 // Note: If you just press the TRIGGER_BUTTON without any transmission from a remote control,
 // you will see random pulses that come from HF noise.
@@ -82,12 +85,7 @@ void loop()
 {
 	const int buttonState = digitalRead(TRIGGER_BUTTON);
 	if(lastbuttonState == HIGH && buttonState == LOW) {
-		//
-		// Dump from the oldest to the newest pulses.
-		//
-//		rcSwitchReceiver.dumpPulseTracer(output, ","); Use this for excel csv format where comma is separator.
-//		rcSwitchReceiver.dumpPulseTracer(output, ";"); Use this for excel csv format where semicolon is separator.
-		rcSwitchReceiver.dumpPulseTracer(output, "");
+		rcSwitchReceiver.deduceProtocolFromPulseTracer(output);
 	}
 	lastbuttonState = buttonState;
 }

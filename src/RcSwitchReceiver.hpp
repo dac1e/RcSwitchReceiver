@@ -164,6 +164,13 @@ public:
 	}
 
 	/**
+	 * Dump the oldest to the youngest pulse as well as pulse statistics.
+	 */
+	static void deduceProtocolFromPulseTracer(typeof(Serial)& serial) {
+		RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::deduceProtocolFromPulseTracer(mReceiverDelegate, serial);
+	}
+
+	/**
 	 * Return a reference to the internal receiver that this API class forwards
 	 * it's public function calls to.
 	 */

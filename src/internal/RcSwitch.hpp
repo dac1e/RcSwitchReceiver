@@ -288,12 +288,14 @@ public:
 	 * class RcSwitchReceiver.
 	 */
 	template <typename T>
-	void dumpPulseTracer(T& stream, const char* separator) const {
+	void dumpAndDedcucePulses(T& stream, const char* separator, bool bDumpPulses, bool bDeduceProtocol) const {
 		mPulseTracingLocked = true;
-		stream.println("\n==== Dumping traced pulses: ==== ");
-		mPulseTracer.dump(stream, separator);
-		stream.println("==== done!                 ===== ");
-		{
+		if(bDumpPulses) {
+			stream.println("\n==== Dumping traced pulses: ==== ");
+			mPulseTracer.dump(stream, separator);
+			stream.println("==== done!                 ===== ");
+		}
+		if(bDeduceProtocol){
 			const RingBufferReadAccess<Pulse> readAccess(mPulseTracer);
 			PulseAnalyzer2 pulseAnalyzer(readAccess);
 			stream.println("\n==== Deducing RC protocol: ===== ");
@@ -304,6 +306,14 @@ public:
 		mPulseTracingLocked = false;
 	}
 };
+
+static constexpr size_t MIN_PULSE_TRACES_FOR_PROTOCOL_DEDUCTION = 192;
+static const char* const toLessPulseTracesError =
+	"The PULSE_TRACES_COUNT parameter of your RcSwitchReceiver is too "
+	"low for protocol deduction. Please change to 192 or higher.";
+
+static const char* const noPulsesToTraceError = "The PULSE_TRACES_COUNT "
+	"parameter is 0. There are no pulses to dump.";
 
 /**
  * ReceiverSelector is used to select a Receiver class as receiver_t,
@@ -316,7 +326,16 @@ template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
 
 	template<typename T>
 	static void dumpPulseTracer(const receiver_t& receiver, T& stream, const char* separator) {
-		receiver.dumpPulseTracer(stream, separator);
+		receiver.dumpAndDedcucePulses(stream, separator, true, false);
+	}
+
+	template<typename T>
+	static void deduceProtocolFromPulseTracer(const receiver_t& receiver, T& stream) {
+		if(PULSE_TRACES_COUNT < MIN_PULSE_TRACES_FOR_PROTOCOL_DEDUCTION) {
+			stream.println(toLessPulseTracesError);
+		} else {
+			receiver.dumpAndDedcucePulses(stream, "", false, true);
+		}
 	}
 };
 
@@ -328,9 +347,15 @@ template<size_t PULSE_TRACES_COUNT> struct ReceiverSelector {
  */
 template<> struct ReceiverSelector<0> {
 	using receiver_t = Receiver;
+
 	template<typename T>
 	static void dumpPulseTracer(const receiver_t& receiver, T& stream, const char* separator) {
-		// There are no pulses traced.
+		stream.println(noPulsesToTraceError);
+	}
+
+	template<typename T>
+	static void deduceProtocolFromPulseTracer(const receiver_t& receiver, T& stream) {
+		stream.println(toLessPulseTracesError);
 	}
 };
 

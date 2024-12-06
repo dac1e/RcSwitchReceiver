@@ -340,34 +340,18 @@ public:
 	void dumpProposedTimings(T& stream, uint16_t clock) {
 		if(mSynchPulseCategories.isValidSynchPulsePair()) {
 			if(mDataPulses.isValid()) {
-				stream.print("makeTimingSpec< #, ");
-
-				stream.print(clock);
-				stream.print(", ");
-
-				stream.print(mPercentTolerance);
-				stream.print(", ");
-
-				stream.print(mSynchPulseCategories.getDurationSyA(clock));
-				stream.print(", ");
-				stream.print(mSynchPulseCategories.getDurationSyB(clock));
-				stream.print(", ");
-
-				stream.print(mDataPulses.getMinMaxAverageD0A(clock));
-				stream.print(", ");
-				stream.print(mDataPulses.getMinMaxAverageD0B(clock));
-				stream.print(", ");
-				stream.print(mDataPulses.getMinMaxAverageD1A(clock));
-				stream.print(", ");
-				stream.print(mDataPulses.getMinMaxAverageD1B(clock));
-				stream.print(", ");
-
-				stream.print(((mDataPulses.bIsInverseLevel) ? "true" : "false"));
-
+				stream.print("makeTimingSpec< #,");
+				printUint(stream, clock, 3, ",");
+				printUint(stream, mPercentTolerance, 3, ",");
+				printUint(stream, mSynchPulseCategories.getDurationSyA(clock), 3, ",");
+				printUint(stream, mSynchPulseCategories.getDurationSyB(clock), 4, ",");
+				printUint(stream, mDataPulses.getMinMaxAverageD0A(clock), 4, ",");
+				printUint(stream, mDataPulses.getMinMaxAverageD0B(clock), 4, ",");
+				printUint(stream, mDataPulses.getMinMaxAverageD1A(clock), 4, ",");
+				printUint(stream, mDataPulses.getMinMaxAverageD1B(clock), 4, ",");
+				stream.print(((mDataPulses.bIsInverseLevel) ? " true" : " false"));
 				stream.println(">");
-
 				stream.println("------- Replace the '#' above by a unique identifier -------");
-
 			}
 		}
 	}
@@ -426,11 +410,13 @@ public:
 				longPulses.dump(stream, separator);
 			}
 #endif
+			static const char* const frame =
+						   "**************************************************************";
 			stream.println("\n"
 						   "Protocol detection succeeded. Protocol proposal:");
-			stream.println("************************************************************");
+			stream.println(frame);
 			dumpProposedTimings(stream, 10);
-			stream.println("************************************************************");
+			stream.println(frame);
 		} else {
 			stream.println("\n"
 					       "Protocol detection failed. Please try again. You may\n"

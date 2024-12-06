@@ -44,6 +44,14 @@ void sprintUint(char *string, const size_t value, const size_t width);
 size_t digitCount(size_t value);
 uint32_t scale(uint32_t value, uint16_t base);
 
+template<typename T>
+void printUint(T& stream, const size_t value, const size_t width, const char* postfix="") {
+	char buffer[12];
+	sprintUint(buffer, value, width);
+	stream.print(buffer);
+	stream.print(postfix);
+}
+
 }
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_ */
