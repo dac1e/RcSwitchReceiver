@@ -35,7 +35,7 @@
 // control button is pressed.
 // The following procedure helps you to record the pulses of a remote control:
 // 0) Wire a push button (TRIGGER_BUTTON) between pin13 an GND of your Arduino.
-// 1) Place the remote control closed to the receiver, so that you get record clean pulses.
+// 1) Place the remote control closed to the receiver, so that you record clean pulses.
 // 2) Press any remote control button and keep it pressed.
 // 3) After 3 seconds, push the TRIGGER_BUTTON and watch the received pulses on the serial monitor.
 // 4) Release the remote control button even while pulses are still dumped on the serial monitor.

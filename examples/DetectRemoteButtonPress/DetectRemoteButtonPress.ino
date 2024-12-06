@@ -36,6 +36,7 @@ size_t constexpr PROTOCOL_PT2262  = 1;
 
 // For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
 // You can add own protocols and remove not needed protocols.
+// You may use the expample sketch LearnRemoteControl.ino to find out what you need to enter here.
 // However, the number of normal level protocols as well as the number of inverse level
 // Protocols should not exceed 7 in this table.
 DATA_ISR_ATTR static const RxProtocolTable <
