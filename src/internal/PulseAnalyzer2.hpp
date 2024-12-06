@@ -340,11 +340,12 @@ public:
 	void dumpProposedTimings(T& stream, uint16_t clock) {
 		if(mSynchPulseCategories.isValidSynchPulsePair()) {
 			if(mDataPulses.isValid()) {
-
 				stream.print("makeTimingSpec< #, ");
-				stream.print(mPercentTolerance);
-				stream.print(", ");
+
 				stream.print(clock);
+				stream.print(", ");
+
+				stream.print(mPercentTolerance);
 				stream.print(", ");
 
 				stream.print(mSynchPulseCategories.getDurationSyA(clock));
@@ -362,6 +363,7 @@ public:
 				stream.print(", ");
 
 				stream.print(((mDataPulses.bIsInverseLevel) ? "true" : "false"));
+
 				stream.println(">");
 
 				stream.println("------- Replace the '#' above by a unique identifier -------");
