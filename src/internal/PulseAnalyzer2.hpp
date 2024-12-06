@@ -84,6 +84,13 @@ public:
 		qsort(&at(0), size(), sizeof(PulseCategory), comparePulseCategoryByDuration);
 	}
 
+	void sortPairsByLevel() {
+		// Sort data pulse pairs by level
+		for(size_t i = 0; (i+1) < size(); i += 2) {
+			sortByLevel(at(i), 2);
+		}
+	}
+
 	void sortByLevel(PulseCategory& first, const size_t size) {
 		qsort(&first, size, sizeof(PulseCategory), comparePulseCategoryByLevel);
 	}
@@ -155,15 +162,9 @@ public:
 			}
 		}
 		synchPulseCategories.sortByDuration();
+		synchPulseCategories.sortPairsByLevel();
 		sortByDuration();
-
-		if(size() >= 2) {
-			sortByLevel(at(0), 2);
-		}
-
-		if(size() >= 4) {
-			sortByLevel(at(2), 2);
-		}
+		sortPairsByLevel();
 	}
 
 	template <typename T>
