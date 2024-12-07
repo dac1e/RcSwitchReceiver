@@ -46,7 +46,7 @@ int comparePulseCategoryByLevel(const void* left, const void* right) {
 	return 0;
 }
 
-PulseAnalyzer::PulseAnalyzer(const RingBufferReadAccess<TraceElement>& input, unsigned percentTolerance)
+PulseAnalyzer::PulseAnalyzer(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance)
 	:mInput(input)
 	,mPercentTolerance(percentTolerance)
 {
