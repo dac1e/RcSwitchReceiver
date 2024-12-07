@@ -13,13 +13,23 @@
 
 namespace RcSwitch {
 
+
+struct TraceElement {
+	uint32_t mUsecInterruptEntry;
+	uint32_t mUsecInterruptExit;
+	Pulse mPulse;
+	uint32_t mUsecLastInterruptEntry;
+};
+
 /**
  * This container stores received pulses for debugging and pulse analysis purpose.
  */
 template<size_t PULSE_TRACES_COUNT>
-class PulseTracer : public RingBuffer<Pulse, PULSE_TRACES_COUNT> {
-	using baseClass = RingBuffer<Pulse, PULSE_TRACES_COUNT>;
+class PulseTracer : public RingBuffer<TraceElement, PULSE_TRACES_COUNT> {
+	using baseClass = RingBuffer<TraceElement, PULSE_TRACES_COUNT>;
 public:
+	using traceElement_t = TraceElement;
+
 	static const char* pulseTypeToString(const Pulse& pulse) {
 		return pulseLevelToString(pulse.mPulseLevel);
 	}
@@ -29,7 +39,7 @@ public:
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		while(i < n) {
-			const Pulse& pulse = at(i);
+			const Pulse& pulse = at(i).mPulse;
 			// print trace buffer index
 			{
 				char buffer[16];

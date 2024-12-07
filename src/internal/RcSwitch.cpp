@@ -175,9 +175,9 @@ inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& p
 	return result;
 }
 
-void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
+void Receiver::handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry) {
 	if(!mSuspended) {
-		const uint32_t microSecDuration = microSecInterruptTime - mMicrosecLastInterruptTime;
+		const uint32_t microSecDuration = usecInterruptEntry - mUsecLastInterruptTime;
 		push(microSecDuration, pinLevel);
 
 		switch(state()) {
@@ -236,7 +236,7 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 				break;
 		}
 	}
-	mMicrosecLastInterruptTime = microSecInterruptTime;
+	mUsecLastInterruptTime = usecInterruptEntry;
 }
 
 // inline attribute, because it is private and called once.
@@ -331,6 +331,10 @@ void Receiver::setRxTimingSpecTable(const rxTimingSpecTable& rxTimingSpecTable) 
 	mRxTimingSpecTableNormal.size = i;
 	mRxTimingSpecTableInverse.start = &rxTimingSpecTable.start[i];
 	mRxTimingSpecTableInverse.size = rxTimingSpecTable.size - i;
+}
+
+uint32_t Receiver::micros_() {
+	return ::micros();
 }
 
 } /* namespace RcSwitch */

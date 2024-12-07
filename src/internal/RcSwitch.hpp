@@ -191,6 +191,7 @@ private:
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
 	enum STATE state() const;
 
+
 	TEXT_ISR_ATTR_2 rxTimingSpecTable getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
 	TEXT_ISR_ATTR_1 void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
 	TEXT_ISR_ATTR_1 void push(uint32_t microSecDuration, const int pinLevel);
@@ -198,7 +199,7 @@ private:
 	TEXT_ISR_ATTR_1 void retry();
 
 protected:
-	uint32_t mMicrosecLastInterruptTime;
+	uint32_t mUsecLastInterruptTime;
 
 	/** ========================================================================== */
 	/** ========= Methods used by API class RcSwitchReceiver ===================== */
@@ -207,7 +208,12 @@ protected:
 	 * Evaluate a new pulse that has been received.
 	 * Will only be called from within interrupt context.
 	 */
-	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
+	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry);
+
+	/**
+	 * Just delegate to ::micros(). The reason is to avoid include of "Arduino.h" within this file.
+	 */
+	TEXT_ISR_ATTR_1 static uint32_t micros_();
 
 	/**
 	 * Default constructor.
@@ -215,7 +221,7 @@ protected:
 	Receiver()
 		    : mRxTimingSpecTableNormal{nullptr, 0}, mRxTimingSpecTableInverse{nullptr, 0}
 		    , mMessageAvailable(false), mSuspended(false)
-			, mDataModePulseCount(0), mMicrosecLastInterruptTime(0)	{
+			, mDataModePulseCount(0), mUsecLastInterruptTime(0)	{
 	}
 
 private:
@@ -249,23 +255,36 @@ public:
 
 };
 
-template<size_t PULSE_TRACES_COUNT>
-class ReceiverWithPulseTracer : public Receiver {
+template<size_t PULSE_TRACES_COUNT> class ReceiverWithPulseTracer : public Receiver {
 	/** API class becomes friend. */
 	template<int IOPIN> friend class ::RcSwitchReceiver;
+
+	using pulseTracer_t = PulseTracer<PULSE_TRACES_COUNT>;
+	using traceElement_t = typename pulseTracer_t::traceElement_t;
 
 	/**
 	 * The most recent received pulses are stored in the pulse tracer for
 	 * analyzing purpose.
 	 */
-	PulseTracer<PULSE_TRACES_COUNT> mPulseTracer;
+	pulseTracer_t mPulseTracer;
+
 	volatile mutable bool mPulseTracingLocked = false;
 
 	/** Store a new pulse in the trace buffer of this message packet. */
-	TEXT_ISR_ATTR_1 void tracePulse(uint32_t microSecDuration, const int pinLevel) {
+	inline TEXT_ISR_ATTR_1 void tracePulse(const uint32_t usecLastInterruptEntry
+			, const uint32_t usecInterruptEntry, const uint32_t usecInterruptExit
+			, const int pinLevel) {
+
 		if(not mPulseTracingLocked) {
-			Pulse * const currentPulse = mPulseTracer.beyondTop();
-			*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
+			traceElement_t * const currentPulse = mPulseTracer.beyondTop();
+			*currentPulse = {
+				usecInterruptEntry, usecInterruptExit,
+				{
+					(usecInterruptEntry-usecLastInterruptEntry),
+					(pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)
+				},
+				usecLastInterruptEntry,
+			};
 			mPulseTracer.selectNext();
 		}
 	}
@@ -277,9 +296,10 @@ class ReceiverWithPulseTracer : public Receiver {
 	 * Evaluate a new pulse that has been received. Will
 	 * only be called from within interrupt context.
 	 */
-	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
-		tracePulse(microSecInterruptTime - mMicrosecLastInterruptTime, pinLevel);
-		Receiver::handleInterrupt(pinLevel, microSecInterruptTime);
+	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t usecInterruptTime) {
+		const uint32_t usecLastInterruptTime = mUsecLastInterruptTime;
+		Receiver::handleInterrupt(pinLevel, usecInterruptTime);
+		tracePulse(usecLastInterruptTime, usecInterruptTime, micros_(), pinLevel);
 	}
 
 public:
@@ -296,7 +316,7 @@ public:
 			stream.println("==== done!                 ===== ");
 		}
 		if(bDeduceProtocol){
-			const RingBufferReadAccess<Pulse> readAccess(mPulseTracer);
+			const RingBufferReadAccess<traceElement_t> readAccess(mPulseTracer);
 			PulseAnalyzer pulseAnalyzer(readAccess);
 			stream.println("\n==== Deducing RC protocol: ===== ");
 			pulseAnalyzer.dedcuceProtocol();
