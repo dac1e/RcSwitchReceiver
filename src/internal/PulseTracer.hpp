@@ -30,34 +30,16 @@ public:
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		while(i < n) {
 			const Pulse& pulse = at(i);
-			// print trace buffer index
-			{
-				char buffer[16];
-				buffer[0] = ('[');
-				sprintUint(&buffer[1], i, indexWidth);
-				stream.print(buffer);
-				stream.print("]");
-			}
-			stream.print(separator);
-			stream.print(" ");
+			stream.print('[');
+			printUintWithSeparator(stream, i, indexWidth, "]");
+			printStringWithSeparator(stream, "", separator);
 
 			// print pulse type (LOW, HIGH)
-			stream.print(pulseTypeToString(pulse));
-			stream.print(separator);
-			stream.print(" ");
-			stream.print("for");
-			stream.print(separator);
-			stream.print(" ");
+			printStringWithSeparator(stream, pulseTypeToString(pulse), separator);
+			printStringWithSeparator(stream, "for", separator);
+			printUsecWithSeparator(stream, pulse.mUsecDuration, 6, separator);
 
-			// print pulse length
-			{
-				char buffer[16];
-				sprintUint(buffer, pulse.mUsecDuration, 6);
-				stream.print(buffer);
-			}
-			stream.print(separator);
-			stream.println("us");
-
+			stream.println();
 			++i;
 		}
 	}
