@@ -48,7 +48,7 @@
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
-// Trace the last 128 received pulses from the remote control.
+// Trace the last 196 received pulses from the remote control.
 constexpr size_t TRACE_BUFFER_SIZE = 196;
 constexpr int RX433_DATA_PIN = 2;
 
@@ -67,10 +67,10 @@ void setup()
 {
 	output.begin(9600);
 
-	// Not interested in receiving data, suspend scanning for data.
+	// Not interested in decoding RC data, suspend scanning for data.
 	rcSwitchReceiver.suspend();
 
-	// No timing spec. table required when not interested in receiving data.
+	// No timing spec. table required when not interested in decoding RC data.
 	rcSwitchReceiver.begin(rxTimingSpecTable{nullptr, 0});
 
 	pinMode(TRIGGER_BUTTON, INPUT_PULLUP);

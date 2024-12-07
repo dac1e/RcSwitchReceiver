@@ -164,7 +164,7 @@ public:
 	}
 
 	/**
-	 * Dump the oldest to the youngest pulse as well as pulse statistics.
+	 * Deduce protocol and dump the result on the serial monitor.
 	 */
 	static void deduceProtocolFromPulseTracer(typeof(Serial)& serial) {
 		RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::deduceProtocolFromPulseTracer(mReceiverDelegate, serial);
