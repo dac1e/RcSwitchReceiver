@@ -193,12 +193,12 @@ private:
 
 	TEXT_ISR_ATTR_2 rxTimingSpecTable getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
 	TEXT_ISR_ATTR_1 void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
-	TEXT_ISR_ATTR_1 void push(uint32_t microSecDuration, const int pinLevel);
+	TEXT_ISR_ATTR_1 void push(uint32_t usecDuration, const int pinLevel);
 	TEXT_ISR_ATTR_1 PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
 	TEXT_ISR_ATTR_1 void retry();
 
 protected:
-	uint32_t mMicrosecLastInterruptTime;
+	uint32_t mUsecLastInterrupt;
 
 	/** ========================================================================== */
 	/** ========= Methods used by API class RcSwitchReceiver ===================== */
@@ -207,7 +207,7 @@ protected:
 	 * Evaluate a new pulse that has been received.
 	 * Will only be called from within interrupt context.
 	 */
-	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime);
+	TEXT_ISR_ATTR_0 void handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry);
 
 	/**
 	 * Default constructor.
@@ -215,7 +215,7 @@ protected:
 	Receiver()
 		    : mRxTimingSpecTableNormal{nullptr, 0}, mRxTimingSpecTableInverse{nullptr, 0}
 		    , mMessageAvailable(false), mSuspended(false)
-			, mDataModePulseCount(0), mMicrosecLastInterruptTime(0)	{
+			, mDataModePulseCount(0), mUsecLastInterrupt(0)	{
 	}
 
 private:
@@ -262,10 +262,10 @@ class ReceiverWithPulseTracer : public Receiver {
 	volatile mutable bool mPulseTracingLocked = false;
 
 	/** Store a new pulse in the trace buffer of this message packet. */
-	TEXT_ISR_ATTR_1 void tracePulse(uint32_t microSecDuration, const int pinLevel) {
+	TEXT_ISR_ATTR_1 void tracePulse(uint32_t uecDuration, const int pinLevel) {
 		if(not mPulseTracingLocked) {
 			Pulse * const currentPulse = mPulseTracer.beyondTop();
-			*currentPulse = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
+			*currentPulse = {uecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
 			mPulseTracer.selectNext();
 		}
 	}
@@ -277,9 +277,9 @@ class ReceiverWithPulseTracer : public Receiver {
 	 * Evaluate a new pulse that has been received. Will
 	 * only be called from within interrupt context.
 	 */
-	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
-		tracePulse(microSecInterruptTime - mMicrosecLastInterruptTime, pinLevel);
-		Receiver::handleInterrupt(pinLevel, microSecInterruptTime);
+	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry) {
+		tracePulse(usecInterruptEntry - mUsecLastInterrupt, pinLevel);
+		Receiver::handleInterrupt(pinLevel, usecInterruptEntry);
 	}
 
 public:

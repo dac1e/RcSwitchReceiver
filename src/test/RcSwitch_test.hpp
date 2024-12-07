@@ -58,9 +58,9 @@ struct TxDataBit {
 class RcSwitch_test {
 public:
 	static void handleInterrupt(Receiver& receiver, const int pinLevel
-		, const uint32_t microSecInterruptTime)
+		, const uint32_t usecInterruptEntry)
 	{
-		return receiver.handleInterrupt(pinLevel, microSecInterruptTime);
+		return receiver.handleInterrupt(pinLevel, usecInterruptEntry);
 	}
 
 	static void sendDataPulse(uint32_t &usec

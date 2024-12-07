@@ -378,7 +378,7 @@ void RcSwitch_test::testProtocolCandidates() const {
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 0); 			// No matching protocol
 
-	pulse_0.mMicroSecDuration = 280;
+	pulse_0.mUsecDuration = 280;
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 2); 					// Match protocol #1 and #7
 
@@ -388,15 +388,15 @@ void RcSwitch_test::testProtocolCandidates() const {
 	}
 
 	receiver.mProtocolCandidates.reset();						// Remove protocol candidates
-	pulse_1.mMicroSecDuration = 7439;							// Lo level pulse too short
+	pulse_1.mUsecDuration = 7439;							// Lo level pulse too short
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 0); 			// No matching protocol
 
-	pulse_0.mMicroSecDuration = 360;							// Hi level pulse matches protocols #1 and #4, Lo pulse still too short.
+	pulse_0.mUsecDuration = 360;							// Hi level pulse matches protocols #1 and #4, Lo pulse still too short.
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 0); 			// No matching protocol
 
-	pulse_1.mMicroSecDuration = 2735;							// Lo level pulse matches protocol #4
+	pulse_1.mUsecDuration = 2735;							// Lo level pulse matches protocol #4
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 1); 			// No matching protocol
 	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  // Check protocol candidates

@@ -32,7 +32,7 @@ static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protoco
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
-				protocol.synchronizationPulsePair.durationA.compare(pulse.mMicroSecDuration);
+				protocol.synchronizationPulsePair.durationA.compare(pulse.mUsecDuration);
 
 		/* First synch pulse is allowed to be longer */
 		if (synchCompare != TimeRange::TOO_SHORT) {
@@ -42,13 +42,13 @@ static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protoco
 
 	{
 		const TimeRange::COMPARE_RESULT log0Compare =
-				protocol.data0pulsePair.durationA.compare(pulse.mMicroSecDuration);
+				protocol.data0pulsePair.durationA.compare(pulse.mUsecDuration);
 
 		if (log0Compare == TimeRange::IS_WITHIN) {
 			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_00;
 		} else {
 			const TimeRange::COMPARE_RESULT log1Compare =
-					protocol.data1pulsePair.durationA.compare(pulse.mMicroSecDuration);
+					protocol.data1pulsePair.durationA.compare(pulse.mUsecDuration);
 			if (log1Compare == TimeRange::IS_WITHIN) {
 				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_01;
 			}
@@ -61,7 +61,7 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
-				protocol.synchronizationPulsePair.durationB.compare(pulse.mMicroSecDuration);
+				protocol.synchronizationPulsePair.durationB.compare(pulse.mUsecDuration);
 
 		/* First synch pulse is allowed to be longer */
 		if (synchCompare == TimeRange::IS_WITHIN) {
@@ -71,14 +71,14 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 
 	{
 		const TimeRange::COMPARE_RESULT log0Compare =
-				protocol.data0pulsePair.durationB.compare(pulse.mMicroSecDuration);
+				protocol.data0pulsePair.durationB.compare(pulse.mUsecDuration);
 
 		if (log0Compare == TimeRange::IS_WITHIN) {
 			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_00;
 		} else {
 			const TimeRange::COMPARE_RESULT log1Compare =
 					protocol.data1pulsePair.durationB.compare(
-					pulse.mMicroSecDuration);
+					pulse.mUsecDuration);
 			if (log1Compare == TimeRange::IS_WITHIN) {
 				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_01;
 			}
@@ -91,7 +91,7 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecT
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	for(size_t i = 0; i < protocol.size; i++) {
 		const RxTimingSpec& prot = protocol.start[i];
-		if(pulseA.mMicroSecDuration <
+		if(pulseA.mUsecDuration <
 				protocol.start[i].synchronizationPulsePair.durationA.lowerBound) {
 			/* Protocols are sorted in ascending order of synchronization
 			 * pulseA lower bound.
@@ -101,11 +101,11 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecT
 			return;
 		}
 
-		if(pulseA.mMicroSecDuration <
+		if(pulseA.mUsecDuration <
 				prot.synchronizationPulsePair.durationA.upperBound) {
-			if(pulseB.mMicroSecDuration >=
+			if(pulseB.mUsecDuration >=
 					prot.synchronizationPulsePair.durationB.lowerBound) {
-				if(pulseB.mMicroSecDuration <
+				if(pulseB.mUsecDuration <
 						prot.synchronizationPulsePair.durationB.upperBound) {
 					protocolCandidates.push(i);
 				}
@@ -175,10 +175,10 @@ inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& p
 	return result;
 }
 
-void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterruptTime) {
+void Receiver::handleInterrupt(const int pinLevel, const uint32_t uescInterruptEntry) {
 	if(!mSuspended) {
-		const uint32_t microSecDuration = microSecInterruptTime - mMicrosecLastInterruptTime;
-		push(microSecDuration, pinLevel);
+		const uint32_t usecDuration = uescInterruptEntry - mUsecLastInterrupt;
+		push(usecDuration, pinLevel);
 
 		switch(state()) {
 			case SYNC_STATE:
@@ -236,7 +236,7 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t microSecInterr
 				break;
 		}
 	}
-	mMicrosecLastInterruptTime = microSecInterruptTime;
+	mUsecLastInterrupt = uescInterruptEntry;
 }
 
 // inline attribute, because it is private and called once.

@@ -52,7 +52,7 @@ public:
 			// print pulse length
 			{
 				char buffer[16];
-				sprintUint(buffer, pulse.mMicroSecDuration, 6);
+				sprintUint(buffer, pulse.mUsecDuration, 6);
 				stream.print(buffer);
 			}
 			stream.print(separator);

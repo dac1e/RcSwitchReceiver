@@ -208,7 +208,7 @@ public:
 	}
 
 	void build(DataPulses& dataPulses, const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance
-			,synchPulseCategories_t& synchPulseCategories, size_t microsecSynchB) {
+			,synchPulseCategories_t& synchPulseCategories, size_t usecSynchB) {
 
 		assert(capacity == DATA_PULSE_CATEGORIY_COUNT); // // This must be the data pulse category collection
 
@@ -217,7 +217,7 @@ public:
 			if((i+1) < input.size()) {
 				// It is not the last pulse
 				const Pulse &nextPulse = input.at(i+1);
-				if(nextPulse.isDurationInRange(microsecSynchB, percentTolerance)) {
+				if(nextPulse.isDurationInRange(usecSynchB, percentTolerance)) {
 					{
 						// It is the synch A pulse
 						const Pulse &pulse = input.at(i);
@@ -226,7 +226,7 @@ public:
 					}
 				} else {
 					const Pulse &pulse = input.at(i);
-					if(pulse.isDurationInRange(microsecSynchB, percentTolerance)) {
+					if(pulse.isDurationInRange(usecSynchB, percentTolerance)) {
 						// It is a synch B pulse, place it in the synch pulse collection
 						const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
 						synchPulseCategories.putPulseInCategory(ci, pulse);
@@ -239,7 +239,7 @@ public:
 			} else {
 				// It is the last pulse
 				const Pulse &pulse = input.at(i);
-				if(pulse.isDurationInRange(microsecSynchB, percentTolerance)) {
+				if(pulse.isDurationInRange(usecSynchB, percentTolerance)) {
 					// It is a synch B pulse, place it in the synch pulse collection
 					const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
 					synchPulseCategories.putPulseInCategory(ci, pulse);

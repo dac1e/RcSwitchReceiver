@@ -92,7 +92,7 @@ namespace Debug {
  */
 template<
 	size_t protocolNumber,
-	size_t clock,
+	size_t usecClock,
 	unsigned percentTolerance,
 	size_t synchA,  size_t synchB,
 	size_t data0_A, size_t data0_B,
@@ -103,22 +103,22 @@ struct makeTimingSpec { // Calculate the timing specification from the protocol 
 	static constexpr size_t PROTOCOL_NUMBER = protocolNumber;
 	static constexpr bool INVERSE_LEVEL = inverseLevel;
 
-	static constexpr size_t uSecSynchA = clock * synchA;
-	static constexpr size_t uSecSynchB = clock * synchB;
+	static constexpr size_t uSecSynchA = usecClock * synchA;
+	static constexpr size_t uSecSynchB = usecClock * synchB;
 	static constexpr size_t usecSynchA_lowerBound = static_cast<uint32_t>(uSecSynchA) * (100-percentTolerance) / 100;
 	static constexpr size_t usecSynchA_upperBound = static_cast<uint32_t>(uSecSynchA) * (100+percentTolerance) / 100;
 	static constexpr size_t usecSynchB_lowerBound = static_cast<uint32_t>(uSecSynchB) * (100-percentTolerance) / 100;
 	static constexpr size_t usecSynchB_upperBound = static_cast<uint32_t>(uSecSynchB) * (100+percentTolerance) / 100;
 
-	static constexpr size_t uSecData0_A = clock * data0_A;
-	static constexpr size_t uSecData0_B = clock * data0_B;
+	static constexpr size_t uSecData0_A = usecClock * data0_A;
+	static constexpr size_t uSecData0_B = usecClock * data0_B;
 	static constexpr size_t uSecData0_A_lowerBound = static_cast<uint32_t>(uSecData0_A) * (100-percentTolerance) / 100;
 	static constexpr size_t uSecData0_A_upperBound = static_cast<uint32_t>(uSecData0_A) * (100+percentTolerance) / 100;
 	static constexpr size_t uSecData0_B_lowerBound = static_cast<uint32_t>(uSecData0_B) * (100-percentTolerance) / 100;
 	static constexpr size_t uSecData0_B_upperBound = static_cast<uint32_t>(uSecData0_B) * (100+percentTolerance) / 100;
 
-	static constexpr size_t uSecData1_A = clock * data1_A;
-	static constexpr size_t uSecData1_B = clock * data1_B;
+	static constexpr size_t uSecData1_A = usecClock * data1_A;
+	static constexpr size_t uSecData1_B = usecClock * data1_B;
 	static constexpr size_t uSecData1_A_lowerBound = static_cast<uint32_t>(uSecData1_A) * (100-percentTolerance) / 100;
 	static constexpr size_t uSecData1_A_upperBound = static_cast<uint32_t>(uSecData1_A) * (100+percentTolerance) / 100;
 	static constexpr size_t uSecData1_B_lowerBound = static_cast<uint32_t>(uSecData1_B) * (100-percentTolerance) / 100;

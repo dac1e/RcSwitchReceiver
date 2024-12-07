@@ -69,13 +69,13 @@ struct PulseTypes {
 };
 
 struct Pulse {
-	size_t mMicroSecDuration;
+	size_t mUsecDuration;
 	PULSE_LEVEL mPulseLevel;
 
 	bool isDurationInRange(size_t value, unsigned percentTolerance) const {
 		// size_t is 16 bit on avr. So static cast to uint32_t avoids
 		// temporary overflow when multiplying with 100
-		if (static_cast<uint32_t>(mMicroSecDuration)
+		if (static_cast<uint32_t>(mUsecDuration)
 				< ((static_cast<uint32_t>(value)
 						* (100 - percentTolerance)) / 100)) {
 			return false;
@@ -83,7 +83,7 @@ struct Pulse {
 
 		// size_t is 16 bit on avr. So static cast to uint32_t avoids
 		// temporary overflow when multiplying with 100
-		if (static_cast<uint32_t>(mMicroSecDuration)
+		if (static_cast<uint32_t>(mUsecDuration)
 				>= ((static_cast<uint32_t>(value)
 						* (100 + percentTolerance)) / 100)) {
 			return false;
@@ -95,23 +95,23 @@ struct Pulse {
 class PulseCategory {
 	// mPulse holds the level and the average of all pulses that constitute this category.
 	Pulse  mPulse;
-	size_t microSecMinDuration;
-	size_t microSecMaxDuration;
+	size_t usecMinDuration;
+	size_t usecMaxDuration;
 	size_t pulseCount;
 
 public:
 	PulseCategory()
 		: mPulse{0, PULSE_LEVEL::UNKNOWN}
-		, microSecMinDuration(0)
-		, microSecMaxDuration(0)
+		, usecMinDuration(0)
+		, usecMaxDuration(0)
 		, pulseCount(0)
 	{
 	}
 
 	PulseCategory(const Pulse& pulse)
-		: mPulse{pulse.mMicroSecDuration, pulse.mPulseLevel}
-		, microSecMinDuration(pulse.mMicroSecDuration)
-		, microSecMaxDuration(pulse.mMicroSecDuration)
+		: mPulse{pulse.mUsecDuration, pulse.mPulseLevel}
+		, usecMinDuration(pulse.mUsecDuration)
+		, usecMaxDuration(pulse.mUsecDuration)
 		, pulseCount(1)
 	{
 	}
@@ -124,14 +124,14 @@ public:
 	 * Get the average of the duration of all pulses.
 	 */
 	inline size_t getWeightedAverage() const {
-		return mPulse.mMicroSecDuration;
+		return mPulse.mUsecDuration;
 	}
 
 	/**
 	 * Get the average of the minimum and maximum duration.
 	 */
 	inline size_t getMinMaxAverage() const {
-		return (microSecMaxDuration + microSecMinDuration) / 2;
+		return (usecMaxDuration + usecMinDuration) / 2;
 	}
 
 	/**
@@ -139,7 +139,7 @@ public:
 	 * Note that those values are identical.
 	 */
 	inline unsigned getPercentMinMaxDeviation() const {
-		return 100 * (microSecMaxDuration - getMinMaxAverage()) / getMinMaxAverage();
+		return 100 * (usecMaxDuration - getMinMaxAverage()) / getMinMaxAverage();
 	}
 
 	inline bool isValid() const {
@@ -150,25 +150,25 @@ public:
 	bool invalidate() {
 		return pulseCount = 0;
 		mPulse.mPulseLevel = PULSE_LEVEL::UNKNOWN;
-		mPulse.mMicroSecDuration = 0;
-		microSecMinDuration = static_cast<size_t>(-1);
-		microSecMaxDuration = 0;
+		mPulse.mUsecDuration = 0;
+		usecMinDuration = static_cast<size_t>(-1);
+		usecMaxDuration = 0;
 	}
 
 	bool addPulse(const Pulse &pulse) {
 		bool result = true;
 
 		// Refresh average for the pulse duration and store it.
-		mPulse.mMicroSecDuration =
-				( (static_cast<uint32_t>(getWeightedAverage()) * pulseCount) + pulse.mMicroSecDuration)
+		mPulse.mUsecDuration =
+				( (static_cast<uint32_t>(getWeightedAverage()) * pulseCount) + pulse.mUsecDuration)
 					/ (pulseCount + 1);
 
-		if(pulse.mMicroSecDuration < microSecMinDuration) {
-			microSecMinDuration = pulse.mMicroSecDuration;
+		if(pulse.mUsecDuration < usecMinDuration) {
+			usecMinDuration = pulse.mUsecDuration;
 		}
 
-		if(pulse.mMicroSecDuration > microSecMaxDuration) {
-			microSecMaxDuration = pulse.mMicroSecDuration;
+		if(pulse.mUsecDuration > usecMaxDuration) {
+			usecMaxDuration = pulse.mUsecDuration;
 		}
 
 		if(getPulseLevel() == PULSE_LEVEL::UNKNOWN) {
@@ -185,12 +185,12 @@ public:
 	void merge(PulseCategory& result, const PulseCategory& other) const {
 		result.mPulse.mPulseLevel = getPulseLevel() == other.getPulseLevel() ? getPulseLevel() : PULSE_LEVEL::LO_or_HI;
 		result.pulseCount = pulseCount + other.pulseCount;
-		result.mPulse.mMicroSecDuration = ((pulseCount * getWeightedAverage())
+		result.mPulse.mUsecDuration = ((pulseCount * getWeightedAverage())
 			+ (other.pulseCount * other.getWeightedAverage())) / result.pulseCount;
-		result.microSecMinDuration = microSecMinDuration < other.microSecMinDuration ?
-				microSecMinDuration : other.microSecMinDuration;
-		result.microSecMaxDuration = microSecMaxDuration > other.microSecMaxDuration ?
-				microSecMaxDuration : other.microSecMaxDuration;
+		result.usecMinDuration = usecMinDuration < other.usecMinDuration ?
+				usecMinDuration : other.usecMinDuration;
+		result.usecMaxDuration = usecMaxDuration > other.usecMaxDuration ?
+				usecMaxDuration : other.usecMaxDuration;
 	}
 
 	template <typename T>
@@ -215,7 +215,7 @@ public:
 		stream.print(separator);
 		{
 			char buffer[16];
-			sprintUint(&buffer[0], microSecMinDuration, 5);
+			sprintUint(&buffer[0], usecMinDuration, 5);
 			stream.print(buffer);
 		}
 
@@ -227,7 +227,7 @@ public:
 		stream.print(separator);
 		{
 			char buffer[16];
-			sprintUint(&buffer[0], microSecMaxDuration, 5);
+			sprintUint(&buffer[0], usecMaxDuration, 5);
 			stream.print(buffer);
 		}
 
