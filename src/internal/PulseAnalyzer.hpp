@@ -350,19 +350,21 @@ public:
 				printUintWithSeparator(stream, mDataPulses.getMinMaxAverageD1A(clock), 4, ",");
 				printUintWithSeparator(stream, mDataPulses.getMinMaxAverageD1B(clock), 4, ",");
 				stream.print(((mDataPulses.bIsInverseLevel) ? " true" : " false"));
-				stream.println(">");
-				stream.println("------- Replace the '#' above by a unique identifier -------");
+				stream.println(">,");
+				stream.println("-------- Replace the '#' above by a unique identifier ---------");
 			}
 		}
 	}
 
 	template <typename T>
 	void dump(T& stream, const char* separator) {
-		stream.println("Identified COMMON pulse categories:");
+#if false
+		stream.println("Identified pulse categories:");
 		mAllPulseCategories.dump(stream, separator);
+#endif
 
 		if(mSynchPulseCategories.size()) {
-			stream.println("\nIdentified SYNCH pulse categories:");
+			stream.println("\nIdentified SYNCH pulse ranges:");
 			mSynchPulseCategories.dump(stream, separator);
 		}
 
@@ -378,7 +380,7 @@ public:
 #endif
 
 		if(mDataPulseCategories.size()) {
-			stream.println("\nIdentified DATA pulse categories:");
+			stream.println("\nIdentified DATA pulse ranges:");
 			mDataPulseCategories.dump(stream, separator);
 		}
 
@@ -411,7 +413,7 @@ public:
 			}
 #endif
 			static const char* const frame =
-						   "**************************************************************";
+						   "***************************************************************";
 			stream.println("\n"
 						   "Protocol detection succeeded. Protocol proposal:");
 			stream.println(frame);
