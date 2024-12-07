@@ -311,7 +311,7 @@ public:
 
 };
 
-class PulseAnalyzer2 {
+class PulseAnalyzer {
 	const RingBufferReadAccess<Pulse> mInput;
 	const unsigned mPercentTolerance;
 
@@ -325,7 +325,7 @@ class PulseAnalyzer2 {
 	void buildAllCategories();
 
 public:
-	PulseAnalyzer2(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance = 20);
+	PulseAnalyzer(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance = 20);
 
 	void dedcuceProtocol() {
 		buildAllCategories();

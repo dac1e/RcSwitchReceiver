@@ -35,7 +35,7 @@
 #include "Container.hpp"
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
-#include "PulseAnalyzer2.hpp"
+#include "PulseAnalyzer.hpp"
 
 #define DEBUG_RCSWITCH false
 
@@ -297,7 +297,7 @@ public:
 		}
 		if(bDeduceProtocol){
 			const RingBufferReadAccess<Pulse> readAccess(mPulseTracer);
-			PulseAnalyzer2 pulseAnalyzer(readAccess);
+			PulseAnalyzer pulseAnalyzer(readAccess);
 			stream.println("\n==== Deducing RC protocol: ===== ");
 			pulseAnalyzer.dedcuceProtocol();
 			pulseAnalyzer.dump(stream, separator);

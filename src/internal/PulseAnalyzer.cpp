@@ -22,7 +22,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#include "PulseAnalyzer2.hpp"
+#include "PulseAnalyzer.hpp"
 
 namespace RcSwitch {
 
@@ -30,7 +30,7 @@ int comparePulseCategoryByDuration(const void* left, const void* right) {
 	const RcSwitch::PulseCategory* a = static_cast<const RcSwitch::PulseCategory*>(left);
 	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(right);
 
-	// This is for ascending order
+	// This is for ascending order by duration
 	if(a->getWeightedAverage() < b->getWeightedAverage()) return -1;
 	if(b->getWeightedAverage() < a->getWeightedAverage()) return 1;
 	return 0;
@@ -40,24 +40,24 @@ int comparePulseCategoryByLevel(const void* left, const void* right) {
 	const RcSwitch::PulseCategory* a = static_cast<const RcSwitch::PulseCategory*>(left);
 	const RcSwitch::PulseCategory* b = static_cast<const RcSwitch::PulseCategory*>(right);
 
-	// This is for ascending order
+	// This is for ascending order by level
 	if(a->getPulseLevel() < b->getPulseLevel()) return -1;
 	if(b->getPulseLevel() < a->getPulseLevel()) return 1;
 	return 0;
 }
 
-PulseAnalyzer2::PulseAnalyzer2(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance)
+PulseAnalyzer::PulseAnalyzer(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance)
 	:mInput(input)
 	,mPercentTolerance(percentTolerance)
 {
 }
 
-void PulseAnalyzer2::buildAllCategories() {
+void PulseAnalyzer::buildAllCategories() {
 	mAllPulseCategories.reset();
 	mAllPulseCategories.build(mInput, mPercentTolerance);
 }
 
-void PulseAnalyzer2::buildSynchAndDataCategories() {
+void PulseAnalyzer::buildSynchAndDataCategories() {
 	mDataPulses.reset();
 	mDataPulseCategories.reset();
 	mSynchPulseCategories.reset();

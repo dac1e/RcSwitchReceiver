@@ -4,14 +4,15 @@
 ![Wiring Diagram](https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/RcSwitchReceiverWiring.pdf)
 
 ## Description
-This library can
+This library can:
 
-- receive and decode data packets from a remote control transmitter. Refer to example sketch *PrintReceivedData*.
-- translate data packets from a remote controller into a button - press information. Refer to example sketch *DetectRemoteButtonPress*.
-- dump received pulses for reverse enginering of the protocol of a remote control transmitter. Refer to example sketch *TraceReceivedPulses*.
+- Learn the remote protocol. Refer to example sketch *LearnRemoteControl.ino*
+- Receive and decode data packets from a remote control. Refer to example sketch *PrintReceivedData.ino*.
+- Translate data packets from a remote control to a button - press information. Refer to example sketch *DetectRemoteButtonPress.ino*.
+- Dump received pulses for investigating the remote control protocol. Refer to example sketch *TraceReceivedPulses.ino*.
 
 
-## Hints on remote operating distance:
+## Hints on remote operating distance
 The development was done on an Arduino Due. Tests have shown that the working range of several 433Mhz receiver modules 
 strongly depend on the quality of the power supply. When the Arduino Due is supplied via USB port, the receiver module works 
 properly when powered from the Arduino 5V pin. When the Arduino Due is supplied via the extra power connector, the Arduino 
