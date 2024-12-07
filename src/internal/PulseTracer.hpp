@@ -15,6 +15,7 @@ namespace RcSwitch {
 
 struct TraceRecord {
 	Pulse mPulse;
+	uint32_t mUsecInteruptDuration;
 };
 
 /**

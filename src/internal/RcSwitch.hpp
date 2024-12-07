@@ -249,6 +249,12 @@ public:
 
 };
 
+/**
+ * Just delegate to ::micros(). The reason is to avoid include of "Arduino.h" within this file.
+ */
+TEXT_ISR_ATTR_1 uint32_t micros_();
+
+
 template<size_t PULSE_TRACES_COUNT>
 class ReceiverWithPulseTracer : public Receiver {
 	/** API class becomes friend. */
@@ -262,10 +268,14 @@ class ReceiverWithPulseTracer : public Receiver {
 	volatile mutable bool mPulseTracingLocked = false;
 
 	/** Store a new pulse in the trace buffer of this message packet. */
-	TEXT_ISR_ATTR_1 void tracePulse(uint32_t uecDuration, const int pinLevel) {
+	TEXT_ISR_ATTR_1 void tracePulse(const uint32_t usecInterruptEntry, const int pinLevel, const uint32_t usecLastInterrupt) {
 		if(not mPulseTracingLocked) {
 			TraceRecord * const traceRecord = mPulseTracer.beyondTop();
-			*traceRecord = {{uecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)}};
+			const uint32_t usecPulseDuration = usecInterruptEntry - usecLastInterrupt;
+			*traceRecord = {
+					{usecPulseDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)},
+					(micros_() - usecLastInterrupt),
+			};
 			mPulseTracer.selectNext();
 		}
 	}
@@ -278,8 +288,9 @@ class ReceiverWithPulseTracer : public Receiver {
 	 * only be called from within interrupt context.
 	 */
 	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry) {
-		tracePulse(usecInterruptEntry - mUsecLastInterrupt, pinLevel);
+		const uint32_t usecLastInterrupt = mUsecLastInterrupt;
 		Receiver::handleInterrupt(pinLevel, usecInterruptEntry);
+		tracePulse(usecInterruptEntry, pinLevel, usecLastInterrupt);
 	}
 
 public:

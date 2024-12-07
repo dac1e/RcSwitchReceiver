@@ -28,6 +28,11 @@
 
 namespace RcSwitch {
 
+uint32_t micros_() {
+	return micros();
+}
+
+
 static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protocol, const Pulse &pulse) {
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
