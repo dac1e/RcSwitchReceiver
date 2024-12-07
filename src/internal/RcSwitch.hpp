@@ -264,8 +264,8 @@ class ReceiverWithPulseTracer : public Receiver {
 	/** Store a new pulse in the trace buffer of this message packet. */
 	TEXT_ISR_ATTR_1 void tracePulse(uint32_t uecDuration, const int pinLevel) {
 		if(not mPulseTracingLocked) {
-			Pulse * const currentPulse = mPulseTracer.beyondTop();
-			*currentPulse = {uecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)};
+			TraceRecord * const traceRecord = mPulseTracer.beyondTop();
+			*traceRecord = {{uecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)}};
 			mPulseTracer.selectNext();
 		}
 	}
@@ -296,7 +296,7 @@ public:
 			stream.println("==== done!                 ===== ");
 		}
 		if(bDeduceProtocol){
-			const RingBufferReadAccess<Pulse> readAccess(mPulseTracer);
+			const RingBufferReadAccess<TraceRecord> readAccess(mPulseTracer);
 			PulseAnalyzer pulseAnalyzer(readAccess);
 			stream.println("\n==== Deducing RC protocol: ===== ");
 			pulseAnalyzer.dedcuceProtocol();

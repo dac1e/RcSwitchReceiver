@@ -97,6 +97,18 @@ inline void printPercentWithSeparator(T& stream, const size_t value, const size_
 	printStringWithSeparator(stream, "%", separator);
 }
 
+template<typename T>
+inline void printRatioAsPercentWithSeparator(T& stream, const uint32_t nominator, const uint32_t denominator
+		, const size_t width, const char* separator) {
+
+	constexpr uint32_t SCALE = 100;
+	const uint32_t preDecimalPlaces = (100 * SCALE * nominator / denominator) / SCALE;
+	const uint32_t decimalPlaces    = (100 * SCALE * nominator / denominator) % SCALE;
+
+	printUintWithSeparator(stream, preDecimalPlaces, width, ".");
+	printPercentWithSeparator(stream, decimalPlaces, width, separator);
+}
+
 }
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_ */

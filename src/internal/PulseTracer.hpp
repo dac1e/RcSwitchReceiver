@@ -13,12 +13,16 @@
 
 namespace RcSwitch {
 
+struct TraceRecord {
+	Pulse mPulse;
+};
+
 /**
  * This container stores received pulses for debugging and pulse analysis purpose.
  */
 template<size_t PULSE_TRACES_COUNT>
-class PulseTracer : public RingBuffer<Pulse, PULSE_TRACES_COUNT> {
-	using baseClass = RingBuffer<Pulse, PULSE_TRACES_COUNT>;
+class PulseTracer : public RingBuffer<TraceRecord, PULSE_TRACES_COUNT> {
+	using baseClass = RingBuffer<TraceRecord, PULSE_TRACES_COUNT>;
 public:
 	static const char* pulseTypeToString(const Pulse& pulse) {
 		return pulseLevelToString(pulse.mPulseLevel);
@@ -29,15 +33,15 @@ public:
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		while(i < n) {
-			const Pulse& pulse = at(i);
+			const TraceRecord& traceRecord = at(i);
 			stream.print('[');
 			printUintWithSeparator(stream, i, indexWidth, "]");
 			printStringWithSeparator(stream, "", separator);
 
 			// print pulse type (LOW, HIGH)
-			printStringWithSeparator(stream, pulseTypeToString(pulse), separator);
+			printStringWithSeparator(stream, pulseTypeToString(traceRecord.mPulse), separator);
 			printStringWithSeparator(stream, "for", separator);
-			printUsecWithSeparator(stream, pulse.mUsecDuration, 6, separator);
+			printUsecWithSeparator(stream, traceRecord.mPulse.mUsecDuration, 6, separator);
 
 			stream.println();
 			++i;

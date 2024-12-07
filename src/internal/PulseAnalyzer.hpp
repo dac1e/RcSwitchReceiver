@@ -32,6 +32,7 @@
 
 #include "ISR_ATTR.hpp"
 #include "Pulse.hpp"
+#include "PulseTracer.hpp"
 #include "Common.hpp"
 #include "Container.hpp"
 
@@ -197,17 +198,17 @@ public:
 		}
 	}
 
-	void build(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance) {
+	void build(const RingBufferReadAccess<TraceRecord>& input, unsigned percentTolerance) {
 		size_t i = 0;
 		for(; i < input.size(); i++) {
-			const Pulse &pulse = input.at(i);
+			const Pulse &pulse = input.at(i).mPulse;
 			const size_t ci = findCategoryForPulse(pulse, percentTolerance);
 			putPulseInCategory(ci, pulse);
 		}
 		sortByDuration();
 	}
 
-	void build(DataPulses& dataPulses, const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance
+	void build(DataPulses& dataPulses, const RingBufferReadAccess<TraceRecord>& input, unsigned percentTolerance
 			,synchPulseCategories_t& synchPulseCategories, size_t usecSynchB) {
 
 		assert(capacity == DATA_PULSE_CATEGORIY_COUNT); // // This must be the data pulse category collection
@@ -216,16 +217,16 @@ public:
 		for(; i < input.size(); i++) {
 			if((i+1) < input.size()) {
 				// It is not the last pulse
-				const Pulse &nextPulse = input.at(i+1);
+				const Pulse &nextPulse = input.at(i+1).mPulse;
 				if(nextPulse.isDurationInRange(usecSynchB, percentTolerance)) {
 					{
 						// It is the synch A pulse
-						const Pulse &pulse = input.at(i);
+						const Pulse &pulse = input.at(i).mPulse;
 						const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
 						synchPulseCategories.putPulseInCategory(ci, pulse);
 					}
 				} else {
-					const Pulse &pulse = input.at(i);
+					const Pulse &pulse = input.at(i).mPulse;
 					if(pulse.isDurationInRange(usecSynchB, percentTolerance)) {
 						// It is a synch B pulse, place it in the synch pulse collection
 						const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
@@ -238,7 +239,7 @@ public:
 				}
 			} else {
 				// It is the last pulse
-				const Pulse &pulse = input.at(i);
+				const Pulse &pulse = input.at(i).mPulse;
 				if(pulse.isDurationInRange(usecSynchB, percentTolerance)) {
 					// It is a synch B pulse, place it in the synch pulse collection
 					const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
@@ -312,7 +313,7 @@ public:
 };
 
 class PulseAnalyzer {
-	const RingBufferReadAccess<Pulse> mInput;
+	const RingBufferReadAccess<TraceRecord> mInput;
 	const unsigned mPercentTolerance;
 
 	PulseCategoryCollection<ALL_PULSE_CATEGORY_COUNT> mAllPulseCategories;
@@ -325,7 +326,7 @@ class PulseAnalyzer {
 	void buildAllCategories();
 
 public:
-	PulseAnalyzer(const RingBufferReadAccess<Pulse>& input, unsigned percentTolerance = 20);
+	PulseAnalyzer(const RingBufferReadAccess<TraceRecord>& input, unsigned percentTolerance = 20);
 
 	void dedcuceProtocol() {
 		buildAllCategories();
