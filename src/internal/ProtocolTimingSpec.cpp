@@ -5,10 +5,10 @@
  *      Author: Wolfgang
  */
 
-#include "Common.hpp"
-#include "ProtocolTimingSpec.hpp"
 #include <stddef.h>
 #include <stdlib.h>
+#include "Common.hpp"
+#include "ProtocolTimingSpec.hpp"
 
 namespace {
 

@@ -29,6 +29,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 namespace RcSwitch {
 
@@ -45,11 +46,55 @@ size_t digitCount(size_t value);
 uint32_t scale(uint32_t value, uint16_t base);
 
 template<typename T>
-void printUint(T& stream, const size_t value, const size_t width, const char* postfix="") {
+void printUintWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
 	char buffer[12];
 	sprintUint(buffer, value, width);
 	stream.print(buffer);
-	stream.print(postfix);
+	if(separator && strlen(separator)) {
+		stream.print(separator);
+	} else {
+		// Print a space as default separator.
+		stream.print(' ');
+	}
+}
+
+template<typename T>
+void printUintWithUnitAndSeparator(T& stream, const size_t value, const size_t width, const char* unit, const char* separator) {
+	char buffer[12];
+	sprintUint(buffer, value, width);
+	stream.print(buffer);
+	if(separator && strlen(separator)) {
+		stream.print(separator);
+	}
+	stream.print(unit);
+	if(separator && strlen(separator)) {
+		stream.print(separator);
+	} else {
+		// Print a space as default separator.
+		stream.print(' ');
+	}
+}
+
+template<typename T>
+inline void printUsecWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
+	printUintWithUnitAndSeparator(stream, value, width, "usec", separator);
+}
+
+template<typename T>
+void printStringWithSeparator(T& stream, const char* string, const char* separator) {
+	stream.print(string);
+	if(separator && strlen(separator)) {
+		stream.print(separator);
+	} else {
+		// Print a space as default separator.
+		stream.print(' ');
+	}
+}
+
+template<typename T>
+inline void printPercentWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
+	printUintWithSeparator(stream, value, width, nullptr);
+	printStringWithSeparator(stream, "%", separator);
 }
 
 }

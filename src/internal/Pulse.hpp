@@ -196,68 +196,27 @@ public:
 	template <typename T>
 	void dump(T& stream, const char* separator) const {
 		stream.print("\t");
-		{
-			char buffer[16];
-			sprintUint(&buffer[0], pulseCount, 3);
-			stream.print(buffer);
-		}
-		stream.print(separator);
-		stream.print(" recordings of");
-		stream.print(separator);
-		stream.print(" ");
+		printUintWithSeparator(stream, pulseCount, 3, separator);
+		printStringWithSeparator(stream, "recordings of", separator);
+		printStringWithSeparator(stream, pulseLevelToString(getPulseLevel()), separator);
 
-		{
-			const char* const levelText = pulseLevelToString(getPulseLevel());
-			stream.print(levelText);
-		}
+		stream.print("[");
 		stream.print(separator);
-		stream.print(" [");
-		stream.print(separator);
-		{
-			char buffer[16];
-			sprintUint(&buffer[0], usecMinDuration, 5);
-			stream.print(buffer);
-		}
 
-		stream.print(separator);
-		stream.print("us");
-		stream.print(" ");
+		printUsecWithSeparator(stream, usecMinDuration, 5, separator);
 
 		stream.print("..");
 		stream.print(separator);
-		{
-			char buffer[16];
-			sprintUint(&buffer[0], usecMaxDuration, 5);
-			stream.print(buffer);
-		}
 
-		stream.print(separator);
-		stream.print("us]");
-		stream.print(separator);
-		stream.print(" ");
+		printUsecWithSeparator(stream, usecMaxDuration, 5, separator);
 
-		{
-			char buffer[16];
-			sprintUint(&buffer[0], getMinMaxAverage(), 5);
-			stream.print(buffer);
-		}
-
-		stream.print(separator);
-		stream.print("us");
-		stream.print(" ");
-
-		stream.print("+-");
+		stream.print("]");
 		stream.print(separator);
 
-		{
-			char buffer[16];
-			sprintUint(&buffer[0], getPercentMinMaxDeviation(), 2);
-			stream.print(buffer);
-			stream.print("%");
-		}
+		printUsecWithSeparator(stream, getMinMaxAverage(), 5, separator);
 
-		stream.print(" ");
-		stream.print(separator);
+		printStringWithSeparator(stream, "+-", separator);
+		printPercentWithSeparator(stream, getPercentMinMaxDeviation(), 2, separator);
 
 		stream.println();
 	}

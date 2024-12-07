@@ -341,14 +341,14 @@ public:
 		if(mSynchPulseCategories.isValidSynchPulsePair()) {
 			if(mDataPulses.isValid()) {
 				stream.print("makeTimingSpec< #,");
-				printUint(stream, clock, 3, ",");
-				printUint(stream, mPercentTolerance, 3, ",");
-				printUint(stream, mSynchPulseCategories.getDurationSyA(clock), 3, ",");
-				printUint(stream, mSynchPulseCategories.getDurationSyB(clock), 4, ",");
-				printUint(stream, mDataPulses.getMinMaxAverageD0A(clock), 4, ",");
-				printUint(stream, mDataPulses.getMinMaxAverageD0B(clock), 4, ",");
-				printUint(stream, mDataPulses.getMinMaxAverageD1A(clock), 4, ",");
-				printUint(stream, mDataPulses.getMinMaxAverageD1B(clock), 4, ",");
+				printUintWithSeparator(stream, clock, 3, ",");
+				printUintWithSeparator(stream, mPercentTolerance, 3, ",");
+				printUintWithSeparator(stream, mSynchPulseCategories.getDurationSyA(clock), 3, ",");
+				printUintWithSeparator(stream, mSynchPulseCategories.getDurationSyB(clock), 4, ",");
+				printUintWithSeparator(stream, mDataPulses.getMinMaxAverageD0A(clock), 4, ",");
+				printUintWithSeparator(stream, mDataPulses.getMinMaxAverageD0B(clock), 4, ",");
+				printUintWithSeparator(stream, mDataPulses.getMinMaxAverageD1A(clock), 4, ",");
+				printUintWithSeparator(stream, mDataPulses.getMinMaxAverageD1B(clock), 4, ",");
 				stream.print(((mDataPulses.bIsInverseLevel) ? " true" : " false"));
 				stream.println(">");
 				stream.println("------- Replace the '#' above by a unique identifier -------");
