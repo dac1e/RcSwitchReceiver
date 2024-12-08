@@ -6,7 +6,7 @@
 ## Description
 This library can:
 
-- Learn the remote protocol. Refer to example sketch *LearnRemoteControl.ino*
+- Learn the protocol from your RC. Refer to example sketch *LearnRemoteControl.ino*
 - Receive and decode data packets from a remote control. Refer to example sketch *PrintReceivedData.ino*.
 - Translate data packets from a remote control to a button - press information. Refer to example sketch *DetectRemoteButtonPress.ino*.
 - Dump received pulses for investigating the remote control protocol. Refer to example sketch *TraceReceivedPulses.ino*.
