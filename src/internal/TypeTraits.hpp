@@ -33,7 +33,7 @@
 namespace RcSwitch {
 
 /**
- * Some compilers (e.g. for Atmega128) don't support type_traits. So a local
+ * Some compilers (e.g. for ATmega328P) don't support type_traits. So a local
  * implementation of this feature is required.
  */
 template<size_t BIT_COUNT> struct INT_TRAITS_IMPL;

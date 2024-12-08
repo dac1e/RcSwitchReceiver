@@ -9,7 +9,7 @@
 #define RCSWITCH_RECEIVER_INTERNAL_PULSETRACER_HPP_
 
 #include "ISR_ATTR.hpp"
-#include "Container.hpp"
+#include "RcSwitchContainer.hpp"
 #include "Pulse.hpp"
 #include "TypeTraits.hpp"
 

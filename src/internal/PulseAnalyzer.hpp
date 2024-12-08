@@ -34,7 +34,7 @@
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
 #include "FormattedPrint.hpp"
-#include "Container.hpp"
+#include "RcSwitchContainer.hpp"
 
 namespace RcSwitch {
 
