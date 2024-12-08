@@ -31,10 +31,10 @@
 #include <stdlib.h>
 
 #include "ISR_ATTR.hpp"
+#include "RcSwitchContainer.hpp"
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
 #include "FormattedPrint.hpp"
-#include "RcSwitchContainer.hpp"
 
 namespace RcSwitch {
 

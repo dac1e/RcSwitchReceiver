@@ -30,8 +30,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "internal/FormattedPrint.hpp"
-
 /*
  * The remote control protocol is a stream of pulse pairs with different duration and
  * pulse levels. In the context of this documentation, the first pulse will be

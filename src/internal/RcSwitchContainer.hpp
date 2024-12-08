@@ -31,8 +31,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
-#include "FormattedPrint.hpp"
+#include "ISR_ATTR.hpp"
 
 /**
  * Setting DEBUG_RCSWITCH_CONTAINER to true will map macro
@@ -213,8 +212,7 @@ class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	/** The index of the bottom element of the ring buffer. */
 	size_t mBegin;
 
-	TEXT_ISR_ATTR_2 static size_t inline squashedIndex(const size_t i)
-	{
+	TEXT_ISR_ATTR_2 static size_t inline squashedIndex(const size_t i) {
 		return (i + CAPACITY) % CAPACITY;
 	}
 protected:
@@ -287,8 +285,7 @@ template<typename ELEMENT_TYPE> class RingBufferReadAccess {
 	const size_t mSize;
 	const size_t mBegin;
 
-	inline size_t squashedIndex(const size_t i) const
-	{
+	inline size_t squashedIndex(const size_t i) const {
 		return (i + mCapacity) % mCapacity;
 	}
 
