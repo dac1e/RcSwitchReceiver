@@ -342,6 +342,7 @@ public:
 	void dumpProposedTimings(T& stream, uint16_t clock) {
 		if(mSynchPulseCategories.isValidSynchPulsePair()) {
 			if(mDataPulses.isValid()) {
+				stream.println();
 				stream.print("makeTimingSpec< #,");
 				printNumWithSeparator(stream, clock, 3, ",");
 				printNumWithSeparator(stream, mPercentTolerance, 3, ",");
@@ -353,7 +354,9 @@ public:
 				printNumWithSeparator(stream, mDataPulses.getMinMaxAverageD1B(clock), 4, ",");
 				stream.print(((mDataPulses.bIsInverseLevel) ? " true" : " false"));
 				stream.println(">,");
+				stream.println();
 				stream.println("-------- Replace the '#' above by a unique identifier ---------");
+				stream.println("-Example sketch PrintReceivedData.ino demonstrates application-");
 			}
 		}
 	}
@@ -414,11 +417,11 @@ public:
 				longPulses.dump(stream, separator);
 			}
 #endif
+			stream.println();
 			static const char* const frame =
 						   "***************************************************************";
-			stream.println("\n"
-						   "Protocol detection succeeded. Protocol proposal:");
 			stream.println(frame);
+			stream.println("Protocol detection succeeded. Protocol proposal:");
 			dumpProposedTimings(stream, 10);
 			stream.println(frame);
 		} else {
