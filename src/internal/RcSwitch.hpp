@@ -319,10 +319,10 @@ public:
 	}
 };
 
-static constexpr size_t MIN_PULSE_TRACES_FOR_PROTOCOL_DEDUCTION = 192;
+static constexpr size_t MIN_PULSE_TRACES_FOR_PROTOCOL_DEDUCTION = 132;
 static const char* const toLessPulseTracesError =
 	"The PULSE_TRACES_COUNT parameter of your RcSwitchReceiver is too "
-	"low for protocol deduction. Please change to 192 or higher.";
+	"low for protocol deduction. Please change to 132 or higher.";
 
 static const char* const noPulsesToTraceError = "The PULSE_TRACES_COUNT "
 	"parameter is 0. There are no pulses to dump.";

@@ -48,8 +48,8 @@
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
-// Trace the last 196 received pulses from the remote control.
-constexpr size_t TRACE_BUFFER_SIZE = 196;
+// Trace the last 140 received pulses from the remote control.
+constexpr size_t TRACE_BUFFER_SIZE = 140;
 constexpr int RX433_DATA_PIN = 2;
 
 // Passing a trace buffer size greater 0 will enable RcSwitchReceiver tracing capability.
