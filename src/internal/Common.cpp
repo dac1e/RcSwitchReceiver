@@ -49,7 +49,7 @@ size_t digitCount(size_t value) {
 	return result;
 }
 
-void sprintUint(char *string, const size_t value, const size_t width) {
+void sprintNum(char *string, const size_t value, const size_t width) {
 	const size_t digitCnt = digitCount(value);
 	const size_t spacesCnt = width > digitCnt ? width - digitCnt : 0;
 	size_t i = 0;

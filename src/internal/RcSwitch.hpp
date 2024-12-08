@@ -272,9 +272,10 @@ class ReceiverWithPulseTracer : public Receiver {
 		if(not mPulseTracingLocked) {
 			TraceRecord * const traceRecord = mPulseTracer.beyondTop();
 			const uint32_t usecPulseDuration = usecInterruptEntry - usecLastInterrupt;
+			const uint32_t usecInteruptDuration = micros_() - usecInterruptEntry;
 			*traceRecord = {
 					{usecPulseDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)},
-					(micros_() - usecLastInterrupt),
+					(usecInteruptDuration),
 			};
 			mPulseTracer.selectNext();
 		}

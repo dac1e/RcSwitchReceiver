@@ -45,23 +45,59 @@ struct rxTimingSpecTable {
  * Some compilers (e.g. for Atmega128) don't support type_traits. So a local
  * implementation of this feature is required.
  */
-template<typename T> struct INT_TRAITS {
-	static constexpr bool IS_SIGNED = static_cast<T>(-1) < 0;
-	static constexpr T MAX = IS_SIGNED ? 2^(sizeof(T)-1)-1 : 2^sizeof(T)-1;
-	static constexpr T MIN = IS_SIGNED ? 2^(sizeof(T)-1) : 0;
+template<size_t BIT_COUNT> struct INT_TRAITS_IMPL;
+
+template<> struct INT_TRAITS_IMPL<7> {
+	static constexpr int8_t MIN = INT8_MIN;
+	static constexpr int8_t MAX = INT8_MAX;
 };
 
-static constexpr size_t ITOA_BUFFER_SIZE = sizeof(int)*8+1;
+template<> struct INT_TRAITS_IMPL<8> {
+	static constexpr uint8_t MIN = 0;
+	static constexpr uint8_t MAX = UINT8_MAX;
+};
+
+template<> struct INT_TRAITS_IMPL<15> {
+	static constexpr int16_t MIN = INT16_MIN;
+	static constexpr int16_t MAX = INT16_MAX;
+};
+
+template<> struct INT_TRAITS_IMPL<16> {
+	static constexpr uint16_t MIN = 0;
+	static constexpr uint16_t MAX = UINT16_MAX;
+};
+
+template<> struct INT_TRAITS_IMPL<31> {
+	static constexpr int32_t MIN = INT32_MIN;
+	static constexpr int32_t MAX = INT32_MAX;
+};
+
+template<> struct INT_TRAITS_IMPL<32> {
+	static constexpr uint32_t MIN = 0;
+	static constexpr uint32_t MAX = UINT32_MAX;
+};
+
+template<typename T> struct INT_TRAITS {
+	static constexpr size_t WIDTH = T(-1) < T(0) ? 8*sizeof(T)-1 : 8*sizeof(T);
+	static constexpr T MIN = INT_TRAITS_IMPL<WIDTH>::MIN;
+	static constexpr T MAX = INT_TRAITS_IMPL<WIDTH>::MAX;
+};
+
+static constexpr size_t NUMTOA_BUFFER_SIZE = sizeof(size_t)*8+1;
+
+/**
+ * Called for systems where size_t is 32 bit (e.g. SAM)
+ */
+void sprintNum(char *string, const size_t value, const size_t width);
 
 
-void sprintUint(char *string, const size_t value, const size_t width);
 size_t digitCount(size_t value);
 uint32_t scale(uint32_t value, uint16_t base);
 
 template<typename T>
-void printUintWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
-	char buffer[ITOA_BUFFER_SIZE];
-	sprintUint(buffer, value, width);
+void printNumWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
+	char buffer[NUMTOA_BUFFER_SIZE];
+	sprintNum(buffer, value, width);
 	stream.print(buffer);
 	if(separator && strlen(separator)) {
 		stream.print(separator);
@@ -72,9 +108,9 @@ void printUintWithSeparator(T& stream, const size_t value, const size_t width, c
 }
 
 template<typename T>
-void printUintWithUnitAndSeparator(T& stream, const size_t value, const size_t width, const char* unit, const char* separator) {
-	char buffer[ITOA_BUFFER_SIZE];
-	sprintUint(buffer, value, width);
+void printNumWithUnitAndSeparator(T& stream, const size_t value, const size_t width, const char* unit, const char* separator) {
+	char buffer[NUMTOA_BUFFER_SIZE];
+	sprintNum(buffer, value, width);
 	stream.print(buffer);
 	if(separator && strlen(separator)) {
 		stream.print(separator);
@@ -90,7 +126,7 @@ void printUintWithUnitAndSeparator(T& stream, const size_t value, const size_t w
 
 template<typename T>
 inline void printUsecWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
-	printUintWithUnitAndSeparator(stream, value, width, "usec", separator);
+	printNumWithUnitAndSeparator(stream, value, width, "usec", separator);
 }
 
 template<typename T>
@@ -106,7 +142,7 @@ void printStringWithSeparator(T& stream, const char* string, const char* separat
 
 template<typename T>
 inline void printPercentWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
-	printUintWithSeparator(stream, value, width, nullptr);
+	printNumWithSeparator(stream, value, width, nullptr);
 	printStringWithSeparator(stream, "%", separator);
 }
 

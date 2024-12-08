@@ -69,7 +69,9 @@ struct PulseTypes {
 };
 
 class Pulse {
+public:
 	using duration_t = size_t;
+private:
 	duration_t mUsecDuration;
 	PULSE_LEVEL mPulseLevel;
 
@@ -237,7 +239,7 @@ public:
 	template <typename T>
 	void dump(T& stream, const char* separator) const {
 		stream.print("\t");
-		printUintWithSeparator(stream, pulseCount, 3, separator);
+		printNumWithSeparator(stream, pulseCount, 3, separator);
 		printStringWithSeparator(stream, "recordings of", separator);
 		printStringWithSeparator(stream, pulseLevelToString(getPulseLevel()), separator);
 

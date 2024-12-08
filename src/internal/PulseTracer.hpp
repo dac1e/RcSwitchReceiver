@@ -15,7 +15,7 @@ namespace RcSwitch {
 
 struct TraceRecord {
 	Pulse mPulse;
-	uint32_t mUsecInteruptDuration;
+	Pulse::duration_t mUsecInteruptDuration;
 };
 
 /**
@@ -30,6 +30,28 @@ public:
 	}
 
 	template<typename T> void dump(T& stream, const char* separator) const {
+
+#if false
+		stream.println(INT_TRAITS<int8_t>::MIN);
+		stream.println(INT_TRAITS<int8_t>::MAX);
+		stream.println(INT_TRAITS<uint8_t>::MIN);
+		stream.println(INT_TRAITS<uint8_t>::MAX);
+		stream.println();
+		stream.println(INT_TRAITS<int16_t>::MIN);
+		stream.println(INT_TRAITS<int16_t>::MAX);
+		stream.println(INT_TRAITS<uint16_t>::MIN);
+		stream.println(INT_TRAITS<uint16_t>::MAX);
+		stream.println();
+		stream.println(INT_TRAITS<int32_t>::MIN);
+		stream.println(INT_TRAITS<int32_t>::MAX);
+		stream.println(INT_TRAITS<uint32_t>::MIN);
+		stream.println(INT_TRAITS<uint32_t>::MAX);
+		stream.println();
+		stream.println(INT_TRAITS<size_t>::MIN);
+		stream.println(INT_TRAITS<size_t>::MAX);
+		stream.println();
+#endif
+
 		const size_t n = baseClass::size();
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
@@ -38,7 +60,7 @@ public:
 			// be taken from the previous entry.
 			const TraceRecord& traceRecord = at(i);
 			stream.print("[");
-			printUintWithSeparator(stream, i, indexWidth, "]");
+			printNumWithSeparator(stream, i, indexWidth, "]");
 			printStringWithSeparator(stream, "", separator);
 
 			// print pulse type (LOW, HIGH)
@@ -46,8 +68,8 @@ public:
 			printStringWithSeparator(stream, "for", separator);
 			printUsecWithSeparator(stream, traceRecord.mPulse.getDuration(), 5, separator);
 
-			printStringWithSeparator(stream, "Interrupt", separator);
-//			printUsecWithSeparator(stream, traceRecord.mUsecInteruptDuration, 3, separator);
+			printStringWithSeparator(stream, "Interrupt duration", separator);
+			printUsecWithSeparator(stream, traceRecord.mUsecInteruptDuration, 3, separator);
 
 			stream.println();
 			i++;
