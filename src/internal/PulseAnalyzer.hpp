@@ -146,7 +146,7 @@ class PulseCategoryCollection : public StackBuffer<PulseCategory, PULSE_CATEGORI
 
 	static bool pulseFitsInCategory(const PulseCategory& category, const Pulse &pulse
 			, unsigned percentTolerance) {
-		if(pulse.mPulseLevel != category.getPulseLevel()) {
+		if(pulse.getLevel() != category.getPulseLevel()) {
 			return false;
 		}
 		return pulse.isDurationInRange(category.getWeightedAverage()

@@ -37,7 +37,7 @@ static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protoco
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
-				protocol.synchronizationPulsePair.durationA.compare(pulse.mUsecDuration);
+				protocol.synchronizationPulsePair.durationA.compare(pulse.getDuration());
 
 		/* First synch pulse is allowed to be longer */
 		if (synchCompare != TimeRange::TOO_SHORT) {
@@ -47,13 +47,13 @@ static TEXT_ISR_ATTR_2 PulseTypes pulseAtoPulseTypes(const RxTimingSpec& protoco
 
 	{
 		const TimeRange::COMPARE_RESULT log0Compare =
-				protocol.data0pulsePair.durationA.compare(pulse.mUsecDuration);
+				protocol.data0pulsePair.durationA.compare(pulse.getDuration());
 
 		if (log0Compare == TimeRange::IS_WITHIN) {
 			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_00;
 		} else {
 			const TimeRange::COMPARE_RESULT log1Compare =
-					protocol.data1pulsePair.durationA.compare(pulse.mUsecDuration);
+					protocol.data1pulsePair.durationA.compare(pulse.getDuration());
 			if (log1Compare == TimeRange::IS_WITHIN) {
 				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_01;
 			}
@@ -66,7 +66,7 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 	PulseTypes result = { PULSE_TYPE::UNKNOWN, PULSE_TYPE::UNKNOWN };
 	{
 		const TimeRange::COMPARE_RESULT synchCompare =
-				protocol.synchronizationPulsePair.durationB.compare(pulse.mUsecDuration);
+				protocol.synchronizationPulsePair.durationB.compare(pulse.getDuration());
 
 		/* First synch pulse is allowed to be longer */
 		if (synchCompare == TimeRange::IS_WITHIN) {
@@ -76,14 +76,14 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 
 	{
 		const TimeRange::COMPARE_RESULT log0Compare =
-				protocol.data0pulsePair.durationB.compare(pulse.mUsecDuration);
+				protocol.data0pulsePair.durationB.compare(pulse.getDuration());
 
 		if (log0Compare == TimeRange::IS_WITHIN) {
 			result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_00;
 		} else {
 			const TimeRange::COMPARE_RESULT log1Compare =
 					protocol.data1pulsePair.durationB.compare(
-					pulse.mUsecDuration);
+					pulse.getDuration());
 			if (log1Compare == TimeRange::IS_WITHIN) {
 				result.mPulseTypeData = PULSE_TYPE::DATA_LOGICAL_01;
 			}
@@ -96,7 +96,7 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecT
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	for(size_t i = 0; i < protocol.size; i++) {
 		const RxTimingSpec& prot = protocol.start[i];
-		if(pulseA.mUsecDuration <
+		if(pulseA.getDuration() <
 				protocol.start[i].synchronizationPulsePair.durationA.lowerBound) {
 			/* Protocols are sorted in ascending order of synchronization
 			 * pulseA lower bound.
@@ -106,11 +106,11 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecT
 			return;
 		}
 
-		if(pulseA.mUsecDuration <
+		if(pulseA.getDuration() <
 				prot.synchronizationPulsePair.durationA.upperBound) {
-			if(pulseB.mUsecDuration >=
+			if(pulseB.getDuration() >=
 					prot.synchronizationPulsePair.durationB.lowerBound) {
-				if(pulseB.mUsecDuration <
+				if(pulseB.getDuration() <
 						prot.synchronizationPulsePair.durationB.upperBound) {
 					protocolCandidates.push(i);
 				}
@@ -129,11 +129,11 @@ size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
 }
 
 void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1) {
-  if(pulse_0.mPulseLevel != pulse_1.mPulseLevel) {
-		if(pulse_0.mPulseLevel == PULSE_LEVEL::HI) {
+  if(pulse_0.getLevel() != pulse_1.getLevel()) {
+		if(pulse_0.getLevel() == PULSE_LEVEL::HI) {
 			mProtocolCandidates.setProtocolGroup(NORMAL_LEVEL_PROTOCOLS);
 			RcSwitch::collectProtocolCandidates(getRxTimingTable(NORMAL_LEVEL_PROTOCOLS), mProtocolCandidates, pulse_0, pulse_1);
-		} else if(pulse_0.mPulseLevel == PULSE_LEVEL::LO) {
+		} else if(pulse_0.getLevel() == PULSE_LEVEL::LO) {
 			mProtocolCandidates.setProtocolGroup(INVERSE_LEVEL_PROTOCOLS);
 			RcSwitch::collectProtocolCandidates(getRxTimingTable(INVERSE_LEVEL_PROTOCOLS), mProtocolCandidates, pulse_0, pulse_1);
 		} else {

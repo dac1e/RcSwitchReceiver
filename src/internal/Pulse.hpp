@@ -68,9 +68,50 @@ struct PulseTypes {
 	PULSE_TYPE mPulseTypeData;
 };
 
-struct Pulse {
-	size_t mUsecDuration;
+class Pulse {
+	using duration_t = size_t;
+	duration_t mUsecDuration;
 	PULSE_LEVEL mPulseLevel;
+
+public:
+	inline Pulse()
+		: mUsecDuration(0), mPulseLevel(PULSE_LEVEL::UNKNOWN){
+	}
+
+	inline Pulse(duration_t duration, const PULSE_LEVEL& pulseLevel)
+		: mUsecDuration(duration), mPulseLevel(pulseLevel){
+	}
+
+	template<typename T>
+	inline Pulse(const T duration, const PULSE_LEVEL& pulseLevel)
+		// limit duration to maximum value of duration_t
+		: mUsecDuration(duration > INT_TRAITS<duration_t>::MAX ?
+				INT_TRAITS<duration_t>::MAX  : duration)
+		, mPulseLevel(pulseLevel){
+	}
+
+	inline void setDuration(const duration_t duration) {
+		mUsecDuration = duration;
+	}
+
+	template<typename T>
+	inline void setDuration(const T duration) {
+		// limit duration to maximum value of duration_t
+		mUsecDuration = duration > INT_TRAITS<duration_t>::MAX ?
+				INT_TRAITS<duration_t>::MAX  : duration;
+	}
+
+	inline duration_t getDuration() const {
+		return mUsecDuration;
+	}
+
+	inline void setLevel(PULSE_LEVEL level) {
+		mPulseLevel = level;
+	}
+
+	inline PULSE_LEVEL getLevel() const {
+		return mPulseLevel;
+	}
 
 	bool isDurationInRange(size_t value, unsigned percentTolerance) const {
 		// size_t is 16 bit on avr. So static cast to uint32_t avoids
@@ -109,22 +150,22 @@ public:
 	}
 
 	PulseCategory(const Pulse& pulse)
-		: mPulse{pulse.mUsecDuration, pulse.mPulseLevel}
-		, usecMinDuration(pulse.mUsecDuration)
-		, usecMaxDuration(pulse.mUsecDuration)
+		: mPulse{pulse.getDuration(), pulse.getLevel()}
+		, usecMinDuration(pulse.getDuration())
+		, usecMaxDuration(pulse.getDuration())
 		, pulseCount(1)
 	{
 	}
 
 	inline PULSE_LEVEL getPulseLevel() const {
-		return mPulse.mPulseLevel;
+		return mPulse.getLevel();
 	}
 
 	/**
 	 * Get the average of the duration of all pulses.
 	 */
 	inline size_t getWeightedAverage() const {
-		return mPulse.mUsecDuration;
+		return mPulse.getDuration();
 	}
 
 	/**
@@ -147,11 +188,11 @@ public:
 				getPulseLevel() != PULSE_LEVEL::UNKNOWN;
 	}
 
-	bool invalidate() {
-		return pulseCount = 0;
-		mPulse.mPulseLevel = PULSE_LEVEL::UNKNOWN;
-		mPulse.mUsecDuration = 0;
-		usecMinDuration = static_cast<size_t>(-1);
+	void invalidate() {
+		pulseCount = 0;
+		mPulse.setLevel(PULSE_LEVEL::UNKNOWN);
+		mPulse.setDuration(0);
+		usecMinDuration = INT_TRAITS<typeof(usecMinDuration)>::MAX;
 		usecMaxDuration = 0;
 	}
 
@@ -159,22 +200,22 @@ public:
 		bool result = true;
 
 		// Refresh average for the pulse duration and store it.
-		mPulse.mUsecDuration =
-				( (static_cast<uint32_t>(getWeightedAverage()) * pulseCount) + pulse.mUsecDuration)
-					/ (pulseCount + 1);
+		mPulse.setDuration(
+				( (static_cast<uint32_t>(getWeightedAverage()) * pulseCount) + pulse.getDuration())
+					/ (pulseCount + 1));
 
-		if(pulse.mUsecDuration < usecMinDuration) {
-			usecMinDuration = pulse.mUsecDuration;
+		if(pulse.getDuration() < usecMinDuration) {
+			usecMinDuration = pulse.getDuration();
 		}
 
-		if(pulse.mUsecDuration > usecMaxDuration) {
-			usecMaxDuration = pulse.mUsecDuration;
+		if(pulse.getDuration() > usecMaxDuration) {
+			usecMaxDuration = pulse.getDuration();
 		}
 
 		if(getPulseLevel() == PULSE_LEVEL::UNKNOWN) {
-			mPulse.mPulseLevel = pulse.mPulseLevel;
+			mPulse.setLevel(pulse.getLevel());
 		} else {
-			result = (getPulseLevel() == pulse.mPulseLevel);
+			result = (getPulseLevel() == pulse.getLevel());
 		}
 
 		++pulseCount;
@@ -183,10 +224,10 @@ public:
 	}
 
 	void merge(PulseCategory& result, const PulseCategory& other) const {
-		result.mPulse.mPulseLevel = getPulseLevel() == other.getPulseLevel() ? getPulseLevel() : PULSE_LEVEL::LO_or_HI;
+		result.mPulse.setLevel(getPulseLevel() == other.getPulseLevel() ? getPulseLevel() : PULSE_LEVEL::LO_or_HI);
 		result.pulseCount = pulseCount + other.pulseCount;
-		result.mPulse.mUsecDuration = ((pulseCount * getWeightedAverage())
-			+ (other.pulseCount * other.getWeightedAverage())) / result.pulseCount;
+		result.mPulse.setDuration(((pulseCount * getWeightedAverage())
+			+ (other.pulseCount * other.getWeightedAverage())) / result.pulseCount);
 		result.usecMinDuration = usecMinDuration < other.usecMinDuration ?
 				usecMinDuration : other.usecMinDuration;
 		result.usecMaxDuration = usecMaxDuration > other.usecMaxDuration ?

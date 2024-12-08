@@ -41,13 +41,26 @@ struct rxTimingSpecTable {
 	size_t size;
 };
 
+/**
+ * Some compilers (e.g. for Atmega128) don't support type_traits. So a local
+ * implementation of this feature is required.
+ */
+template<typename T> struct INT_TRAITS {
+	static constexpr bool IS_SIGNED = static_cast<T>(-1) < 0;
+	static constexpr T MAX = IS_SIGNED ? 2^(sizeof(T)-1)-1 : 2^sizeof(T)-1;
+	static constexpr T MIN = IS_SIGNED ? 2^(sizeof(T)-1) : 0;
+};
+
+static constexpr size_t ITOA_BUFFER_SIZE = sizeof(int)*8+1;
+
+
 void sprintUint(char *string, const size_t value, const size_t width);
 size_t digitCount(size_t value);
 uint32_t scale(uint32_t value, uint16_t base);
 
 template<typename T>
 void printUintWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
-	char buffer[12];
+	char buffer[ITOA_BUFFER_SIZE];
 	sprintUint(buffer, value, width);
 	stream.print(buffer);
 	if(separator && strlen(separator)) {
@@ -60,7 +73,7 @@ void printUintWithSeparator(T& stream, const size_t value, const size_t width, c
 
 template<typename T>
 void printUintWithUnitAndSeparator(T& stream, const size_t value, const size_t width, const char* unit, const char* separator) {
-	char buffer[12];
+	char buffer[ITOA_BUFFER_SIZE];
 	sprintUint(buffer, value, width);
 	stream.print(buffer);
 	if(separator && strlen(separator)) {

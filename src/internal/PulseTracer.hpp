@@ -26,7 +26,7 @@ class PulseTracer : public RingBuffer<TraceRecord, PULSE_TRACES_COUNT> {
 	using baseClass = RingBuffer<TraceRecord, PULSE_TRACES_COUNT>;
 public:
 	static const char* pulseTypeToString(const Pulse& pulse) {
-		return pulseLevelToString(pulse.mPulseLevel);
+		return pulseLevelToString(pulse.getLevel());
 	}
 
 	template<typename T> void dump(T& stream, const char* separator) const {
@@ -34,18 +34,23 @@ public:
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		while(i < n) {
+			// Start with index one, because the interrupt duration to be printed needs to
+			// be taken from the previous entry.
 			const TraceRecord& traceRecord = at(i);
-			stream.print('[');
+			stream.print("[");
 			printUintWithSeparator(stream, i, indexWidth, "]");
 			printStringWithSeparator(stream, "", separator);
 
 			// print pulse type (LOW, HIGH)
 			printStringWithSeparator(stream, pulseTypeToString(traceRecord.mPulse), separator);
 			printStringWithSeparator(stream, "for", separator);
-			printUsecWithSeparator(stream, traceRecord.mPulse.mUsecDuration, 6, separator);
+			printUsecWithSeparator(stream, traceRecord.mPulse.getDuration(), 5, separator);
+
+			printStringWithSeparator(stream, "Interrupt", separator);
+//			printUsecWithSeparator(stream, traceRecord.mUsecInteruptDuration, 3, separator);
 
 			stream.println();
-			++i;
+			i++;
 		}
 	}
 
