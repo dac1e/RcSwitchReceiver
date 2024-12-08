@@ -16,16 +16,24 @@ namespace RcSwitch {
 
 class TraceRecord {
 	using duration_t = Pulse::duration_t;
-	duration_t mUsecInteruptDuration;
-	Pulse mPulse;
 
+	/**
+	 * Special encoding of Pulse here in order to save static memory.
+	 * This is important on CPUs with little RAM like on
+	 * Arduino UNO R3 with ATmega328P.
+	 */
+	duration_t mUsecInteruptDuration: INT_TRAITS<duration_t>::WIDTH-1;
+	duration_t mPulseLevel:1;
+	duration_t mPulseDuration;
 public:
 	TEXT_ISR_ATTR_1 inline TraceRecord()
-		: mUsecInteruptDuration(0) {
+		: mUsecInteruptDuration(0), mPulseLevel(0), mPulseDuration(0) {
 	}
 
 	TEXT_ISR_ATTR_1 inline TraceRecord(const Pulse& pulse, const duration_t usecInterruptDuration)
-		: mUsecInteruptDuration(usecInterruptDuration), mPulse(pulse) {
+		: mUsecInteruptDuration(usecInterruptDuration)
+		, mPulseLevel(pulse.getLevel() == PULSE_LEVEL::LO ? 0 : 1)
+		, mPulseDuration(pulse.getDuration()){
 	}
 
 	TEXT_ISR_ATTR_1 inline duration_t getDuration() const {
@@ -33,13 +41,14 @@ public:
 	}
 
 	TEXT_ISR_ATTR_1 inline Pulse getPulse() const {
-		return mPulse;
+		return Pulse(mPulseDuration, mPulseLevel ? PULSE_LEVEL::HI : PULSE_LEVEL::LO);
 	}
 
 	TEXT_ISR_ATTR_1 inline void set(duration_t pulseDuration, PULSE_LEVEL pulseLevel,
 			const duration_t usecInterruptDuration) {
 		mUsecInteruptDuration = usecInterruptDuration;
-		mPulse = Pulse(pulseDuration, pulseLevel);
+		mPulseLevel = pulseLevel ==  PULSE_LEVEL::LO ? 0 : 1;
+		mPulseDuration = pulseDuration;
 	}
 };
 
