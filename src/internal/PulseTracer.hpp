@@ -71,6 +71,9 @@ public:
 			printStringWithSeparator(stream, "Interrupt duration", separator);
 			printUsecWithSeparator(stream, traceRecord.mUsecInteruptDuration, 3, separator);
 
+			printRatioAsPercentWithSeparator(stream, traceRecord.mUsecInteruptDuration
+					, traceRecord.mPulse.getDuration(), 2, separator);
+
 			stream.println();
 			i++;
 		}

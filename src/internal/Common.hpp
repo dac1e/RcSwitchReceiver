@@ -150,12 +150,23 @@ template<typename T>
 inline void printRatioAsPercentWithSeparator(T& stream, const uint32_t nominator, const uint32_t denominator
 		, const size_t width, const char* separator) {
 
-	constexpr uint32_t SCALE = 100;
-	const uint32_t preDecimalPlaces = (100 * SCALE * nominator / denominator) / SCALE;
-	const uint32_t decimalPlaces    = (100 * SCALE * nominator / denominator) % SCALE;
+	// decimal places width:
+	//   1 -> width is 1
+	//  10 -> width is 2
+	// 100 -> width is 3
+	constexpr size_t DECIMAL_PLACES_DIV = 10;
 
-	printUintWithSeparator(stream, preDecimalPlaces, width, ".");
-	printPercentWithSeparator(stream, decimalPlaces, width, separator);
+	constexpr uint32_t SCALE = 1000;
+
+	const uint32_t scaledRatio = (SCALE * (100 * nominator)) / denominator;
+	const uint32_t roundedScaledRation = scaledRatio + DECIMAL_PLACES_DIV / 2;
+	const uint32_t preDecimalPlaces = roundedScaledRation / SCALE;
+	uint32_t decimalPlaces = (roundedScaledRation % SCALE) / DECIMAL_PLACES_DIV;
+
+	printNumWithSeparator(stream, preDecimalPlaces, width, ".");
+	stream.print(decimalPlaces);
+	stream.print('%');
+	stream.print(separator);
 }
 
 }
