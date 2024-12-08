@@ -8,14 +8,32 @@
 #ifndef RCSWITCH_RECEIVER_INTERNAL_PULSETRACER_HPP_
 #define RCSWITCH_RECEIVER_INTERNAL_PULSETRACER_HPP_
 
+#include "ISR_ATTR.hpp"
 #include "Container.hpp"
 #include "Pulse.hpp"
 
 namespace RcSwitch {
 
-struct TraceRecord {
+class TraceRecord {
+	using duration_t = Pulse::duration_t;
 	Pulse mPulse;
-	Pulse::duration_t mUsecInteruptDuration;
+	duration_t mUsecInteruptDuration;
+public:
+	TEXT_ISR_ATTR_1 inline TraceRecord()
+		: mUsecInteruptDuration(0) {
+	}
+
+	TEXT_ISR_ATTR_1 inline TraceRecord(const Pulse& pulse, const duration_t usecInterruptDuration)
+		: mPulse(pulse), mUsecInteruptDuration(usecInterruptDuration) {
+	}
+
+	TEXT_ISR_ATTR_1 inline duration_t getDuration() const {
+		return mUsecInteruptDuration;
+	}
+
+	TEXT_ISR_ATTR_1 inline Pulse getPulse() const {
+		return mPulse;
+	}
 };
 
 /**
@@ -64,15 +82,15 @@ public:
 			printStringWithSeparator(stream, "", separator);
 
 			// print pulse type (LOW, HIGH)
-			printStringWithSeparator(stream, pulseTypeToString(traceRecord.mPulse), separator);
+			printStringWithSeparator(stream, pulseTypeToString(traceRecord.getPulse()), separator);
 			printStringWithSeparator(stream, "for", separator);
-			printUsecWithSeparator(stream, traceRecord.mPulse.getDuration(), 5, separator);
+			printUsecWithSeparator(stream, traceRecord.getPulse().getDuration(), 5, separator);
 
-			printStringWithSeparator(stream, "Interrupt duration", separator);
-			printUsecWithSeparator(stream, traceRecord.mUsecInteruptDuration, 3, separator);
+			printStringWithSeparator(stream, "Interrupt CPU load =", separator);
+			printUsecWithSeparator(stream, traceRecord.getDuration(), 3, separator);
 
-			printRatioAsPercentWithSeparator(stream, traceRecord.mUsecInteruptDuration
-					, traceRecord.mPulse.getDuration(), 2, separator);
+			printRatioAsPercentWithSeparator(stream, traceRecord.getDuration()
+					, traceRecord.getPulse().getDuration(), 2, separator);
 
 			stream.println();
 			i++;

@@ -201,7 +201,7 @@ public:
 	void build(const RingBufferReadAccess<TraceRecord>& input, unsigned percentTolerance) {
 		size_t i = 0;
 		for(; i < input.size(); i++) {
-			const Pulse &pulse = input.at(i).mPulse;
+			const Pulse &pulse = input.at(i).getPulse();
 			const size_t ci = findCategoryForPulse(pulse, percentTolerance);
 			putPulseInCategory(ci, pulse);
 		}
@@ -217,16 +217,16 @@ public:
 		for(; i < input.size(); i++) {
 			if((i+1) < input.size()) {
 				// It is not the last pulse
-				const Pulse &nextPulse = input.at(i+1).mPulse;
+				const Pulse &nextPulse = input.at(i+1).getPulse();
 				if(nextPulse.isDurationInRange(usecSynchB, percentTolerance)) {
 					{
 						// It is the synch A pulse
-						const Pulse &pulse = input.at(i).mPulse;
+						const Pulse &pulse = input.at(i).getPulse();
 						const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
 						synchPulseCategories.putPulseInCategory(ci, pulse);
 					}
 				} else {
-					const Pulse &pulse = input.at(i).mPulse;
+					const Pulse &pulse = input.at(i).getPulse();
 					if(pulse.isDurationInRange(usecSynchB, percentTolerance)) {
 						// It is a synch B pulse, place it in the synch pulse collection
 						const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
@@ -239,7 +239,7 @@ public:
 				}
 			} else {
 				// It is the last pulse
-				const Pulse &pulse = input.at(i).mPulse;
+				const Pulse &pulse = input.at(i).getPulse();
 				if(pulse.isDurationInRange(usecSynchB, percentTolerance)) {
 					// It is a synch B pulse, place it in the synch pulse collection
 					const size_t ci = synchPulseCategories.findCategoryForPulse(pulse, percentTolerance);
@@ -281,7 +281,8 @@ public:
 			// Note that synch pulses are sorted in ascending order of duration.
 			const PulseCategory& shorterPulse = at(0);
 			const PulseCategory& longerPulse = at(1);
-			if(static_cast<uint32_t>(longerPulse.getWeightedAverage()) > SYNCH_PULSES_MIN_RATIO * shorterPulse.getWeightedAverage()) {
+			if(static_cast<uint32_t>(longerPulse.getWeightedAverage()) >
+				SYNCH_PULSES_MIN_RATIO * shorterPulse.getWeightedAverage()) {
 				return true;
 			}
 		}
