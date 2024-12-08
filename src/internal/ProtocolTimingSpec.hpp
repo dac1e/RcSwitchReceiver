@@ -31,7 +31,7 @@
 #include <stdint.h>
 
 #include "ISR_ATTR.hpp"
-#include "Common.hpp"
+#include "TimingSpecTable.hpp"
 #include "Typeselect.hpp"
 #include <Arduino.h>
 

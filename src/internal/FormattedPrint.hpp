@@ -24,22 +24,14 @@
 
 #pragma once
 
-#ifndef RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_
-#define RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_
+#ifndef RCSWITCH_RECEIVER_INTERNAL_FORMATTED_PRINT_HPP_
+#define RCSWITCH_RECEIVER_INTERNAL_FORMATTED_PRINT_HPP_
 
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
 namespace RcSwitch {
-
-/** Forward declaration */
-class RxTimingSpec;
-
-struct rxTimingSpecTable {
-	const RxTimingSpec* start;
-	size_t size;
-};
 
 static constexpr size_t NUMTOA_BUFFER_SIZE = sizeof(size_t)*8+1;
 
@@ -129,4 +121,4 @@ inline void printRatioAsPercentWithSeparator(T& stream, const uint32_t nominator
 
 }
 
-#endif /* RCSWITCH_RECEIVER_INTERNAL_COMMON_HPP_ */
+#endif /* RCSWITCH_RECEIVER_INTERNAL_FORMATTED_PRINT_HPP_ */

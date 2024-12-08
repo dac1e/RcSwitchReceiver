@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include "Common.hpp"
+#include "FormattedPrint.hpp"
 #include "TypeTraits.hpp"
 
 namespace RcSwitch {

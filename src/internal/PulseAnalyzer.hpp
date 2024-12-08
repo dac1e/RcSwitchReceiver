@@ -24,8 +24,8 @@
 
 #pragma once
 
-#ifndef RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER2_HPP_
-#define RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER2_HPP_
+#ifndef RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER_HPP_
+#define RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER_HPP_
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -33,7 +33,7 @@
 #include "ISR_ATTR.hpp"
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
-#include "Common.hpp"
+#include "FormattedPrint.hpp"
 #include "Container.hpp"
 
 namespace RcSwitch {
@@ -433,4 +433,4 @@ public:
 
 } /* namespace RcSwitch */
 
-#endif /* RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER2_HPP_ */
+#endif /* RCSWITCH_RECEIVER_INTERNAL_PULSE_ANALYZER_HPP_ */

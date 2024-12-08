@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include "Common.hpp"
+#include "FormattedPrint.hpp"
 #include "ProtocolTimingSpec.hpp"
 
 namespace {

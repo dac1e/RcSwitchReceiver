@@ -32,7 +32,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "Common.hpp"
+#include "FormattedPrint.hpp"
 
 /**
  * Setting DEBUG_RCSWITCH_CONTAINER to true will map macro

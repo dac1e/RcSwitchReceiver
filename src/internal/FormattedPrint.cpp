@@ -28,7 +28,7 @@
 	#include <itoa.h>
 #endif
 
-#include "Common.hpp"
+#include "FormattedPrint.hpp"
 
 namespace RcSwitch {
 
