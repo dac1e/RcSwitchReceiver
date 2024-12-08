@@ -71,7 +71,7 @@ void setup()
 	rcSwitchReceiver.suspend();
 
 	// No timing spec. table required when not interested in decoding RC data.
-	rcSwitchReceiver.begin(rxTimingSpecTable{nullptr, 0});
+	rcSwitchReceiver.begin(RxTimingSpecTable{nullptr, 0});
 
 	pinMode(TRIGGER_BUTTON, INPUT_PULLUP);
 	int lastbuttonState = digitalRead(TRIGGER_BUTTON);

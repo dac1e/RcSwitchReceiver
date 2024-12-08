@@ -45,7 +45,7 @@ namespace RcSwitch {
 
 namespace Debug {
 
-void dumpRxTimingSpecTable(serial_t &serial, const rxTimingSpecTable &rxtimingSpecTable) {
+void dumpRxTimingSpecTable(serial_t &serial, const RxTimingSpecTable &rxtimingSpecTable) {
 
 	serial.println(" #,i,{<--------SYNCH----------->}{<--------DATA 0-------->}{<--------DATA 1-------->}");
 	serial.println("      [  PulseA  ][   PulseB   ]  [  PulseA  ][  PulseB  ]  [  PulseA  ][  PulseB  ]");

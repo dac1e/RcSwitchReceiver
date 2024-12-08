@@ -92,7 +92,7 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 	return result;
 }
 
-static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecTable& protocol,
+static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const RxTimingSpecTable& protocol,
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	for(size_t i = 0; i < protocol.size; i++) {
 		const RxTimingSpec& prot = protocol.start[i];
@@ -121,7 +121,7 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const rxTimingSpecT
 
 // ======== Receiver ===================
 size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
-	 const rxTimingSpecTable& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
+	 const RxTimingSpecTable& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	 RCSWITCH_ASSERT(protocolCandidateIndex < mProtocolCandidates.size());
 	 const size_t protocolIndex = mProtocolCandidates.at(protocolCandidateIndex);
 	 RCSWITCH_ASSERT(protocolIndex < protocol.size);
@@ -150,7 +150,7 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
 // inline attribute, because it is private and called once.
 inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) {
 	PULSE_TYPE result = PULSE_TYPE::UNKNOWN;
-	const rxTimingSpecTable protocols = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
+	const RxTimingSpecTable protocols = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	size_t protocolCandidatesIndex = mProtocolCandidates.size();
 	while(protocolCandidatesIndex > 0) {
 		--protocolCandidatesIndex;
@@ -308,7 +308,7 @@ int Receiver::receivedProtocol(const size_t index) const {
 	return -1;
 }
 
-rxTimingSpecTable Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const {
+RxTimingSpecTable Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const {
 	switch (protocolGroup) {
 	case PROTOCOL_GROUP_ID::NORMAL_LEVEL_PROTOCOLS:
 		return mRxTimingSpecTableNormal;
@@ -320,10 +320,10 @@ rxTimingSpecTable Receiver::getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) co
 		RCSWITCH_ASSERT(false);
 		break;
 	}
-	return rxTimingSpecTable{nullptr, 0};
+	return RxTimingSpecTable{nullptr, 0};
 }
 
-void Receiver::setRxTimingSpecTable(const rxTimingSpecTable& rxTimingSpecTable) {
+void Receiver::setRxTimingSpecTable(const RxTimingSpecTable& rxTimingSpecTable) {
 	size_t i = 0;
 	/* The given timing spec table is sorted in a way that inverse level protocols
 	 * reside at the end. */

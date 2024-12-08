@@ -31,7 +31,7 @@
 #include <stdint.h>
 
 #include "ISR_ATTR.hpp"
-#include "TimingSpecTable.hpp"
+#include "RxTimingSpecTable.hpp"
 #include "Container.hpp"
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
@@ -177,8 +177,8 @@ private:
 	/** API class becomes friend. */
 	template<int IOPIN, size_t PULSE_TRACES_COUNT> friend class ::RcSwitchReceiver;
 
-	rxTimingSpecTable mRxTimingSpecTableNormal;
-	rxTimingSpecTable mRxTimingSpecTableInverse;
+	RxTimingSpecTable mRxTimingSpecTableNormal;
+	RxTimingSpecTable mRxTimingSpecTableInverse;
 
 	MessagePacket mReceivedMessagePacket;
 
@@ -191,7 +191,7 @@ private:
 	enum STATE {AVAILABLE_STATE, SYNC_STATE, DATA_STATE};
 	enum STATE state() const;
 
-	TEXT_ISR_ATTR_2 rxTimingSpecTable getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
+	TEXT_ISR_ATTR_2 RxTimingSpecTable getRxTimingTable(PROTOCOL_GROUP_ID protocolGroup) const;
 	TEXT_ISR_ATTR_1 void collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pulse_1);
 	TEXT_ISR_ATTR_1 void push(uint32_t usecDuration, const int pinLevel);
 	TEXT_ISR_ATTR_1 PULSE_TYPE analyzePulsePair(const Pulse& firstPulse, const Pulse& secondPulse);
@@ -222,7 +222,7 @@ private:
 	/**
 	 * Set the protocol table for receiving data.
 	 */
-	void setRxTimingSpecTable(const rxTimingSpecTable& rxTimingSpecTable);
+	void setRxTimingSpecTable(const RxTimingSpecTable& rxTimingSpecTable);
 
 	/**
 	 * Remove protocol candidates for the mProtocolCandidates buffer.

@@ -34,7 +34,7 @@ namespace RcSwitch {
 /** Forward declaration */
 class RxTimingSpec;
 
-struct rxTimingSpecTable {
+struct RxTimingSpecTable {
 	const RxTimingSpec* start;
 	size_t size;
 };
