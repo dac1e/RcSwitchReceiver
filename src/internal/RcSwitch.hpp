@@ -273,10 +273,8 @@ class ReceiverWithPulseTracer : public Receiver {
 			TraceRecord * const traceRecord = mPulseTracer.beyondTop();
 			const uint32_t usecPulseDuration = usecInterruptEntry - usecLastInterrupt;
 			const uint32_t usecInteruptDuration = micros_() - usecInterruptEntry;
-			*traceRecord = {
-					{usecPulseDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)},
-					(usecInteruptDuration),
-			};
+			const PULSE_LEVEL pulseLevel = pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI;
+			traceRecord->set(usecPulseDuration, pulseLevel, usecInteruptDuration);
 			mPulseTracer.selectNext();
 		}
 	}

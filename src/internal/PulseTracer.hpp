@@ -16,15 +16,16 @@ namespace RcSwitch {
 
 class TraceRecord {
 	using duration_t = Pulse::duration_t;
-	Pulse mPulse;
 	duration_t mUsecInteruptDuration;
+	Pulse mPulse;
+
 public:
 	TEXT_ISR_ATTR_1 inline TraceRecord()
 		: mUsecInteruptDuration(0) {
 	}
 
 	TEXT_ISR_ATTR_1 inline TraceRecord(const Pulse& pulse, const duration_t usecInterruptDuration)
-		: mPulse(pulse), mUsecInteruptDuration(usecInterruptDuration) {
+		: mUsecInteruptDuration(usecInterruptDuration), mPulse(pulse) {
 	}
 
 	TEXT_ISR_ATTR_1 inline duration_t getDuration() const {
@@ -33,6 +34,12 @@ public:
 
 	TEXT_ISR_ATTR_1 inline Pulse getPulse() const {
 		return mPulse;
+	}
+
+	TEXT_ISR_ATTR_1 inline void set(duration_t pulseDuration, PULSE_LEVEL pulseLevel,
+			const duration_t usecInterruptDuration) {
+		mUsecInteruptDuration = usecInterruptDuration;
+		mPulse = Pulse(pulseDuration, pulseLevel);
 	}
 };
 
