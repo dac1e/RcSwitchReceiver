@@ -36,7 +36,7 @@ public:
 		, mPulseDuration(pulse.getDuration()){
 	}
 
-	TEXT_ISR_ATTR_1 inline duration_t getDuration() const {
+	TEXT_ISR_ATTR_1 inline duration_t getInterruptDuration() const {
 		return mUsecInteruptDuration;
 	}
 
@@ -85,13 +85,14 @@ public:
 		stream.println(INT_TRAITS<size_t>::MAX);
 		stream.println();
 #endif
+		uint32_t interruptLoadSum = 0;
+		uint32_t pulseDurationSum = 0;
 
 		const size_t n = baseClass::size();
 		size_t i = 0;
 		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
 		while(i < n) {
-			// Start with index one, because the interrupt duration to be printed needs to
-			// be taken from the previous entry.
+
 			const TraceRecord& traceRecord = at(i);
 			stream.print("[");
 			printNumWithSeparator(stream, i, indexWidth, "]");
@@ -102,15 +103,22 @@ public:
 			printStringWithSeparator(stream, "for", separator);
 			printUsecWithSeparator(stream, traceRecord.getPulse().getDuration(), 5, separator);
 
-			printStringWithSeparator(stream, "Interrupt CPU load =", separator);
-			printUsecWithSeparator(stream, traceRecord.getDuration(), 3, separator);
+			printStringWithSeparator(stream, "CPU interrupt load =", separator);
+			printUsecWithSeparator(stream, traceRecord.getInterruptDuration(), 3, separator);
 
-			printRatioAsPercentWithSeparator(stream, traceRecord.getDuration()
+			printRatioAsPercentWithSeparator(stream, traceRecord.getInterruptDuration()
 					, traceRecord.getPulse().getDuration(), 2, separator);
-
 			stream.println();
+
+			interruptLoadSum += traceRecord.getInterruptDuration();
+			pulseDurationSum += traceRecord.getPulse().getDuration();
+
 			i++;
 		}
+
+		printStringWithSeparator(stream, "Average CPU interrupt load =", separator);
+		printRatioAsPercentWithSeparator(stream, interruptLoadSum/n, pulseDurationSum/n, 2, separator);
+		stream.println();
 	}
 
 	PulseTracer() {
