@@ -31,6 +31,7 @@
 #include <assert.h>
 
 #include "Common.hpp"
+#include "TypeTraits.hpp"
 
 namespace RcSwitch {
 

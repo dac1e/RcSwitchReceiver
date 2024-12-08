@@ -11,6 +11,7 @@
 #include "ISR_ATTR.hpp"
 #include "Container.hpp"
 #include "Pulse.hpp"
+#include "TypeTraits.hpp"
 
 namespace RcSwitch {
 
