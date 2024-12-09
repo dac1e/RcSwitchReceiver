@@ -36,18 +36,25 @@ namespace RcSwitch {
 static constexpr size_t NUMTOA_BUFFER_SIZE = sizeof(size_t)*8+1;
 
 /**
- * Called for systems where size_t is 32 bit (e.g. SAM)
+ * Prints an unsigned integer with a particular width. If the the number less
+ * has decimal digits than width, the number is prepended with spaces.
  */
-void sprintNum(char *string, const size_t value, const size_t width);
+void sprintNumAsDecimal(char *string, const unsigned int value, const size_t width);
 
+/**
+ * Returns the number of decimal digits of an unsigned integer.
+ */
+size_t decimalDigits(unsigned int value);
 
-size_t digitCount(size_t value);
-uint32_t scale(uint32_t value, uint16_t base);
+/**
+ * Returns a base - rounded and divided 32 bit integer.
+ */
+uint32_t scaleUint32(const uint32_t value, const unsigned int  base);
 
 template<typename T>
-void printNumWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
+void printNumWithSeparator(T& stream, const unsigned int value, const size_t width, const char* separator) {
 	char buffer[NUMTOA_BUFFER_SIZE];
-	sprintNum(buffer, value, width);
+	sprintNumAsDecimal(buffer, value, width);
 	stream.print(buffer);
 	if(separator && strlen(separator)) {
 		stream.print(separator);
@@ -58,9 +65,9 @@ void printNumWithSeparator(T& stream, const size_t value, const size_t width, co
 }
 
 template<typename T>
-void printNumWithUnitAndSeparator(T& stream, const size_t value, const size_t width, const char* unit, const char* separator) {
+void printNumWithUnitAndSeparator(T& stream, const unsigned int value, const size_t width, const char* unit, const char* separator) {
 	char buffer[NUMTOA_BUFFER_SIZE];
-	sprintNum(buffer, value, width);
+	sprintNumAsDecimal(buffer, value, width);
 	stream.print(buffer);
 	if(separator && strlen(separator)) {
 		stream.print(separator);
@@ -75,7 +82,7 @@ void printNumWithUnitAndSeparator(T& stream, const size_t value, const size_t wi
 }
 
 template<typename T>
-inline void printUsecWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
+inline void printUsecWithSeparator(T& stream, const unsigned int value, const size_t width, const char* separator) {
 	printNumWithUnitAndSeparator(stream, value, width, "usec", separator);
 }
 
@@ -91,7 +98,7 @@ void printStringWithSeparator(T& stream, const char* string, const char* separat
 }
 
 template<typename T>
-inline void printPercentWithSeparator(T& stream, const size_t value, const size_t width, const char* separator) {
+inline void printPercentWithSeparator(T& stream, const unsigned int value, const size_t width, const char* separator) {
 	printNumWithSeparator(stream, value, width, nullptr);
 	printStringWithSeparator(stream, "%", separator);
 }
@@ -105,7 +112,6 @@ inline void printRatioAsPercentWithSeparator(T& stream, const uint32_t nominator
 	//  10 -> width is 2
 	// 100 -> width is 3
 	constexpr size_t DECIMAL_PLACES_DIV = 10;
-
 	constexpr uint32_t SCALE = 1000;
 
 	const uint32_t scaledRatio = (SCALE * (100 * nominator)) / denominator;

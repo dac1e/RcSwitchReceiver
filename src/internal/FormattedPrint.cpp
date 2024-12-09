@@ -32,7 +32,7 @@
 
 namespace RcSwitch {
 
-uint32_t scale(uint32_t value, uint16_t base) {
+uint32_t scaleUint32(const uint32_t value, unsigned int base) {
 	if(base) {
 		uint32_t x = (value + (base / 2)) / base;
 		return x;
@@ -40,7 +40,7 @@ uint32_t scale(uint32_t value, uint16_t base) {
 	return value;
 }
 
-size_t digitCount(size_t value) {
+size_t decimalDigits(unsigned int value) {
 	size_t result = 0;
 	do {
 		++result;
@@ -49,8 +49,8 @@ size_t digitCount(size_t value) {
 	return result;
 }
 
-void sprintNum(char *string, const size_t value, const size_t width) {
-	const size_t digitCnt = digitCount(value);
+void sprintNumAsDecimal(char *string, const unsigned int value, const size_t width) {
+	const size_t digitCnt = decimalDigits(value);
 	const size_t spacesCnt = width > digitCnt ? width - digitCnt : 0;
 	size_t i = 0;
 	while(i < spacesCnt) {

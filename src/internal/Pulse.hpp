@@ -73,13 +73,13 @@ struct PulseTypes {
 class Pulse {
 public:
 	/**
-	 * size_t will be 16 bit on 8 and 16 bit systems and 32 bit
+	 * unsigned int will be 16 bit on 8 and 16 bit systems and 32 bit
 	 * on 32 bit systems.
 	 * Typical pulse durations from remote controls are in the
 	 * range of 200us .. 15000us. Smaller and longer pulses might
 	 * come form HF noise. Hence 16 bit width is sufficient.
 	 */
-	using duration_t = size_t;
+	using duration_t = unsigned int;
 
 private:
 	duration_t mUsecDuration;
@@ -94,7 +94,7 @@ public:
 	 * When duration_t is identical to the type passed
 	 * by the caller, we can just take over everything.
 	 * This will be the case on 32 bit systems, where
-	 * duration_t = size_t and micros() return type is
+	 * duration_t = unsigned int and micros() return type is
 	 * uint32_t.
 	 */
 	TEXT_ISR_ATTR_1 inline Pulse(duration_t duration, const PULSE_LEVEL& pulseLevel)
@@ -109,7 +109,7 @@ public:
 	 * When duration_t is smaller than the type passed
 	 * by the caller, we limit it to the maximum of
 	 * duration_t. This will be the case on 16 bit systems
-	 * where size_t = duration_t = uint16_t and the
+	 * where unsigned int = duration_t = uint16_t and the
 	 * return type of micros() is uint32_t.
 	 */
 	template<typename T>
@@ -139,7 +139,7 @@ public:
 		return mPulseLevel;
 	}
 
-	bool isDurationInRange(size_t value, unsigned percentTolerance) const;
+	bool isDurationInRange(unsigned int value, unsigned percentTolerance) const;
 };
 
 class PulseCategory {
@@ -148,9 +148,9 @@ class PulseCategory {
 	 * this category.
 	 */
 	Pulse  mPulse;
-	size_t usecMinDuration;
-	size_t usecMaxDuration;
-	size_t pulseCount;
+	unsigned int usecMinDuration;
+	unsigned int usecMaxDuration;
+	unsigned int pulseCount;
 
 public:
 	PulseCategory();
@@ -164,14 +164,14 @@ public:
 	/**
 	 * Get the average of the duration of all pulses.
 	 */
-	inline size_t getWeightedAverage() const {
+	inline unsigned int getWeightedAverage() const {
 		return mPulse.getDuration();
 	}
 
 	/**
 	 * Get the average of the minimum and maximum duration.
 	 */
-	inline size_t getMinMaxAverage() const {
+	inline unsigned int getMinMaxAverage() const {
 		return (usecMaxDuration + usecMinDuration) / 2;
 	}
 

@@ -39,8 +39,8 @@
 namespace RcSwitch {
 
 struct TimeRange {
-	size_t lowerBound;
-	size_t upperBound;
+	unsigned int lowerBound;
+	unsigned int upperBound;
 
 	enum COMPARE_RESULT {
 		IS_WITHIN =  0,
@@ -63,7 +63,7 @@ struct RxPulsePairTimeRanges {
 };
 
 struct RxTimingSpec {
-	size_t   protocolNumber;
+	unsigned int   protocolNumber;
 	bool bInverseLevel;
 	RxPulsePairTimeRanges  synchronizationPulsePair;
 	RxPulsePairTimeRanges  data0pulsePair;
@@ -71,8 +71,8 @@ struct RxTimingSpec {
 };
 
 struct TxPulsePairTiming {
-	size_t durationA;
-	size_t durationB;
+	unsigned int durationA;
+	unsigned int durationB;
 };
 
 template<typename L, typename R> struct isRxTimingSpecLower {
@@ -91,38 +91,38 @@ namespace Debug {
  * makeTimingSpec
  */
 template<
-	size_t protocolNumber,
-	size_t usecClock,
+	unsigned int protocolNumber,
+	unsigned int usecClock,
 	unsigned percentTolerance,
-	size_t synchA,  size_t synchB,
-	size_t data0_A, size_t data0_B,
-	size_t data1_A, size_t data1_B,
+	unsigned int synchA,  unsigned int synchB,
+	unsigned int data0_A, unsigned int data0_B,
+	unsigned int data1_A, unsigned int data1_B,
 	bool inverseLevel>
 
 struct makeTimingSpec { // Calculate the timing specification from the protocol definition.
-	static constexpr size_t PROTOCOL_NUMBER = protocolNumber;
+	static constexpr unsigned int PROTOCOL_NUMBER = protocolNumber;
 	static constexpr bool INVERSE_LEVEL = inverseLevel;
 
-	static constexpr size_t uSecSynchA = usecClock * synchA;
-	static constexpr size_t uSecSynchB = usecClock * synchB;
-	static constexpr size_t usecSynchA_lowerBound = static_cast<uint32_t>(uSecSynchA) * (100-percentTolerance) / 100;
-	static constexpr size_t usecSynchA_upperBound = static_cast<uint32_t>(uSecSynchA) * (100+percentTolerance) / 100;
-	static constexpr size_t usecSynchB_lowerBound = static_cast<uint32_t>(uSecSynchB) * (100-percentTolerance) / 100;
-	static constexpr size_t usecSynchB_upperBound = static_cast<uint32_t>(uSecSynchB) * (100+percentTolerance) / 100;
+	static constexpr unsigned int uSecSynchA = usecClock * synchA;
+	static constexpr unsigned int uSecSynchB = usecClock * synchB;
+	static constexpr unsigned int usecSynchA_lowerBound = static_cast<uint32_t>(uSecSynchA) * (100-percentTolerance) / 100;
+	static constexpr unsigned int usecSynchA_upperBound = static_cast<uint32_t>(uSecSynchA) * (100+percentTolerance) / 100;
+	static constexpr unsigned int usecSynchB_lowerBound = static_cast<uint32_t>(uSecSynchB) * (100-percentTolerance) / 100;
+	static constexpr unsigned int usecSynchB_upperBound = static_cast<uint32_t>(uSecSynchB) * (100+percentTolerance) / 100;
 
-	static constexpr size_t uSecData0_A = usecClock * data0_A;
-	static constexpr size_t uSecData0_B = usecClock * data0_B;
-	static constexpr size_t uSecData0_A_lowerBound = static_cast<uint32_t>(uSecData0_A) * (100-percentTolerance) / 100;
-	static constexpr size_t uSecData0_A_upperBound = static_cast<uint32_t>(uSecData0_A) * (100+percentTolerance) / 100;
-	static constexpr size_t uSecData0_B_lowerBound = static_cast<uint32_t>(uSecData0_B) * (100-percentTolerance) / 100;
-	static constexpr size_t uSecData0_B_upperBound = static_cast<uint32_t>(uSecData0_B) * (100+percentTolerance) / 100;
+	static constexpr unsigned int uSecData0_A = usecClock * data0_A;
+	static constexpr unsigned int uSecData0_B = usecClock * data0_B;
+	static constexpr unsigned int uSecData0_A_lowerBound = static_cast<uint32_t>(uSecData0_A) * (100-percentTolerance) / 100;
+	static constexpr unsigned int uSecData0_A_upperBound = static_cast<uint32_t>(uSecData0_A) * (100+percentTolerance) / 100;
+	static constexpr unsigned int uSecData0_B_lowerBound = static_cast<uint32_t>(uSecData0_B) * (100-percentTolerance) / 100;
+	static constexpr unsigned int uSecData0_B_upperBound = static_cast<uint32_t>(uSecData0_B) * (100+percentTolerance) / 100;
 
-	static constexpr size_t uSecData1_A = usecClock * data1_A;
-	static constexpr size_t uSecData1_B = usecClock * data1_B;
-	static constexpr size_t uSecData1_A_lowerBound = static_cast<uint32_t>(uSecData1_A) * (100-percentTolerance) / 100;
-	static constexpr size_t uSecData1_A_upperBound = static_cast<uint32_t>(uSecData1_A) * (100+percentTolerance) / 100;
-	static constexpr size_t uSecData1_B_lowerBound = static_cast<uint32_t>(uSecData1_B) * (100-percentTolerance) / 100;
-	static constexpr size_t uSecData1_B_upperBound = static_cast<uint32_t>(uSecData1_B) * (100+percentTolerance) / 100;
+	static constexpr unsigned int uSecData1_A = usecClock * data1_A;
+	static constexpr unsigned int uSecData1_B = usecClock * data1_B;
+	static constexpr unsigned int uSecData1_A_lowerBound = static_cast<uint32_t>(uSecData1_A) * (100-percentTolerance) / 100;
+	static constexpr unsigned int uSecData1_A_upperBound = static_cast<uint32_t>(uSecData1_A) * (100+percentTolerance) / 100;
+	static constexpr unsigned int uSecData1_B_lowerBound = static_cast<uint32_t>(uSecData1_B) * (100-percentTolerance) / 100;
+	static constexpr unsigned int uSecData1_B_upperBound = static_cast<uint32_t>(uSecData1_B) * (100+percentTolerance) / 100;
 
 	typedef RcSwitch::RxTimingSpec rx_spec_t;
 	static constexpr rx_spec_t RX = {PROTOCOL_NUMBER, INVERSE_LEVEL,

@@ -120,7 +120,7 @@ static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const RxTimingSpecT
 }
 
 // ======== Receiver ===================
-size_t Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
+unsigned int Receiver::getProtcolNumber(const size_t protocolCandidateIndex) const {
 	 const RxTimingSpecTable& protocol = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	 RCSWITCH_ASSERT(protocolCandidateIndex < mProtocolCandidates.size());
 	 const size_t protocolIndex = mProtocolCandidates.at(protocolCandidateIndex);
@@ -277,7 +277,7 @@ void Receiver::reset() {
 	mMessageAvailable = false;
 }
 
-size_t Receiver::receivedBitsCount() const {
+unsigned int Receiver::receivedBitsCount() const {
 	if(available()) {
 		const MessagePacket& messagePacket = mReceivedMessagePacket;
 		return messagePacket.size() + messagePacket.overflowCount();

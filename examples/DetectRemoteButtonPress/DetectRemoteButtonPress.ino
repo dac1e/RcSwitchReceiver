@@ -32,7 +32,7 @@
 #include "RcButtonPressDetector.hpp"
 #include <Arduino.h>
 
-size_t constexpr PROTOCOL_PT2262  = 1;
+unsigned int constexpr PROTOCOL_PT2262  = 1;
 
 // For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
 // You can add own protocols and remove not needed protocols.

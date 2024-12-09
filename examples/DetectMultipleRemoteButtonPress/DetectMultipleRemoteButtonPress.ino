@@ -34,8 +34,8 @@
 
 #define PRINT_DETECTED_BUTTON true
 
-size_t constexpr PROTOCOL_PT2262  = 1;
-size_t constexpr PROTOCOL_SYGONIX =12;
+unsigned int constexpr PROTOCOL_PT2262  = 1;
+unsigned int constexpr PROTOCOL_SYGONIX =12;
 
 // For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
 // You can add own protocols and remove not needed protocols.

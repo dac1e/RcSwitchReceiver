@@ -27,7 +27,7 @@
 
 namespace RcSwitch {
 
-bool Pulse::isDurationInRange(size_t value, unsigned percentTolerance) const {
+bool Pulse::isDurationInRange(unsigned int value, unsigned percentTolerance) const {
 	// duration_t may be 16 bit. So static cast to uint32_t avoids
 	// temporary overflow when multiplying with 100
 	if (static_cast<uint32_t>(mUsecDuration)

@@ -58,7 +58,7 @@ RcButtonPressDetector::rcButtonCode_t RcButtonPressDetector::rcDataToButton(
 	return RcButtonPressDetector::NO_BUTTON;
 }
 
-RcButtonPressDetector::RcButtonPressDetector(size_t msecDebounceDelayTime)
+RcButtonPressDetector::RcButtonPressDetector(unsigned int msecDebounceDelayTime)
 	: mDebounceDelayTime(msecDebounceDelayTime)
 	, mRcSwitchReceiver(nullptr)
 	, mLastPressedButton(NO_BUTTON)

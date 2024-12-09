@@ -244,7 +244,7 @@ public:
 	int receivedProtocol(const size_t index) const;
 	void suspend() {mSuspended = true;}
 	void resume() {if(mSuspended) {reset(); mSuspended=false;}}
-	size_t getProtcolNumber(const size_t protocolCandidateIndex) const;
+	unsigned int getProtcolNumber(const size_t protocolCandidateIndex) const;
 	void resetAvailable() {if(available()) {reset();}}
 
 };

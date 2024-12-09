@@ -92,7 +92,7 @@ public:
 
 		const size_t n = baseClass::size();
 		size_t i = 0;
-		const size_t indexWidth = digitCount(PULSE_TRACES_COUNT);
+		const size_t indexWidth = decimalDigits(PULSE_TRACES_COUNT);
 		while(i < n) {
 			const TraceRecord& traceRecord = at(i);
 			traceRecord.dump(serial, separator, i, indexWidth);

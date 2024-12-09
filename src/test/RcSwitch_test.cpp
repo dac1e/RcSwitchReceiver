@@ -154,7 +154,7 @@ static const TxDataBit invalidMessagePacket_secondPulseTooLong[] = {
 		{DATA_BIT::UNKNOWN},
 };
 
-template<size_t protocolNumber> class PulseLength {};
+template<unsigned int protocolNumber> class PulseLength {};
 
 template<> struct PulseLength<1> {
 	static constexpr uint32_t synchShortPulseLength =  1 * 350;
@@ -179,7 +179,7 @@ void RcSwitch_test::sendDataPulse(uint32_t &usec, Receiver &receiver, const uint
 	receiver.handleInterrupt(secondPulseEndLevel, usec);
 }
 
-template<size_t protocolNumber> struct Protocol {
+template<unsigned int protocolNumber> struct Protocol {
 	static void sendLogical0(uint32_t &usec, Receiver &receiver,
 			const double& firstPulseDurationFactor, const double& secondPulseDurationFactor) {
 
@@ -383,7 +383,7 @@ void RcSwitch_test::testProtocolCandidates() const {
 	assert(receiver.mProtocolCandidates.size() == 2); 					// Match protocol #1 and #7
 
 	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  	// Check protocol candidates
-		static const size_t expectedProtocols[] = {7,1};
+		static const unsigned int expectedProtocols[] = {7,1};
 		assert(receiver.getProtcolNumber(i) == expectedProtocols[i]);
 	}
 
@@ -400,7 +400,7 @@ void RcSwitch_test::testProtocolCandidates() const {
 	receiver.collectProtocolCandidates(pulse_0, pulse_1);
 	assert(receiver.mProtocolCandidates.size() == 1); 			// No matching protocol
 	for(size_t i = 0; i < receiver.mProtocolCandidates.size(); i++) {  // Check protocol candidates
-		static const size_t expectedProtocols[] = {4};
+		static const unsigned int expectedProtocols[] = {4};
 		assert(receiver.getProtcolNumber(i) == expectedProtocols[i]);
 	}
 }

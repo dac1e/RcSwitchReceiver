@@ -12,13 +12,13 @@
 
 namespace {
 
-size_t sprintRange(char *string, const size_t begin, const size_t end, const size_t width) {
+size_t sprintRange(char *string, const unsigned int begin, const unsigned int end, const size_t width) {
 	size_t i=0;
 	string[i++] = '[';
-	RcSwitch::sprintNum(&string[i], begin, width); // adds a null terminated string
+	RcSwitch::sprintNumAsDecimal(&string[i], begin, width); // adds a null terminated string
 	strcat(string, "..");
 	i = strlen(string);
-	RcSwitch::sprintNum(&string[i], end, width); // adds a null terminated string
+	RcSwitch::sprintNumAsDecimal(&string[i], end, width); // adds a null terminated string
 	i = strlen(string);
 	string[i++] = ']';
 	string[i] = '\0'; // ensure null termination
@@ -53,7 +53,7 @@ void dumpRxTimingSpecTable(serial_t &serial, const RxTimingSpecTable &rxtimingSp
 
 	for (size_t i = 0; i < rxtimingSpecTable.size; i++) {
 		const RxTimingSpec &p = rxtimingSpecTable.start[i];
-		sprintNum(buffer, p.protocolNumber, 2);
+		sprintNumAsDecimal(buffer, p.protocolNumber, 2);
 		serial.print(buffer);
 		if (p.bInverseLevel) {
 			serial.print(",1,");

@@ -104,16 +104,16 @@ struct DataPulses {
 	}
 
 	inline uint32_t getMinMaxAverageD0A(uint16_t scaleBase = 1) {
-		return scale(d0A->getMinMaxAverage(), scaleBase); // short pulse
+		return scaleUint32(d0A->getMinMaxAverage(), scaleBase); // short pulse
 	}
 	inline uint32_t getMinMaxAverageD0B(uint16_t scaleBase = 1) {
-		return scale(d0B->getMinMaxAverage(), scaleBase); // long pulse
+		return scaleUint32(d0B->getMinMaxAverage(), scaleBase); // long pulse
 	}
 	inline uint32_t getMinMaxAverageD1A(uint16_t scaleBase = 1) {
-		return scale(d1A->getMinMaxAverage(), scaleBase); // long pulse
+		return scaleUint32(d1A->getMinMaxAverage(), scaleBase); // long pulse
 	}
 	inline uint32_t getMinMaxAverageD1B(uint16_t scaleBase = 1) {
-		return scale(d1B->getMinMaxAverage(), scaleBase); // short pulse
+		return scaleUint32(d1B->getMinMaxAverage(), scaleBase); // short pulse
 	}
 
 	bool checkRatio() {
@@ -208,7 +208,7 @@ public:
 	}
 
 	void build(DataPulses& dataPulses, const RingBufferReadAccess<TraceRecord>& input, unsigned percentTolerance
-			,synchPulseCategories_t& synchPulseCategories, size_t usecSynchB) {
+			,synchPulseCategories_t& synchPulseCategories, unsigned int usecSynchB) {
 
 		assert(capacity == DATA_PULSE_CATEGORIY_COUNT); // // This must be the data pulse category collection
 
@@ -291,13 +291,13 @@ public:
 	uint32_t getDurationSyA(uint16_t scaleBase = 1) {
 		assert(capacity == SYNCH_PULSE_CATEGORIY_COUNT); // This must be the synch pulse category collection
 		const PulseCategory& pulseCategorySyA = at(0);
-		return scale(pulseCategorySyA.getWeightedAverage(), scaleBase);
+		return scaleUint32(pulseCategorySyA.getWeightedAverage(), scaleBase);
 	}
 
 	uint32_t getDurationSyB(uint16_t scaleBase = 1) {
 		assert(capacity == SYNCH_PULSE_CATEGORIY_COUNT); // This must be the synch pulse category collection
 		const PulseCategory& pulseCategorySyB = at(1);
-		return scale(pulseCategorySyB.getWeightedAverage(), scaleBase);
+		return scaleUint32(pulseCategorySyB.getWeightedAverage(), scaleBase);
 	}
 
 	static constexpr uint32_t DATA_PULSES_MIN_RATIO_PERCENT = 100 * DATA_PULSES_MIN_RATIO;

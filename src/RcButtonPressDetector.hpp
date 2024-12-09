@@ -48,7 +48,7 @@ private:
 		ON,
 	};
 
-	const size_t mDebounceDelayTime; // in milliseconds
+	const unsigned int mDebounceDelayTime; // in milliseconds
 	RcSwitch::Receiver* mRcSwitchReceiver;
 	STATE mRcButtonState = STATE::OFF;
 	rcButtonCode_t mLastPressedButton;
@@ -130,7 +130,7 @@ protected:
 	virtual rcButtonCode_t rcDataToButton(const int rcProtocol, const receivedValue_t receivedData) const;
 
 public:
-	RcButtonPressDetector(size_t msecDebounceDelayTime = 250);
+	RcButtonPressDetector(unsigned int msecDebounceDelayTime = 250);
 	void scanRcButtons();
 
 	/**

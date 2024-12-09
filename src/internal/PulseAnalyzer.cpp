@@ -129,7 +129,7 @@ template <> void PulseAnalyzer::dump(typeof(Serial)& stream, const char* separat
 		static const char* const frame =
 					   "***************************************************************";
 		stream.println(frame);
-		stream.println("Protocol detection succeeded. Protocol proposal:");
+		stream.println("Protocol detection succeeded. Timing specification proposal:");
 		dumpProposedTimings(stream, 10);
 		stream.println(frame);
 	} else {

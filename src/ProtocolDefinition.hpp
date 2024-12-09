@@ -105,12 +105,12 @@
  */
 template<
 	/** A protocol specification is given by the following parameters: */
-	size_t protocolNumber,           /* A unique integer identifier of this protocol. */
-	size_t usecClock,                /* The clock rate in microseconds.  */
+	unsigned int protocolNumber,           /* A unique integer identifier of this protocol. */
+	unsigned int usecClock,                /* The clock rate in microseconds.  */
 	unsigned percentTolerance,       /* The tolerance for a pulse length to be recognized as a valid. */
-	size_t synchA,  size_t synchB,   /* Number of clocks for the synchronization pulse pair. */
-	size_t data0_A, size_t data0_B,  /* Number of clocks for a logical 0 bit data pulse pair. */
-	size_t data1_A, size_t data1_B,  /* Number of clocks for a logical 1 bit data pulse pair. */
+	unsigned int synchA,  unsigned int synchB,   /* Number of clocks for the synchronization pulse pair. */
+	unsigned int data0_A, unsigned int data0_B,  /* Number of clocks for a logical 0 bit data pulse pair. */
+	unsigned int data1_A, unsigned int data1_B,  /* Number of clocks for a logical 1 bit data pulse pair. */
 	bool inverseLevel>               /* Flag whether pulse levels are normal or inverse. */
 struct makeTimingSpec;
 
