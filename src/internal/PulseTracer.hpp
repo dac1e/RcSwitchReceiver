@@ -49,22 +49,12 @@ class TraceRecord {
 	}
 
 public:
-	TEXT_ISR_ATTR_1 inline TraceRecord()
-		: mUsecInteruptDuration(0), mPulseLevel(0), mPulseDuration(0) {
-	}
+	TEXT_ISR_ATTR_1_INLINE TraceRecord();
 
-	TEXT_ISR_ATTR_1 inline TraceRecord(const Pulse& pulse, const duration_t usecInterruptDuration)
-		: mUsecInteruptDuration(usecInterruptDuration)
-		, mPulseLevel(pulse.getLevel() == PULSE_LEVEL::LO ? 0 : 1)
-		, mPulseDuration(pulse.getDuration()){
-	}
+	TEXT_ISR_ATTR_1_INLINE TraceRecord(const Pulse &pulse, const duration_t usecInterruptDuration);
 
-	TEXT_ISR_ATTR_1 inline void set(duration_t pulseDuration, PULSE_LEVEL pulseLevel,
-			const duration_t usecInterruptDuration) {
-		mUsecInteruptDuration = usecInterruptDuration;
-		mPulseLevel = pulseLevel ==  PULSE_LEVEL::LO ? 0 : 1;
-		mPulseDuration = pulseDuration;
-	}
+	TEXT_ISR_ATTR_1_INLINE void set(duration_t pulseDuration, PULSE_LEVEL pulseLevel,
+			const duration_t usecInterruptDuration);
 
 	inline duration_t getInterruptDuration() const {
 		return mUsecInteruptDuration;
@@ -124,7 +114,10 @@ public:
 	 */
 	using baseClass::at;
 };
-
 } // namespace RcSwitch
+
+#if not defined(ESP32) && not defined(ESP8266)
+#include "PulseTracer.inc"
+#endif
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_PULSETRACER_HPP_ */

@@ -119,10 +119,7 @@ public:
 	}
 
 	/** Remove all protocol candidates from this container. */
-	TEXT_ISR_ATTR_1 inline void reset() {
-		baseClass::reset();
-		mProtocolGroupId = UNKNOWN_PROTOCOL;
-	}
+	TEXT_ISR_ATTR_1_INLINE void reset();
 
 	/**
 	 * Push another protocol candidate onto the stack.
@@ -286,11 +283,7 @@ class ReceiverWithPulseTracer : public Receiver {
 	 * Evaluate a new pulse that has been received. Will
 	 * only be called from within interrupt context.
 	 */
-	TEXT_ISR_ATTR_0 inline void handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry) {
-		const uint32_t usecLastInterrupt = mUsecLastInterrupt;
-		Receiver::handleInterrupt(pinLevel, usecInterruptEntry);
-		tracePulse(usecInterruptEntry, pinLevel, usecLastInterrupt);
-	}
+	TEXT_ISR_ATTR_0_INLINE void handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry);
 
 public:
 	/**
@@ -316,6 +309,13 @@ public:
 		mPulseTracingLocked = false;
 	}
 };
+
+template<size_t PULSE_TRACES_COUNT>
+void ReceiverWithPulseTracer<PULSE_TRACES_COUNT>::handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry) {
+	const uint32_t usecLastInterrupt = mUsecLastInterrupt;
+	Receiver::handleInterrupt(pinLevel, usecInterruptEntry);
+	tracePulse(usecInterruptEntry, pinLevel, usecLastInterrupt);
+}
 
 static constexpr size_t MIN_PULSE_TRACES_FOR_PROTOCOL_DEDUCTION = 132;
 static const char* const toLessPulseTracesError =
@@ -370,5 +370,9 @@ template<> struct ReceiverSelector<0> {
 };
 
 } /* namespace RcSwitch */
+
+#if not defined(ESP32) && not defined(ESP8266)
+#include "RcSwitch.inc"
+#endif
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_RCSWTICH__HPP_ */

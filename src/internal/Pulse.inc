@@ -22,31 +22,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#include "PulseTracer.hpp"
-#include <Arduino.h>
-
-#if defined(ESP32) || defined(ESP8266)
-#include "PulseTracer.inc"
-#endif
-
 namespace RcSwitch {
 
-template<> void TraceRecord::dump(typeof(Serial)& serial, const char* separator, const size_t i, const size_t indexWidth) const {
-	serial.print("[");
-	printNumWithSeparator(serial, i, indexWidth, "]");
-	printStringWithSeparator(serial, "", separator);
-
-	// print pulse type (LOW, HIGH)
-	printStringWithSeparator(serial, pulseTypeToString(getPulse()), separator);
-	printStringWithSeparator(serial, "for", separator);
-	printUsecWithSeparator(serial, getPulse().getDuration(), 5, separator);
-
-	printStringWithSeparator(serial, "CPU interrupt load =", separator);
-	printUsecWithSeparator(serial, getInterruptDuration(), 3, separator);
-
-	printRatioAsPercentWithSeparator(serial, getInterruptDuration()
-			, getPulse().getDuration(), 2, separator);
-	serial.println();
+Pulse::Pulse(duration_t duration, const PULSE_LEVEL &pulseLevel) :
+		mUsecDuration(duration), mPulseLevel(pulseLevel) {
 }
 
-} /* namespace RcSwitch */
+} // namespace RcSwitch

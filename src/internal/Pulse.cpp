@@ -25,6 +25,10 @@
 #include "Pulse.hpp"
 #include <Arduino.h>
 
+#if defined(ESP32) || defined(ESP8266)
+#include "Pulse.inc"
+#endif
+
 namespace RcSwitch {
 
 bool Pulse::isDurationInRange(unsigned int value, unsigned percentTolerance) const {

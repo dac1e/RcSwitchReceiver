@@ -26,6 +26,10 @@
 #include "ProtocolTimingSpec.hpp"
 #include "RcSwitch.hpp"
 
+#if defined(ESP32) || defined(ESP8266)
+#include "RcSwitch.inc"
+#endif
+
 namespace RcSwitch {
 
 uint32_t micros_() {
@@ -92,7 +96,7 @@ static PulseTypes TEXT_ISR_ATTR_2 pulseBtoPulseTypes(const RxTimingSpec& protoco
 	return result;
 }
 
-static TEXT_ISR_ATTR_2 inline void collectProtocolCandidates(const RxTimingSpecTable& protocol,
+static TEXT_ISR_ATTR_2_INLINE void collectProtocolCandidates(const RxTimingSpecTable& protocol,
 		ProtocolCandidates& protocolCandidates, const Pulse&  pulseA, const Pulse&  pulseB) {
 	for(size_t i = 0; i < protocol.size; i++) {
 		const RxTimingSpec& prot = protocol.start[i];
@@ -147,8 +151,7 @@ void Receiver::collectProtocolCandidates(const Pulse&  pulse_0, const Pulse&  pu
   }
 }
 
-// inline attribute, because it is private and called once.
-inline PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) {
+PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) {
 	PULSE_TYPE result = PULSE_TYPE::UNKNOWN;
 	const RxTimingSpecTable protocols = getRxTimingTable(mProtocolCandidates.getProtocolGroup());
 	size_t protocolCandidatesIndex = mProtocolCandidates.size();
@@ -244,8 +247,7 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t uescInterruptE
 	mUsecLastInterrupt = uescInterruptEntry;
 }
 
-// inline attribute, because it is private and called once.
-inline void Receiver::push(uint32_t microSecDuration, const int pinLevel) {
+void Receiver::push(uint32_t microSecDuration, const int pinLevel) {
 	Pulse * const storage = beyondTop();
 	*storage = Pulse(microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI));
 	baseClass::selectNext();
@@ -258,8 +260,7 @@ Receiver::STATE Receiver::state() const {
 	return mProtocolCandidates.size() ? DATA_STATE : SYNC_STATE;
 }
 
-// inline attribute, because it is private and called once.
-inline void Receiver::retry() {
+void Receiver::retry() {
 	mReceivedMessagePacket.reset();
 	baseClass::reset();
 }

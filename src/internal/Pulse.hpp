@@ -97,9 +97,7 @@ public:
 	 * duration_t = unsigned int and micros() return type is
 	 * uint32_t.
 	 */
-	TEXT_ISR_ATTR_1 inline Pulse(duration_t duration, const PULSE_LEVEL& pulseLevel)
-		: mUsecDuration(duration), mPulseLevel(pulseLevel){
-	}
+	TEXT_ISR_ATTR_1_INLINE Pulse(duration_t duration, const PULSE_LEVEL &pulseLevel);
 
 	inline void setDuration(const duration_t duration) {
 		mUsecDuration = duration;
@@ -198,5 +196,9 @@ public:
 };
 
 } //  namespace RcSwitch
+
+#if not defined(ESP32) && not defined(ESP8266)
+#include "Pulse.inc"
+#endif
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_PULSE_HPP_ */
