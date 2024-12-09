@@ -247,8 +247,7 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t uescInterruptE
 // inline attribute, because it is private and called once.
 inline void Receiver::push(uint32_t microSecDuration, const int pinLevel) {
 	Pulse * const storage = beyondTop();
-	*storage = {microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI)
-	};
+	*storage = Pulse(microSecDuration, (pinLevel ? PULSE_LEVEL::LO : PULSE_LEVEL::HI));
 	baseClass::selectNext();
 }
 

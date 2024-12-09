@@ -30,8 +30,9 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include "FormattedPrint.hpp"
+#include "ISR_ATTR.hpp"
 #include "TypeTraits.hpp"
+#include "FormattedPrint.hpp"
 
 namespace RcSwitch {
 
@@ -71,7 +72,15 @@ struct PulseTypes {
 
 class Pulse {
 public:
+	/**
+	 * size_t will be 16 bit on 8 and 16 bit systems and 32 bit
+	 * on 32 bit systems.
+	 * Typical pulse durations from remote controls are in the
+	 * range of 200us .. 15000us. Smaller and longer pulses might
+	 * come form HF noise. Hence 16 bit width is sufficient.
+	 */
 	using duration_t = size_t;
+
 private:
 	duration_t mUsecDuration;
 	PULSE_LEVEL mPulseLevel;
@@ -81,20 +90,34 @@ public:
 		: mUsecDuration(0), mPulseLevel(PULSE_LEVEL::UNKNOWN){
 	}
 
-	inline Pulse(duration_t duration, const PULSE_LEVEL& pulseLevel)
+	/**
+	 * When duration_t is identical to the type passed
+	 * by the caller, we can just take over everything.
+	 * This will be the case on 32 bit systems, where
+	 * duration_t = size_t and micros() return type is
+	 * uint32_t.
+	 */
+	TEXT_ISR_ATTR_1 inline Pulse(duration_t duration, const PULSE_LEVEL& pulseLevel)
 		: mUsecDuration(duration), mPulseLevel(pulseLevel){
-	}
-
-	template<typename T>
-	inline Pulse(const T duration, const PULSE_LEVEL& pulseLevel)
-		// limit duration to maximum value of duration_t
-		: mUsecDuration(duration > INT_TRAITS<duration_t>::MAX ?
-				INT_TRAITS<duration_t>::MAX  : duration)
-		, mPulseLevel(pulseLevel){
 	}
 
 	inline void setDuration(const duration_t duration) {
 		mUsecDuration = duration;
+	}
+
+	/**
+	 * When duration_t is smaller than the type passed
+	 * by the caller, we limit it to the maximum of
+	 * duration_t. This will be the case on 16 bit systems
+	 * where size_t = duration_t = uint16_t and the
+	 * return type of micros() is uint32_t.
+	 */
+	template<typename T>
+	TEXT_ISR_ATTR_1 inline Pulse(const T duration, const PULSE_LEVEL& pulseLevel)
+		// limit duration to maximum value of duration_t
+		: mUsecDuration(duration > INT_TRAITS<duration_t>::MAX ?
+				INT_TRAITS<duration_t>::MAX  : duration)
+		, mPulseLevel(pulseLevel){
 	}
 
 	template<typename T>
@@ -117,7 +140,7 @@ public:
 	}
 
 	bool isDurationInRange(size_t value, unsigned percentTolerance) const {
-		// size_t is 16 bit on avr. So static cast to uint32_t avoids
+		// duration_t may be 16 bit. So static cast to uint32_t avoids
 		// temporary overflow when multiplying with 100
 		if (static_cast<uint32_t>(mUsecDuration)
 				< ((static_cast<uint32_t>(value)
@@ -125,7 +148,7 @@ public:
 			return false;
 		}
 
-		// size_t is 16 bit on avr. So static cast to uint32_t avoids
+		// duration_t may be 16 bit. So static cast to uint32_t avoids
 		// temporary overflow when multiplying with 100
 		if (static_cast<uint32_t>(mUsecDuration)
 				>= ((static_cast<uint32_t>(value)
@@ -137,7 +160,10 @@ public:
 };
 
 class PulseCategory {
-	// mPulse holds the level and the average of all pulses that constitute this category.
+	/**
+	 * mPulse holds the level and the average of all pulses that constitute
+	 * this category.
+	 */
 	Pulse  mPulse;
 	size_t usecMinDuration;
 	size_t usecMaxDuration;

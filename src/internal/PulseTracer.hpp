@@ -19,9 +19,9 @@ class TraceRecord {
 	using duration_t = Pulse::duration_t;
 
 	/**
-	 * Special encoding of Pulse here in order to save static memory.
-	 * This is important on CPUs with little RAM like on
-	 * Arduino UNO R3 with ATmega328P.
+	 * There is a special encoding of Pulse here in order to save static memory.
+	 * This is important on CPUs with little RAM like on* Arduino UNO R3 with
+	 * an ATmega328P.
 	 */
 	duration_t mUsecInteruptDuration: INT_TRAITS<duration_t>::WIDTH-1;
 	duration_t mPulseLevel:1;
