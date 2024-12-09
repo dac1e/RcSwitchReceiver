@@ -26,6 +26,11 @@ class TraceRecord {
 	duration_t mUsecInteruptDuration: INT_TRAITS<duration_t>::WIDTH-1;
 	duration_t mPulseLevel:1;
 	duration_t mPulseDuration;
+
+	static const char* pulseTypeToString(const Pulse& pulse) {
+		return pulseLevelToString(pulse.getLevel());
+	}
+
 public:
 	TEXT_ISR_ATTR_1 inline TraceRecord()
 		: mUsecInteruptDuration(0), mPulseLevel(0), mPulseDuration(0) {
@@ -51,6 +56,25 @@ public:
 		mPulseLevel = pulseLevel ==  PULSE_LEVEL::LO ? 0 : 1;
 		mPulseDuration = pulseDuration;
 	}
+
+	template<typename T>
+	void dump(T& serial, const char* separator, const size_t i, const size_t indexWidth) const {
+		serial.print("[");
+		printNumWithSeparator(serial, i, indexWidth, "]");
+		printStringWithSeparator(serial, "", separator);
+
+		// print pulse type (LOW, HIGH)
+		printStringWithSeparator(serial, pulseTypeToString(getPulse()), separator);
+		printStringWithSeparator(serial, "for", separator);
+		printUsecWithSeparator(serial, getPulse().getDuration(), 5, separator);
+
+		printStringWithSeparator(serial, "CPU interrupt load =", separator);
+		printUsecWithSeparator(serial, getInterruptDuration(), 3, separator);
+
+		printRatioAsPercentWithSeparator(serial, getInterruptDuration()
+				, getPulse().getDuration(), 2, separator);
+		serial.println();
+	}
 };
 
 /**
@@ -60,32 +84,8 @@ template<size_t PULSE_TRACES_COUNT>
 class PulseTracer : public RingBuffer<TraceRecord, PULSE_TRACES_COUNT> {
 	using baseClass = RingBuffer<TraceRecord, PULSE_TRACES_COUNT>;
 public:
-	static const char* pulseTypeToString(const Pulse& pulse) {
-		return pulseLevelToString(pulse.getLevel());
-	}
-
 	template<typename T> void dump(T& serial, const char* separator) const {
 
-#if false
-		serial.println(INT_TRAITS<int8_t>::MIN);
-		serial.println(INT_TRAITS<int8_t>::MAX);
-		serial.println(INT_TRAITS<uint8_t>::MIN);
-		serial.println(INT_TRAITS<uint8_t>::MAX);
-		serial.println();
-		serial.println(INT_TRAITS<int16_t>::MIN);
-		serial.println(INT_TRAITS<int16_t>::MAX);
-		serial.println(INT_TRAITS<uint16_t>::MIN);
-		serial.println(INT_TRAITS<uint16_t>::MAX);
-		serial.println();
-		serial.println(INT_TRAITS<int32_t>::MIN);
-		serial.println(INT_TRAITS<int32_t>::MAX);
-		serial.println(INT_TRAITS<uint32_t>::MIN);
-		serial.println(INT_TRAITS<uint32_t>::MAX);
-		serial.println();
-		serial.println(INT_TRAITS<size_t>::MIN);
-		serial.println(INT_TRAITS<size_t>::MAX);
-		serial.println();
-#endif
 		uint32_t interruptLoadSum = 0;
 		uint32_t pulseDurationSum = 0;
 
@@ -95,22 +95,7 @@ public:
 		while(i < n) {
 
 			const TraceRecord& traceRecord = at(i);
-			serial.print("[");
-			printNumWithSeparator(serial, i, indexWidth, "]");
-			printStringWithSeparator(serial, "", separator);
-
-			// print pulse type (LOW, HIGH)
-			printStringWithSeparator(serial, pulseTypeToString(traceRecord.getPulse()), separator);
-			printStringWithSeparator(serial, "for", separator);
-			printUsecWithSeparator(serial, traceRecord.getPulse().getDuration(), 5, separator);
-
-			printStringWithSeparator(serial, "CPU interrupt load =", separator);
-			printUsecWithSeparator(serial, traceRecord.getInterruptDuration(), 3, separator);
-
-			printRatioAsPercentWithSeparator(serial, traceRecord.getInterruptDuration()
-					, traceRecord.getPulse().getDuration(), 2, separator);
-			serial.println();
-
+			traceRecord.dump(serial, separator, i, indexWidth);
 			interruptLoadSum += traceRecord.getInterruptDuration();
 			pulseDurationSum += traceRecord.getPulse().getDuration();
 
