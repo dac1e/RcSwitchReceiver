@@ -37,7 +37,7 @@ class TraceRecord {
 
 	/**
 	 * There is a special encoding of Pulse here in order to save static memory.
-	 * This is important on CPUs with little RAM like on* Arduino UNO R3 with
+	 * This is important on CPUs with little RAM like on Arduino UNO R3 with
 	 * an ATmega328P.
 	 */
 	duration_t mUsecInteruptDuration: INT_TRAITS<duration_t>::WIDTH-1;
@@ -59,19 +59,19 @@ public:
 		, mPulseDuration(pulse.getDuration()){
 	}
 
-	TEXT_ISR_ATTR_1 inline duration_t getInterruptDuration() const {
-		return mUsecInteruptDuration;
-	}
-
-	TEXT_ISR_ATTR_1 inline Pulse getPulse() const {
-		return Pulse(mPulseDuration, mPulseLevel ? PULSE_LEVEL::HI : PULSE_LEVEL::LO);
-	}
-
 	TEXT_ISR_ATTR_1 inline void set(duration_t pulseDuration, PULSE_LEVEL pulseLevel,
 			const duration_t usecInterruptDuration) {
 		mUsecInteruptDuration = usecInterruptDuration;
 		mPulseLevel = pulseLevel ==  PULSE_LEVEL::LO ? 0 : 1;
 		mPulseDuration = pulseDuration;
+	}
+
+	inline duration_t getInterruptDuration() const {
+		return mUsecInteruptDuration;
+	}
+
+	inline Pulse getPulse() const {
+		return Pulse(mPulseDuration, mPulseLevel ? PULSE_LEVEL::HI : PULSE_LEVEL::LO);
 	}
 
 	template<typename T>
