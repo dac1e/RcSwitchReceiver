@@ -139,24 +139,7 @@ public:
 		return mPulseLevel;
 	}
 
-	bool isDurationInRange(size_t value, unsigned percentTolerance) const {
-		// duration_t may be 16 bit. So static cast to uint32_t avoids
-		// temporary overflow when multiplying with 100
-		if (static_cast<uint32_t>(mUsecDuration)
-				< ((static_cast<uint32_t>(value)
-						* (100 - percentTolerance)) / 100)) {
-			return false;
-		}
-
-		// duration_t may be 16 bit. So static cast to uint32_t avoids
-		// temporary overflow when multiplying with 100
-		if (static_cast<uint32_t>(mUsecDuration)
-				>= ((static_cast<uint32_t>(value)
-						* (100 + percentTolerance)) / 100)) {
-			return false;
-		}
-		return true;
-	}
+	bool isDurationInRange(size_t value, unsigned percentTolerance) const;
 };
 
 class PulseCategory {
@@ -170,21 +153,9 @@ class PulseCategory {
 	size_t pulseCount;
 
 public:
-	PulseCategory()
-		: mPulse{0, PULSE_LEVEL::UNKNOWN}
-		, usecMinDuration(0)
-		, usecMaxDuration(0)
-		, pulseCount(0)
-	{
-	}
+	PulseCategory();
 
-	PulseCategory(const Pulse& pulse)
-		: mPulse{pulse.getDuration(), pulse.getLevel()}
-		, usecMinDuration(pulse.getDuration())
-		, usecMaxDuration(pulse.getDuration())
-		, pulseCount(1)
-	{
-	}
+	PulseCategory(const Pulse &pulse);
 
 	inline PULSE_LEVEL getPulseLevel() const {
 		return mPulse.getLevel();
@@ -217,80 +188,13 @@ public:
 				getPulseLevel() != PULSE_LEVEL::UNKNOWN;
 	}
 
-	void invalidate() {
-		pulseCount = 0;
-		mPulse.setLevel(PULSE_LEVEL::UNKNOWN);
-		mPulse.setDuration(0);
-		usecMinDuration = INT_TRAITS<typeof(usecMinDuration)>::MAX;
-		usecMaxDuration = 0;
-	}
+	void invalidate();
 
-	bool addPulse(const Pulse &pulse) {
-		bool result = true;
+	bool addPulse(const Pulse &pulse);
 
-		// Refresh average for the pulse duration and store it.
-		mPulse.setDuration(
-				( (static_cast<uint32_t>(getWeightedAverage()) * pulseCount) + pulse.getDuration())
-					/ (pulseCount + 1));
+	void merge(PulseCategory &result, const PulseCategory &other) const;
 
-		if(pulse.getDuration() < usecMinDuration) {
-			usecMinDuration = pulse.getDuration();
-		}
-
-		if(pulse.getDuration() > usecMaxDuration) {
-			usecMaxDuration = pulse.getDuration();
-		}
-
-		if(getPulseLevel() == PULSE_LEVEL::UNKNOWN) {
-			mPulse.setLevel(pulse.getLevel());
-		} else {
-			result = (getPulseLevel() == pulse.getLevel());
-		}
-
-		++pulseCount;
-
-		return result;
-	}
-
-	void merge(PulseCategory& result, const PulseCategory& other) const {
-		result.mPulse.setLevel(getPulseLevel() == other.getPulseLevel() ? getPulseLevel() : PULSE_LEVEL::LO_or_HI);
-		result.pulseCount = pulseCount + other.pulseCount;
-		result.mPulse.setDuration(((pulseCount * getWeightedAverage())
-			+ (other.pulseCount * other.getWeightedAverage())) / result.pulseCount);
-		result.usecMinDuration = usecMinDuration < other.usecMinDuration ?
-				usecMinDuration : other.usecMinDuration;
-		result.usecMaxDuration = usecMaxDuration > other.usecMaxDuration ?
-				usecMaxDuration : other.usecMaxDuration;
-	}
-
-	template <typename T>
-	void dump(T& stream, const char* separator) const {
-		stream.print("\t");
-		printNumWithSeparator(stream, pulseCount, 3, separator);
-		printStringWithSeparator(stream, "recordings of", separator);
-		printStringWithSeparator(stream, pulseLevelToString(getPulseLevel()), separator);
-
-		stream.print("[");
-		stream.print(separator);
-
-		printUsecWithSeparator(stream, usecMinDuration, 5, separator);
-
-		stream.print("..");
-		stream.print(separator);
-
-		printUsecWithSeparator(stream, usecMaxDuration, 5, separator);
-
-		stream.print("]");
-		stream.print(separator);
-
-		printUsecWithSeparator(stream, getMinMaxAverage(), 5, separator);
-
-		printStringWithSeparator(stream, "+-", separator);
-		printPercentWithSeparator(stream, getPercentMinMaxDeviation(), 2, separator);
-
-		stream.println();
-	}
-
+	template <typename T> void dump(T& serial, const char* separator) const;
 };
 
 } //  namespace RcSwitch

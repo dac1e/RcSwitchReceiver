@@ -64,27 +64,27 @@ public:
 		return pulseLevelToString(pulse.getLevel());
 	}
 
-	template<typename T> void dump(T& stream, const char* separator) const {
+	template<typename T> void dump(T& serial, const char* separator) const {
 
 #if false
-		stream.println(INT_TRAITS<int8_t>::MIN);
-		stream.println(INT_TRAITS<int8_t>::MAX);
-		stream.println(INT_TRAITS<uint8_t>::MIN);
-		stream.println(INT_TRAITS<uint8_t>::MAX);
-		stream.println();
-		stream.println(INT_TRAITS<int16_t>::MIN);
-		stream.println(INT_TRAITS<int16_t>::MAX);
-		stream.println(INT_TRAITS<uint16_t>::MIN);
-		stream.println(INT_TRAITS<uint16_t>::MAX);
-		stream.println();
-		stream.println(INT_TRAITS<int32_t>::MIN);
-		stream.println(INT_TRAITS<int32_t>::MAX);
-		stream.println(INT_TRAITS<uint32_t>::MIN);
-		stream.println(INT_TRAITS<uint32_t>::MAX);
-		stream.println();
-		stream.println(INT_TRAITS<size_t>::MIN);
-		stream.println(INT_TRAITS<size_t>::MAX);
-		stream.println();
+		serial.println(INT_TRAITS<int8_t>::MIN);
+		serial.println(INT_TRAITS<int8_t>::MAX);
+		serial.println(INT_TRAITS<uint8_t>::MIN);
+		serial.println(INT_TRAITS<uint8_t>::MAX);
+		serial.println();
+		serial.println(INT_TRAITS<int16_t>::MIN);
+		serial.println(INT_TRAITS<int16_t>::MAX);
+		serial.println(INT_TRAITS<uint16_t>::MIN);
+		serial.println(INT_TRAITS<uint16_t>::MAX);
+		serial.println();
+		serial.println(INT_TRAITS<int32_t>::MIN);
+		serial.println(INT_TRAITS<int32_t>::MAX);
+		serial.println(INT_TRAITS<uint32_t>::MIN);
+		serial.println(INT_TRAITS<uint32_t>::MAX);
+		serial.println();
+		serial.println(INT_TRAITS<size_t>::MIN);
+		serial.println(INT_TRAITS<size_t>::MAX);
+		serial.println();
 #endif
 		uint32_t interruptLoadSum = 0;
 		uint32_t pulseDurationSum = 0;
@@ -95,21 +95,21 @@ public:
 		while(i < n) {
 
 			const TraceRecord& traceRecord = at(i);
-			stream.print("[");
-			printNumWithSeparator(stream, i, indexWidth, "]");
-			printStringWithSeparator(stream, "", separator);
+			serial.print("[");
+			printNumWithSeparator(serial, i, indexWidth, "]");
+			printStringWithSeparator(serial, "", separator);
 
 			// print pulse type (LOW, HIGH)
-			printStringWithSeparator(stream, pulseTypeToString(traceRecord.getPulse()), separator);
-			printStringWithSeparator(stream, "for", separator);
-			printUsecWithSeparator(stream, traceRecord.getPulse().getDuration(), 5, separator);
+			printStringWithSeparator(serial, pulseTypeToString(traceRecord.getPulse()), separator);
+			printStringWithSeparator(serial, "for", separator);
+			printUsecWithSeparator(serial, traceRecord.getPulse().getDuration(), 5, separator);
 
-			printStringWithSeparator(stream, "CPU interrupt load =", separator);
-			printUsecWithSeparator(stream, traceRecord.getInterruptDuration(), 3, separator);
+			printStringWithSeparator(serial, "CPU interrupt load =", separator);
+			printUsecWithSeparator(serial, traceRecord.getInterruptDuration(), 3, separator);
 
-			printRatioAsPercentWithSeparator(stream, traceRecord.getInterruptDuration()
+			printRatioAsPercentWithSeparator(serial, traceRecord.getInterruptDuration()
 					, traceRecord.getPulse().getDuration(), 2, separator);
-			stream.println();
+			serial.println();
 
 			interruptLoadSum += traceRecord.getInterruptDuration();
 			pulseDurationSum += traceRecord.getPulse().getDuration();
@@ -117,9 +117,9 @@ public:
 			i++;
 		}
 
-		printStringWithSeparator(stream, "Average CPU interrupt load =", separator);
-		printRatioAsPercentWithSeparator(stream, interruptLoadSum/n, pulseDurationSum/n, 2, separator);
-		stream.println();
+		printStringWithSeparator(serial, "Average CPU interrupt load =", separator);
+		printRatioAsPercentWithSeparator(serial, interruptLoadSum/n, pulseDurationSum/n, 2, separator);
+		serial.println();
 	}
 
 	PulseTracer() {

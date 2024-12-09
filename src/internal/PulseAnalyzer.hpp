@@ -303,10 +303,10 @@ public:
 	static constexpr uint32_t DATA_PULSES_MIN_RATIO_PERCENT = 100 * DATA_PULSES_MIN_RATIO;
 
 	template <typename T>
-	void dump(T& stream, const char* separator) const {
+	void dump(T& serial, const char* separator) const {
 		for(size_t i = 0; i < size(); i++) {
 			const PulseCategory& pulseCategory = at(i);
-			pulseCategory.dump(stream, separator);
+			pulseCategory.dump(serial, separator);
 		}
 	}
 
