@@ -35,10 +35,13 @@
 	// interrupt handler and related code must be in RAM on ESP8266,
 	// according to issue #46.
 	#define TEXT_ISR_ATTR ICACHE_RAM_ATTR
+	#define TEXT_ISR_ATTR_INLINE TEXT_ISR_ATTR
 #elif defined(ESP32)
 	#define TEXT_ISR_ATTR IRAM_ATTR
+	#define TEXT_ISR_ATTR_INLINE TEXT_ISR_ATTR
 #else
 	#define TEXT_ISR_ATTR
+	#define TEXT_ISR_ATTR_INLINE inline
 #endif
 
 #if defined(ESP32)
@@ -50,5 +53,9 @@
 #define TEXT_ISR_ATTR_0 TEXT_ISR_ATTR // attibute for handleInterrupt()
 #define TEXT_ISR_ATTR_1 TEXT_ISR_ATTR // attibute functions called by handleInterrupt()
 #define TEXT_ISR_ATTR_2 TEXT_ISR_ATTR // attibute functions called by functions called by handleInterrupt()
+
+#define TEXT_ISR_ATTR_0_INLINE TEXT_ISR_ATTR_INLINE // attibute for handleInterrupt()
+#define TEXT_ISR_ATTR_1_INLINE TEXT_ISR_ATTR_INLINE // attibute functions called by handleInterrupt()
+#define TEXT_ISR_ATTR_2_INLINE TEXT_ISR_ATTR_INLINE // attibute functions called by functions called by handleInterrupt()
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_ISR_ATTR_HPP_ */

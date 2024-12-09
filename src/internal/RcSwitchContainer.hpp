@@ -212,7 +212,7 @@ class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
 	/** The index of the bottom element of the ring buffer. */
 	size_t mBegin;
 
-	TEXT_ISR_ATTR_2 static size_t inline squashedIndex(const size_t i) {
+	static TEXT_ISR_ATTR_2 inline size_t squashedIndex(const size_t i) {
 		return (i + CAPACITY) % CAPACITY;
 	}
 protected:
