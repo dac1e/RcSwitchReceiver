@@ -35,13 +35,13 @@
 	// interrupt handler and related code must be in RAM on ESP8266,
 	// according to issue #46.
 	#define TEXT_ISR_ATTR ICACHE_RAM_ATTR
-	#define TEXT_ISR_ATTR_INLINE TEXT_ISR_ATTR
+	#define TEXT_ISR_ATTR_INLINE ICACHE_RAM_ATTR	// Map to 'ICACHE_RAM_ATTR'
 #elif defined(ESP32)
 	#define TEXT_ISR_ATTR IRAM_ATTR
-	#define TEXT_ISR_ATTR_INLINE TEXT_ISR_ATTR
+	#define TEXT_ISR_ATTR_INLINE IRAM_ATTR			// Map to 'IRAM_ATTR'
 #else
 	#define TEXT_ISR_ATTR
-	#define TEXT_ISR_ATTR_INLINE inline
+	#define TEXT_ISR_ATTR_INLINE inline				// Map to 'inline'
 #endif
 
 #if defined(ESP32)
@@ -50,12 +50,12 @@
 	#define DATA_ISR_ATTR
 #endif
 
-#define TEXT_ISR_ATTR_0 TEXT_ISR_ATTR // attibute for handleInterrupt()
-#define TEXT_ISR_ATTR_1 TEXT_ISR_ATTR // attibute functions called by handleInterrupt()
-#define TEXT_ISR_ATTR_2 TEXT_ISR_ATTR // attibute functions called by functions called by handleInterrupt()
+#define TEXT_ISR_ATTR_0			TEXT_ISR_ATTR // level 0, attibute for handleInterrupt()
+#define TEXT_ISR_ATTR_1			TEXT_ISR_ATTR // level 1, attibute functions called by handleInterrupt()
+#define TEXT_ISR_ATTR_2			TEXT_ISR_ATTR // level 2, attibute functions called by functions called by handleInterrupt()
 
-#define TEXT_ISR_ATTR_0_INLINE TEXT_ISR_ATTR_INLINE // attibute for handleInterrupt()
-#define TEXT_ISR_ATTR_1_INLINE TEXT_ISR_ATTR_INLINE // attibute functions called by handleInterrupt()
-#define TEXT_ISR_ATTR_2_INLINE TEXT_ISR_ATTR_INLINE // attibute functions called by functions called by handleInterrupt()
+#define TEXT_ISR_ATTR_0_INLINE	TEXT_ISR_ATTR_INLINE // level 0, IRAM_ATTR or ICACHE_RAM_ATTR on ESP. Otherwise 'inline'
+#define TEXT_ISR_ATTR_1_INLINE	TEXT_ISR_ATTR_INLINE // level 1, IRAM_ATTR or ICACHE_RAM_ATTR on ESP. Otherwise 'inline'
+#define TEXT_ISR_ATTR_2_INLINE	TEXT_ISR_ATTR_INLINE // level 2, IRAM_ATTR or ICACHE_RAM_ATTR on ESP. Otherwise 'inline'
 
 #endif /* RCSWITCH_RECEIVER_INTERNAL_ISR_ATTR_HPP_ */

@@ -77,22 +77,26 @@ class PulseTracer : public RingBuffer<TraceRecord, PULSE_TRACES_COUNT> {
 public:
 	template<typename T> void dump(T& serial, const char* separator) const {
 
-		uint32_t interruptLoadSum = 0;
-		uint32_t pulseDurationSum = 0;
-
 		const size_t n = baseClass::size();
-		size_t i = 0;
-		const size_t indexWidth = decimalDigits(PULSE_TRACES_COUNT);
-		while(i < n) {
-			const TraceRecord& traceRecord = at(i);
-			traceRecord.dump(serial, separator, i, indexWidth);
-			interruptLoadSum += traceRecord.getInterruptDuration();
-			pulseDurationSum += traceRecord.getPulse().getDuration();
-			i++;
-		}
+		if(n > 0) {
+			uint32_t interruptLoadSum = 0;
+			uint32_t pulseDurationSum = 0;
 
-		printStringWithSeparator(serial, "Average CPU interrupt load =", separator);
-		printRatioAsPercentWithSeparator(serial, interruptLoadSum/n, pulseDurationSum/n, 2, separator);
+			size_t i = 0;
+			const size_t indexWidth = decimalDigits(PULSE_TRACES_COUNT);
+			while(i < n) {
+				const TraceRecord& traceRecord = at(i);
+				traceRecord.dump(serial, separator, i, indexWidth);
+				interruptLoadSum += traceRecord.getInterruptDuration();
+				pulseDurationSum += traceRecord.getPulse().getDuration();
+				i++;
+			}
+
+			printStringWithSeparator(serial, "Average CPU interrupt load =", separator);
+			printRatioAsPercentWithSeparator(serial, interruptLoadSum/n, pulseDurationSum/n, 2, separator);
+		} else {
+			serial.println("No pulses found.");
+		}
 		serial.println();
 	}
 
