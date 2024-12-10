@@ -50,7 +50,12 @@
 
 // Trace the last 140 received pulses from the remote control.
 constexpr size_t TRACE_BUFFER_SIZE = 140;
-constexpr int RX433_DATA_PIN = 2;
+
+#if defined (ARDUINO_AVR_UNO)
+constexpr int RX433_DATA_PIN = 2; // Pin 2 has interrupt capability on UNO
+#else
+constexpr int RX433_DATA_PIN = 6;
+#endif
 
 // Passing a trace buffer size greater 0 will enable RcSwitchReceiver tracing capability.
 static RcSwitchReceiver<RX433_DATA_PIN, TRACE_BUFFER_SIZE> rcSwitchReceiver;

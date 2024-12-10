@@ -49,7 +49,12 @@ DATA_ISR_ATTR static const RxProtocolTable <
 	makeTimingSpec< PROTOCOL_SYGONIX , 300, 20,   2,   23,    2,  4,    4,  2, false>  // (Sygonix)
 > rxProtocolTable;
 
-constexpr int RX433_DATA_PIN = 2;
+#if defined (ARDUINO_AVR_UNO)
+constexpr int RX433_DATA_PIN = 2; // Pin 2 has interrupt capability on UNO
+#else
+constexpr int RX433_DATA_PIN = 6;
+#endif
+
 static RcSwitchReceiver<RX433_DATA_PIN> rcSwitchReceiver;
 
 // Reference to the serial to be used for printing.

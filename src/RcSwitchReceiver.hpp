@@ -82,8 +82,8 @@ public:
 	 */
 	static void begin(const RxTimingSpecTable& rxTimingSpecTable) {
 		pinMode(IOPIN, INPUT_PULLUP);
-		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
 		mReceiverDelegate.setRxTimingSpecTable(rxTimingSpecTable);
+		attachInterrupt(digitalPinToInterrupt(IOPIN), handleInterrupt, CHANGE);
 	}
 
 	/**
