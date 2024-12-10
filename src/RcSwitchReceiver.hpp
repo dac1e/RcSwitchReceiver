@@ -54,15 +54,6 @@ using RcSwitch::RxTimingSpecTable;
  */
 
 template<int IOPIN, size_t PULSE_TRACES_COUNT = 0> class RcSwitchReceiver {
-	static constexpr bool IS_SMALL_PROCESSOR = sizeof(size_t) <= 2;
-	static constexpr size_t PULSE_TRACES_LIMIT = IS_SMALL_PROCESSOR ? 140 : 280;
-
-	static_assert((PULSE_TRACES_COUNT <= PULSE_TRACES_LIMIT),
-			"Error: Maximum number for parameter PULSE_TRACES_COUNT %s exceeded. "
-			"The need for static RAM scales with the number of traced pulses, "
-			"and the likelihood of a stack overflow scales with the consumption "
-			"of static RAM. This is critical for micro controllers with very "
-			"little RAM like on Arduino UNO R3 with ATmega328P.");
 public:
 	using receiver_t = typename RcSwitch::ReceiverSelector<PULSE_TRACES_COUNT>::receiver_t;
 	using receivedValue_t = RcSwitch::receivedValue_t;
@@ -186,6 +177,16 @@ public:
 	static basicReceiver_t& getReceiverDelegate() {
 		return mReceiverDelegate;
 	}
+private:
+	static constexpr bool IS_SMALL_PROCESSOR = sizeof(size_t) <= 2;
+	static constexpr size_t PULSE_TRACES_LIMIT = IS_SMALL_PROCESSOR ? 140 : 280;
+
+	static_assert((PULSE_TRACES_COUNT <= PULSE_TRACES_LIMIT),
+			"Error: Maximum number for parameter PULSE_TRACES_COUNT exceeded. "
+			"The need for static RAM scales with the number of traced pulses "
+			"and the likelihood of a stack overflow scales with the consumption "
+			"of static RAM. This is critical for micro controllers with very "
+			"little RAM like on Arduino UNO R3 with ATmega328P.");
 };
 
 /** The receiver instance for this IO pin. */

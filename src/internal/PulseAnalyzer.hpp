@@ -93,13 +93,13 @@ struct DataPulses {
 	inline uint32_t getDurationD0A() {
 		return d0A->getWeightedAverage(); // short pulse
 	}
-	inline uint32_t getDurationD0B(uint16_t scaleBase = 1) {
+	inline uint32_t getDurationD0B() {
 		return d0B->getWeightedAverage(); // long pulse
 	}
-	inline uint32_t getDurationD1A(uint16_t scaleBase = 1) {
+	inline uint32_t getDurationD1A() {
 		return d1A->getWeightedAverage(); // long pulse
 	}
-	inline uint32_t getDurationD1B(uint16_t scaleBase = 1) {
+	inline uint32_t getDurationD1B() {
 		return d1B->getWeightedAverage(); // short pulse
 	}
 

@@ -88,12 +88,14 @@ static const char* const BUTTON_TEXT[] = { // Must be ordered as in enum BUTTON_
 #endif
 
 class MyRcButtonPressDetector : public RcButtonPressDetector { // @suppress("Class has a virtual method and non-virtual destructor")
+#if PRINT_DETECTED_BUTTON
 	static const char* buttonToText(rcButtonCode_t buttonCode) {
 		if((buttonCode >= 0 && buttonCode < (sizeof(BUTTON_TEXT) / sizeof(BUTTON_TEXT[0])) )) {
 			return BUTTON_TEXT[buttonCode];
 		}
 		return "?";
 	}
+#endif
 
 	static bool isLedOnButton(rcButtonCode_t buttonCode) {
 		bool result = false;
@@ -105,6 +107,9 @@ class MyRcButtonPressDetector : public RcButtonPressDetector { // @suppress("Cla
 		case BUTTON_CODE::I_3_ON:
 		case BUTTON_CODE::I_ALL_ON:
 			result = true;
+			break;
+		default:
+			break;
 		}
 		return result;
 	}
@@ -119,6 +124,9 @@ class MyRcButtonPressDetector : public RcButtonPressDetector { // @suppress("Cla
 		case BUTTON_CODE::I_3_OFF:
 		case BUTTON_CODE::I_ALL_OFF:
 			result = true;
+			break;
+		default:
+			break;
 		}
 		return result;
 	}

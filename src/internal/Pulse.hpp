@@ -51,6 +51,8 @@ inline const char* pulseLevelToString(const PULSE_LEVEL& pulseLevel) {
 		return "HIGH";
 	case PULSE_LEVEL::LO_or_HI:
 		return " ANY";
+	case PULSE_LEVEL::UNKNOWN:
+		return "UNKNOWN";
 	}
 	return "??";
 }
