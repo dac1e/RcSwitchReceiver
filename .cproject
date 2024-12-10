@@ -22,6 +22,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.2046757637" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -30,6 +34,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1255101809" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -38,6 +46,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1371280392" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
@@ -78,7 +90,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="DetectMultipleRemoteButtonPress|LearnRemoteControl|PrintReceivedData|TraceReceivedPulses|examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -105,6 +117,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1745426722" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -113,6 +129,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.266585678" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -121,6 +141,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1818676830" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
@@ -161,7 +185,387 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="DetectMultipleRemoteButtonPress|LearnRemoteControl|PrintReceivedData|TraceReceivedPulses|examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="io.sloeber.core.sketch.0.323711163.1439312038">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="io.sloeber.core.sketch.0.323711163.1439312038" moduleId="org.eclipse.cdt.core.settings" name="_DebugTraceReceivedPulses">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" cleanCommand="rm -f" description="" id="io.sloeber.core.sketch.0.323711163.1439312038" name="_DebugTraceReceivedPulses" parent="io.sloeber.core.configuration.release">
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1439312038." name="/" resourcePath="">
+						<toolChain id="io.sloeber.core.toolChain.release.591953760" name="Arduino Toolchain (Sloeber edition)" superClass="io.sloeber.core.toolChain.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="io.sloeber.targetplatform.1785748392" name="Arduino Target" osList="all" superClass="io.sloeber.targetplatform"/>
+							<builder buildPath="${workspace_loc:/RcSwitchReceiverDemo}/Release" id="io.sloeber.sketch.builder.191452404" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" parallelBuildOn="false" superClass="io.sloeber.sketch.builder"/>
+							<tool id="io.sloeber.tool.sketch.compiler.cpp.755044709" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.cpp.sketch.option.incpath.1798623649" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.cpp.sketch.input.1675258129" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.compiler.c.722966889" name="Arduino C Compiler" superClass="io.sloeber.tool.compiler.c">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.c.sketch.option.incpath.1641012682" name="Include Paths (-I)" superClass="io.sloeber.compiler.c.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.c.sketch.input.2002543445" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.sketch.compiler.s.132667043" name="Arduino Assembler" superClass="io.sloeber.tool.sketch.compiler.s">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.asm.sketch.option.incpath.1084144963" name="Include Paths (-I)" superClass="io.sloeber.compiler.asm.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.S.sketch.input.1304200422" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.ar.1685493033" name="Arduino archiver" superClass="io.sloeber.tool.ar"/>
+							<tool id="io.sloeber.tool.combine.690295013" name="Arduino combiner" superClass="io.sloeber.tool.combine"/>
+							<tool id="io.sloeber.tool.objcopy.eep.1621644958" name="Arduino tool objcopy command" superClass="io.sloeber.tool.objcopy.eep"/>
+							<tool id="io.sloeber.tool.size.1592488059" name="Arduino tool Print Size" superClass="io.sloeber.tool.size"/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1439312038.libraries/**/._*" resourcePath="libraries/**/._*">
+						<toolChain id="io.sloeber.core.toolChain5.738781412" superClass="io.sloeber.core.toolChain5">
+							<targetPlatform id="io.sloeber.core.toolChain5.738781412.2073943602" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1439312038.libraries/?*/**/test*/**" resourcePath="libraries/?*/**/test*/**">
+						<toolChain id="io.sloeber.core.toolChain3.874118018" superClass="io.sloeber.core.toolChain3">
+							<targetPlatform id="io.sloeber.core.toolChain3.874118018.517938743" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1439312038.libraries/?*/**/?xtras/**" resourcePath="libraries/?*/**/?xtras/**">
+						<toolChain id="io.sloeber.core.toolChain2.1340166207" superClass="io.sloeber.core.toolChain2">
+							<targetPlatform id="io.sloeber.core.toolChain2.1340166207.488555021" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1439312038.libraries/?*/**/?xamples/**" resourcePath="libraries/?*/**/?xamples/**">
+						<toolChain id="io.sloeber.core.toolChain1.865657352" superClass="io.sloeber.core.toolChain1">
+							<targetPlatform id="io.sloeber.core.toolChain1.865657352.1574354124" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1439312038.libraries/?*/**/third-party/**" resourcePath="libraries/?*/**/third-party/**">
+						<toolChain id="io.sloeber.core.toolChain4.1083169477" superClass="io.sloeber.core.toolChain4">
+							<targetPlatform id="io.sloeber.core.toolChain4.1083169477.837946171" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1439312038.libraries/?*/utility/*/*" resourcePath="libraries/?*/utility/*/*">
+						<toolChain id="io.sloeber.core.toolChain6.1072379814" superClass="io.sloeber.core.toolChain6">
+							<targetPlatform id="io.sloeber.core.toolChain6.1072379814.683511772" name=""/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="DetectMultipleRemoteButtonPress|LearnRemoteControl|PrintReceivedData|examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="io.sloeber.core.sketch.0.323711163.1646486205">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="io.sloeber.core.sketch.0.323711163.1646486205" moduleId="org.eclipse.cdt.core.settings" name="_DebugLearnRemoteControl">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" cleanCommand="rm -f" description="" id="io.sloeber.core.sketch.0.323711163.1646486205" name="_DebugLearnRemoteControl" parent="io.sloeber.core.configuration.release">
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1646486205." name="/" resourcePath="">
+						<toolChain id="io.sloeber.core.toolChain.release.384549398" name="Arduino Toolchain (Sloeber edition)" superClass="io.sloeber.core.toolChain.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="io.sloeber.targetplatform.1442649983" name="Arduino Target" osList="all" superClass="io.sloeber.targetplatform"/>
+							<builder buildPath="${workspace_loc:/RcSwitchReceiverDemo}/Release" id="io.sloeber.sketch.builder.420680442" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" parallelBuildOn="false" superClass="io.sloeber.sketch.builder"/>
+							<tool id="io.sloeber.tool.sketch.compiler.cpp.2001335175" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.cpp.sketch.option.incpath.1203930236" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.cpp.sketch.input.1971462971" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.compiler.c.157033363" name="Arduino C Compiler" superClass="io.sloeber.tool.compiler.c">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.c.sketch.option.incpath.2031828481" name="Include Paths (-I)" superClass="io.sloeber.compiler.c.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.c.sketch.input.1970535668" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.sketch.compiler.s.1962379947" name="Arduino Assembler" superClass="io.sloeber.tool.sketch.compiler.s">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.asm.sketch.option.incpath.718843874" name="Include Paths (-I)" superClass="io.sloeber.compiler.asm.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.S.sketch.input.1720031494" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.ar.2123946983" name="Arduino archiver" superClass="io.sloeber.tool.ar"/>
+							<tool id="io.sloeber.tool.combine.1646182541" name="Arduino combiner" superClass="io.sloeber.tool.combine"/>
+							<tool id="io.sloeber.tool.objcopy.eep.1695431255" name="Arduino tool objcopy command" superClass="io.sloeber.tool.objcopy.eep"/>
+							<tool id="io.sloeber.tool.size.580293735" name="Arduino tool Print Size" superClass="io.sloeber.tool.size"/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1646486205.libraries/**/._*" resourcePath="libraries/**/._*">
+						<toolChain id="io.sloeber.core.toolChain5.1976789862" superClass="io.sloeber.core.toolChain5">
+							<targetPlatform id="io.sloeber.core.toolChain5.1976789862.1640755488" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1646486205.libraries/?*/**/test*/**" resourcePath="libraries/?*/**/test*/**">
+						<toolChain id="io.sloeber.core.toolChain3.1173002076" superClass="io.sloeber.core.toolChain3">
+							<targetPlatform id="io.sloeber.core.toolChain3.1173002076.1090781323" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1646486205.libraries/?*/**/?xtras/**" resourcePath="libraries/?*/**/?xtras/**">
+						<toolChain id="io.sloeber.core.toolChain2.871269112" superClass="io.sloeber.core.toolChain2">
+							<targetPlatform id="io.sloeber.core.toolChain2.871269112.1952205346" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1646486205.libraries/?*/**/?xamples/**" resourcePath="libraries/?*/**/?xamples/**">
+						<toolChain id="io.sloeber.core.toolChain1.1923987255" superClass="io.sloeber.core.toolChain1">
+							<targetPlatform id="io.sloeber.core.toolChain1.1923987255.301916577" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1646486205.libraries/?*/**/third-party/**" resourcePath="libraries/?*/**/third-party/**">
+						<toolChain id="io.sloeber.core.toolChain4.453654424" superClass="io.sloeber.core.toolChain4">
+							<targetPlatform id="io.sloeber.core.toolChain4.453654424.1525112945" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1646486205.libraries/?*/utility/*/*" resourcePath="libraries/?*/utility/*/*">
+						<toolChain id="io.sloeber.core.toolChain6.1867898289" superClass="io.sloeber.core.toolChain6">
+							<targetPlatform id="io.sloeber.core.toolChain6.1867898289.1548591456" name=""/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="DetectMultipleRemoteButtonPress|PrintReceivedData|TraceReceivedPulses|examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="io.sloeber.core.sketch.0.323711163.584203526">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="io.sloeber.core.sketch.0.323711163.584203526" moduleId="org.eclipse.cdt.core.settings" name="_DebugPrintReceivedData">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" cleanCommand="rm -f" description="" id="io.sloeber.core.sketch.0.323711163.584203526" name="_DebugPrintReceivedData" parent="io.sloeber.core.configuration.release">
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.584203526." name="/" resourcePath="">
+						<toolChain id="io.sloeber.core.toolChain.release.1958363991" name="Arduino Toolchain (Sloeber edition)" superClass="io.sloeber.core.toolChain.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="io.sloeber.targetplatform.781430729" name="Arduino Target" osList="all" superClass="io.sloeber.targetplatform"/>
+							<builder buildPath="${workspace_loc:/RcSwitchReceiverDemo}/Release" id="io.sloeber.sketch.builder.1398645069" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" parallelBuildOn="false" superClass="io.sloeber.sketch.builder"/>
+							<tool id="io.sloeber.tool.sketch.compiler.cpp.210342970" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.cpp.sketch.option.incpath.1047337615" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.cpp.sketch.input.1887593491" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.compiler.c.1551687504" name="Arduino C Compiler" superClass="io.sloeber.tool.compiler.c">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.c.sketch.option.incpath.220296934" name="Include Paths (-I)" superClass="io.sloeber.compiler.c.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.c.sketch.input.1323571316" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.sketch.compiler.s.1112403414" name="Arduino Assembler" superClass="io.sloeber.tool.sketch.compiler.s">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.asm.sketch.option.incpath.1513073172" name="Include Paths (-I)" superClass="io.sloeber.compiler.asm.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.S.sketch.input.1787376591" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.ar.373341714" name="Arduino archiver" superClass="io.sloeber.tool.ar"/>
+							<tool id="io.sloeber.tool.combine.793806526" name="Arduino combiner" superClass="io.sloeber.tool.combine"/>
+							<tool id="io.sloeber.tool.objcopy.eep.854044352" name="Arduino tool objcopy command" superClass="io.sloeber.tool.objcopy.eep"/>
+							<tool id="io.sloeber.tool.size.359899063" name="Arduino tool Print Size" superClass="io.sloeber.tool.size"/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.584203526.libraries/**/._*" resourcePath="libraries/**/._*">
+						<toolChain id="io.sloeber.core.toolChain5.1150307443" superClass="io.sloeber.core.toolChain5">
+							<targetPlatform id="io.sloeber.core.toolChain5.1150307443.1853671540" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.584203526.libraries/?*/**/test*/**" resourcePath="libraries/?*/**/test*/**">
+						<toolChain id="io.sloeber.core.toolChain3.816553960" superClass="io.sloeber.core.toolChain3">
+							<targetPlatform id="io.sloeber.core.toolChain3.816553960.279148779" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.584203526.libraries/?*/**/?xtras/**" resourcePath="libraries/?*/**/?xtras/**">
+						<toolChain id="io.sloeber.core.toolChain2.57748619" superClass="io.sloeber.core.toolChain2">
+							<targetPlatform id="io.sloeber.core.toolChain2.57748619.95636731" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.584203526.libraries/?*/**/?xamples/**" resourcePath="libraries/?*/**/?xamples/**">
+						<toolChain id="io.sloeber.core.toolChain1.654725717" superClass="io.sloeber.core.toolChain1">
+							<targetPlatform id="io.sloeber.core.toolChain1.654725717.869737072" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.584203526.libraries/?*/**/third-party/**" resourcePath="libraries/?*/**/third-party/**">
+						<toolChain id="io.sloeber.core.toolChain4.771997458" superClass="io.sloeber.core.toolChain4">
+							<targetPlatform id="io.sloeber.core.toolChain4.771997458.1697958255" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.584203526.libraries/?*/utility/*/*" resourcePath="libraries/?*/utility/*/*">
+						<toolChain id="io.sloeber.core.toolChain6.39404641" superClass="io.sloeber.core.toolChain6">
+							<targetPlatform id="io.sloeber.core.toolChain6.39404641.860296902" name=""/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="DetectMultipleRemoteButtonPress|LearnRemoteControl|TraceReceivedPulses|examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="io.sloeber.core.sketch.0.323711163.1846368711">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="io.sloeber.core.sketch.0.323711163.1846368711" moduleId="org.eclipse.cdt.core.settings" name="_DebugMultipleRemoteButtonPress">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" cleanCommand="rm -f" description="" id="io.sloeber.core.sketch.0.323711163.1846368711" name="_DebugMultipleRemoteButtonPress" parent="io.sloeber.core.configuration.release">
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1846368711." name="/" resourcePath="">
+						<toolChain id="io.sloeber.core.toolChain.release.1045622395" name="Arduino Toolchain (Sloeber edition)" superClass="io.sloeber.core.toolChain.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="io.sloeber.targetplatform.605145512" name="Arduino Target" osList="all" superClass="io.sloeber.targetplatform"/>
+							<builder buildPath="${workspace_loc:/RcSwitchReceiverDemo}/Release" id="io.sloeber.sketch.builder.1643304225" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" parallelBuildOn="false" superClass="io.sloeber.sketch.builder"/>
+							<tool id="io.sloeber.tool.sketch.compiler.cpp.1811641271" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.cpp.sketch.option.incpath.1955190017" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.cpp.sketch.input.1575229701" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.compiler.c.1471255395" name="Arduino C Compiler" superClass="io.sloeber.tool.compiler.c">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.c.sketch.option.incpath.78431287" name="Include Paths (-I)" superClass="io.sloeber.compiler.c.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.c.sketch.input.1971509956" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.sketch.compiler.s.1966165283" name="Arduino Assembler" superClass="io.sloeber.tool.sketch.compiler.s">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.asm.sketch.option.incpath.1896176133" name="Include Paths (-I)" superClass="io.sloeber.compiler.asm.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/TraceReceivedPulses}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/LearnRemoteControl}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/PrintReceivedData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RcSwitchReceiverDemo/DetectMultipleRemoteButtonPress}&quot;"/>
+								</option>
+								<inputType id="io.sloeber.compiler.S.sketch.input.1095747813" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
+							</tool>
+							<tool id="io.sloeber.tool.ar.1907557677" name="Arduino archiver" superClass="io.sloeber.tool.ar"/>
+							<tool id="io.sloeber.tool.combine.1328703209" name="Arduino combiner" superClass="io.sloeber.tool.combine"/>
+							<tool id="io.sloeber.tool.objcopy.eep.1019157352" name="Arduino tool objcopy command" superClass="io.sloeber.tool.objcopy.eep"/>
+							<tool id="io.sloeber.tool.size.779220814" name="Arduino tool Print Size" superClass="io.sloeber.tool.size"/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1846368711.libraries/**/._*" resourcePath="libraries/**/._*">
+						<toolChain id="io.sloeber.core.toolChain5.1941383830" superClass="io.sloeber.core.toolChain5">
+							<targetPlatform id="io.sloeber.core.toolChain5.1941383830.1309080785" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1846368711.libraries/?*/**/test*/**" resourcePath="libraries/?*/**/test*/**">
+						<toolChain id="io.sloeber.core.toolChain3.1420467150" superClass="io.sloeber.core.toolChain3">
+							<targetPlatform id="io.sloeber.core.toolChain3.1420467150.709010343" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1846368711.libraries/?*/**/?xtras/**" resourcePath="libraries/?*/**/?xtras/**">
+						<toolChain id="io.sloeber.core.toolChain2.1684113376" superClass="io.sloeber.core.toolChain2">
+							<targetPlatform id="io.sloeber.core.toolChain2.1684113376.1349031761" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1846368711.libraries/?*/**/?xamples/**" resourcePath="libraries/?*/**/?xamples/**">
+						<toolChain id="io.sloeber.core.toolChain1.69898332" superClass="io.sloeber.core.toolChain1">
+							<targetPlatform id="io.sloeber.core.toolChain1.69898332.631509313" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1846368711.libraries/?*/**/third-party/**" resourcePath="libraries/?*/**/third-party/**">
+						<toolChain id="io.sloeber.core.toolChain4.1265913527" superClass="io.sloeber.core.toolChain4">
+							<targetPlatform id="io.sloeber.core.toolChain4.1265913527.1004381534" name=""/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="io.sloeber.core.sketch.0.323711163.1846368711.libraries/?*/utility/*/*" resourcePath="libraries/?*/utility/*/*">
+						<toolChain id="io.sloeber.core.toolChain6.706727071" superClass="io.sloeber.core.toolChain6">
+							<targetPlatform id="io.sloeber.core.toolChain6.706727071.820439879" name=""/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="LearnRemoteControl|PrintReceivedData|TraceReceivedPulses|examples|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

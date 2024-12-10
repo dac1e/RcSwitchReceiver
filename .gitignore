@@ -34,3 +34,7 @@
 # Folders
 /Debug/
 /Release/
+/_DebugLearnRemoteControl/
+/_DebugMultipleRemoteButtonPress/
+/_DebugPrintReceivedData/
+/_DebugTraceReceivedPulses/

@@ -32,6 +32,26 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>DetectMultipleRemoteButtonPress</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/examples/DetectMultipleRemoteButtonPress</locationURI>
+		</link>
+		<link>
+			<name>LearnRemoteControl</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/examples/LearnRemoteControl</locationURI>
+		</link>
+		<link>
+			<name>PrintReceivedData</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/examples/PrintReceivedData</locationURI>
+		</link>
+		<link>
+			<name>TraceReceivedPulses</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/examples/TraceReceivedPulses</locationURI>
+		</link>
+		<link>
 			<name>core/core</name>
 			<type>2</type>
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/sam/1.6.12/cores/arduino</locationURI>
