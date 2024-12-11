@@ -32,11 +32,10 @@
 *.app
 
 # Folders
-/Debug/
-/Release/
-/_DebugLearnRemoteControl/
-/_DebugMultipleRemoteButtonPress/
-/_DebugPrintReceivedData/
-/_DebugTraceReceivedPulses/
-/sloeber.ino.cpp
+/Debug*/
+/Release*/
+/_Debug*/
+/_Release*/
 /.metadata/
+/.settings/
+
