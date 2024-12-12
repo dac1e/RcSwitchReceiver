@@ -14,6 +14,11 @@ This library can:
   https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/ESP32S3_InterruptLoadWithSignal.jpg
 
 
+## Tested on, but not limited to the following boards
+- Arduino UNO
+- Arduino DUE
+- ESP32S3DEVK-C1N8.
+
 ## Hints on remote operating distance
 The development was done on an Arduino Due. Tests have shown that the working range of several 433Mhz receiver modules 
 strongly depend on the quality of the power supply. When the Arduino Due is supplied via USB port, the receiver module works 
