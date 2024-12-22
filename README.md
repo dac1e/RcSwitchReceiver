@@ -6,13 +6,18 @@
 ## Description
 This library can:
 
-- Learn the protocol from your RC. Refer to example sketch *LearnRemoteControl.ino*
+- Learn the protocol of your RC. Refer to example sketch *LearnRemoteControl.ino*
 - Receive and decode data packets from a remote control. Refer to example sketch *PrintReceivedData.ino*.
 - Translate data packets from a remote control to a button - press information. Refer to example sketch *DetectRemoteButtonPress.ino*.
 - Dump received pulses for investigating the remote control protocol and get CPU interrupt load information. Refer to example sketch *TraceReceivedPulses.ino*. See screenshots from running this sketch on ESP32S3DEVK-C1N8 @ 240Mhz compiled with optimization for speed.
   https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/ESP32S3_InterruptLoadWithNoise.jpg
   https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/ESP32S3_InterruptLoadWithSignal.jpg
 
+
+## Tested on, but not limited to the following boards
+- Arduino UNO
+- Arduino DUE
+- ESP32S3DEVK-C1N8.
 
 ## Hints on remote operating distance
 The development was done on an Arduino Due. Tests have shown that the working range of several 433Mhz receiver modules 
