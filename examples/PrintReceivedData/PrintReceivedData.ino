@@ -71,6 +71,8 @@ typeof(Serial)& output = Serial;
 void setup()
 {
 	output.begin(9600);
+	output.println("\n>>>>>>>> PrintReceivedDatat <<<<<<<<\n");
+
 #if DUMP_TIMING_SPEC_TABLE
 	output.println();
 	rxProtocolTable.dumpTimingSpec(output);

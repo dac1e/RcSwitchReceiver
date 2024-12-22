@@ -104,6 +104,7 @@ static MyRcButtonPressDetector rcButtonPressDetector;
 void setup()
 {
 	output.begin(9600);
+	output.println("\n>>>>>>>> DetectRemoteButtonPress <<<<<<<<\n");
 	pinMode(LED_BUILTIN, OUTPUT);
 	rcSwitchReceiver.begin(rxProtocolTable.toTimingSpecTable());
 	rcButtonPressDetector.begin(rcSwitchReceiver);

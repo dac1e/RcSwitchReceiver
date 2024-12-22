@@ -71,6 +71,7 @@ int lastbuttonState = LOW;
 void setup()
 {
 	output.begin(9600);
+	output.println("\n>>>>>>>> TraceReceivedPulses <<<<<<<<\n");
 
 	// Not interested in decoding RC data, suspend scanning for data.
 	rcSwitchReceiver.suspend();
