@@ -32,6 +32,7 @@
 *.app
 
 # Folders
+/extras_src/
 /Debug*/
 /Release*/
 /_Debug*/
