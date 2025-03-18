@@ -156,7 +156,7 @@ void PulseAnalyzer::buildSynchAndDataCategories() {
 	mDataPulses.reset();
 	mDataPulseCategories.reset();
 	mSynchPulseCategories.reset();
-	if (mAllPulseCategories.size() >= 0) {
+	if (mAllPulseCategories.size() > 0) {
 		mDataPulseCategories.build(mDataPulses, mInput, mPercentTolerance, mSynchPulseCategories,
 			mAllPulseCategories.at(mAllPulseCategories.size()-1).getWeightedAverage());
 	}
