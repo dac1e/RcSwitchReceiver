@@ -23,9 +23,9 @@
 */
 
 #include "RcSwitch_test.hpp"
-#include "../ProtocolDefinition.hpp"
+#ifdef ENABLE_RCSWITCH_TEST
 
-#if ENABLE_RCSWITCH_TEST
+#include "../ProtocolDefinition.hpp"
 
 #include <limits.h>
 #include <assert.h>
@@ -474,4 +474,4 @@ void RcSwitch_test::testRingBuffer() const {
 
 } /* namespace RcSwitch */
 
-#endif // ENABLE_RCSWITCH_TEST
+#endif // #ifdef ENABLE_RCSWITCH_TEST

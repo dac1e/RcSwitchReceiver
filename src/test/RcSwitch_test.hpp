@@ -27,9 +27,7 @@
 #ifndef RCSWITCH_RECEIVER_TEST_RCSWITCH_TEST_HPP_
 #define RCSWITCH_RECEIVER_TEST_RCSWITCH_TEST_HPP_
 
-#define ENABLE_RCSWITCH_TEST true
-
-#if ENABLE_RCSWITCH_TEST
+#ifdef ENABLE_RCSWITCH_TEST
 
 #include "../internal/RcSwitch.hpp"
 
@@ -102,6 +100,6 @@ public:
 
 } // namespace RcSwitch
 
-#endif // ENABLE_RCSWITCH_TEST
+#endif // #ifdef ENABLE_RCSWITCH_TEST
 
 #endif /* RCSWITCH_RECEIVER_TEST_RCSWITCH_TEST_HPP_ */
