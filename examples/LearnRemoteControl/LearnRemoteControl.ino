@@ -46,7 +46,6 @@
 // Note: If you just press the TRIGGER_BUTTON without any transmission from a remote control,
 // you will see an error message, that a protocol couldn't be decuced.
 
-#include "ProtocolDefinition.hpp"
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 

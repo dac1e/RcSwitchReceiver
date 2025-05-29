@@ -44,7 +44,6 @@
 // Note: If you just press the TRIGGER_BUTTON without any transmission from a remote control,
 // you will see random pulses that come from HF noise.
 
-#include "ProtocolDefinition.hpp"
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 

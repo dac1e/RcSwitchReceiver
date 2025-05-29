@@ -27,7 +27,6 @@
  * For wiring diagram refer to https://github.com/dac1e/RcSwitchReceiver/blob/main/extras/RcSwitchReceiverWiring.pdf
  */
 
-#include "ProtocolDefinition.hpp"
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 

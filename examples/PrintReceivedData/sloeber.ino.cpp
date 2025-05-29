@@ -5,13 +5,11 @@
 //This file has been generated on 2024-12-07 13:42:28
 
 #include "Arduino.h"
-#include "ProtocolDefinition.hpp"
 #include "RcSwitchReceiver.hpp"
 #include <Arduino.h>
 
 void setup() ;
 void loop() ;
-
 
 #include "PrintReceivedData.ino"
 
