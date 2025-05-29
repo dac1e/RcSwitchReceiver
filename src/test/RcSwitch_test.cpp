@@ -25,7 +25,7 @@
 #include "RcSwitch_test.hpp"
 #ifdef ENABLE_RCSWITCH_TEST
 
-#include "../ProtocolDefinition.hpp"
+#include "../RcSwitchReceiver.hpp"
 
 #include <limits.h>
 #include <assert.h>

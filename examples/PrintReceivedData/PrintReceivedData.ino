@@ -33,7 +33,6 @@
 // For curiosity or debugging print the timing spec table that has been created.
 #define DUMP_TIMING_SPEC_TABLE true
 
-// For details about this protocol table, refer to documentation in ProtocolDefinition.hpp
 // You can add own protocols and remove not needed protocols.
 // You may use the expample sketch LearnRemoteControl.ino to find out what you need to enter here.
 // However, the number of normal level protocols as well as the number of inverse level
