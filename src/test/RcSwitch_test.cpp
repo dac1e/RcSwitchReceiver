@@ -84,7 +84,7 @@ static_assert( (sizeof(validMessagePacket_B) - 1 /* one less for the delimiter *
 			sizeof(validMessagePacket_B[0]) >= MIN_MSG_PACKET_BITS,
 		"Error: Insufficient data bits for a valid message packet.");
 
-static const TxDataBit invalidMessagePacket_tooLessMessagePackteBits[] = {
+static const TxDataBit invalidMessagePacket_tooLessMessagePacketBits[] = {
 		{DATA_BIT::LOGICAL_0},
 		{DATA_BIT::LOGICAL_0},
 		{DATA_BIT::LOGICAL_1},
@@ -93,8 +93,8 @@ static const TxDataBit invalidMessagePacket_tooLessMessagePackteBits[] = {
 		{DATA_BIT::UNKNOWN},
 };
 
-static_assert( (sizeof(invalidMessagePacket_tooLessMessagePackteBits) - 1 /* one less for the delimiter */)/
-			sizeof(invalidMessagePacket_tooLessMessagePackteBits[0]) < MIN_MSG_PACKET_BITS,
+static_assert( (sizeof(invalidMessagePacket_tooLessMessagePacketBits) - 1 /* one less for the delimiter */)/
+			sizeof(invalidMessagePacket_tooLessMessagePacketBits[0]) < MIN_MSG_PACKET_BITS,
 		"Error: Sufficient data bits has made the invalid message packet valid.");
 
 
@@ -273,7 +273,7 @@ void RcSwitch_test::tooShortMessagePacketTest(uint32_t& usec, Receiver &receiver
 	{
 		// Send too short message
 
-		sendMessagePacket(usec, receiver, invalidMessagePacket_tooLessMessagePackteBits, 1);
+		sendMessagePacket(usec, receiver, invalidMessagePacket_tooLessMessagePacketBits, 1);
 		assert(receiver.state() == Receiver::DATA_STATE);
 		assert(receiver.mProtocolCandidates.size() > 0);
 

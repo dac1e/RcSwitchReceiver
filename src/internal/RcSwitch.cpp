@@ -183,9 +183,9 @@ PULSE_TYPE Receiver::analyzePulsePair(const Pulse& pulseA, const Pulse& pulseB) 
 	return result;
 }
 
-void Receiver::handleInterrupt(const int pinLevel, const uint32_t uescInterruptEntry) {
+void Receiver::handleInterrupt(const int pinLevel, const uint32_t usecInterruptEntry) {
 	if(!mSuspended) {
-		const uint32_t usecDuration = uescInterruptEntry - mUsecLastInterrupt;
+		const uint32_t usecDuration = usecInterruptEntry - mUsecLastInterrupt;
 		push(usecDuration, pinLevel);
 
 		switch(state()) {
@@ -244,7 +244,7 @@ void Receiver::handleInterrupt(const int pinLevel, const uint32_t uescInterruptE
 				break;
 		}
 	}
-	mUsecLastInterrupt = uescInterruptEntry;
+	mUsecLastInterrupt = usecInterruptEntry;
 }
 
 void Receiver::push(uint32_t microSecDuration, const int pinLevel) {

@@ -23,7 +23,7 @@ This library can:
 The development was done on an Arduino Due. Tests have shown that the working range of several 433Mhz receiver modules 
 strongly depend on the quality of the power supply. When the Arduino Due is supplied via USB port, the receiver module works 
 properly when powered from the Arduino 5V pin. When the Arduino Due is supplied via the extra power connector, the Arduino 
-5V pin is is powered from an **Arduino Due internal voltage regulator**. A receiver module now powerd from the Arduino 
+5V pin is is powered from an **Arduino Due internal voltage regulator**. A receiver module now powered from the Arduino 
 Due 5V pin, will **drop the working range by at least 50%** compared to the USB powering situation. So when the extra power 
 connector is used for Arduino Due, I recommend suppying the receiver module separately by a linear Voltage regulator like an 
 7805, to achieve best working range.

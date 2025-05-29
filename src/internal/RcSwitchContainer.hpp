@@ -201,8 +201,9 @@ template<typename ELEMENT_TYPE> class RingBufferReadAccess;
 /**
  * A container that encapsulates a fixed size ring buffer.
  * Elements can be pushed on the ring buffer. When the
- * size of the stack has reached the capacity, the bottom
- * element will be dropped on cost of a new pushed element.
+ * size of the stack has reached the capacity, the new
+ * element will be pushed and the bottom element will be
+ * dropped.
  */
 template<typename ELEMENT_TYPE, size_t CAPACITY>
 class RingBuffer : public Array<ELEMENT_TYPE, CAPACITY> {
