@@ -54,7 +54,7 @@ private:
 	rcButtonCode_t mLastPressedButton;
 	uint32_t mOffDelayStartTime;
 
-	rcButtonCode_t testRcButtonData();
+	virtual rcButtonCode_t testRcButtonData();
 
 	/**
 	 * This pure virtual function will be called, when a button
@@ -131,7 +131,7 @@ protected:
 
 public:
 	RcButtonPressDetector(unsigned int msecDebounceDelayTime = 250);
-	void scanRcButtons();
+	virtual void scanRcButtons();
 
 	/**
 	 * Attach the RcSwitchReceiver to this button detector.
