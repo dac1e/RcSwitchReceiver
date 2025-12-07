@@ -49,7 +49,6 @@ private:
 	};
 
 	const unsigned int mDebounceDelayTime; // in milliseconds
-	RcSwitch::Receiver* mRcSwitchReceiver;
 	STATE mRcButtonState = STATE::OFF;
 	rcButtonCode_t mLastPressedButton;
 	uint32_t mOffDelayStartTime;
@@ -82,6 +81,8 @@ private:
 	virtual void onButtonPressed(rcButtonCode_t buttonCode) const = 0;
 
 protected:
+	RcSwitch::Receiver* mRcSwitchReceiver;
+
 	/**
 	 * This virtual function must be overridden, and provide positive button
 	 * codes for all received data packet that should be evaluated.
