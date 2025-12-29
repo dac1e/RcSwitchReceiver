@@ -205,12 +205,33 @@ public:
 	static inline bool available() {return mReceiverDelegate.available();}
 
 	/**
-	 * Return the received value if a value is available. Otherwise 0.
+	 * Return the number of received values within one packet.
+	 * When RCSWITCH_UINT32_ARRAY_SIZE greater than one, more than one value can
+   * be received within a packet.
+	 */
+	static inline size_t receivedValuesCount() {return mReceiverDelegate.receivedValuesCount();}
+
+  /**
+   * Return the received value if a value is available. Otherwise 0.
+   * The first received bit will be reflected as the highest
+   * significant bit. In case that more than one value has been received within one packet
+   * function receivedValueAt() can be called to obtain subsequent values.
+   * See also receivedValuesCount().
+   * Must not be called, when available returns false.
+   */
+  static inline receivedValue_t receivedValue() {return mReceiverDelegate.receivedValue();}
+
+	/**
+	 * Return the received value at a particular index, if a value at that index is available. Otherwise 0.
+	 * When RCSWITCH_UINT32_ARRAY_SIZE greater than one, more than one value can
+	 * be received within a packet. Subsequent values can be queried by calling this function with the next
+	 * index. The highest possible index can be obtained from function receivedValuesCount().
 	 * The first received bit will be reflected as the highest
 	 * significant bit.
 	 * Must not be called, when available returns false.
 	 */
-	static inline receivedValue_t receivedValue() {return mReceiverDelegate.receivedValue();}
+	static inline receivedValue_t receivedValueAt(const size_t index) {return mReceiverDelegate.receivedValueAt(index);}
+
 
 	/**
 	 * Return the number of received bits. Can be greater than

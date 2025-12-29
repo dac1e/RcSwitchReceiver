@@ -37,7 +37,13 @@
 #include "PulseTracer.hpp"
 #include "PulseAnalyzer.hpp"
 
+#if not defined DEBUG_RCSWITCH
 #define DEBUG_RCSWITCH false
+#endif
+
+#if not defined RCSWITCH_UINT32_ARRAY_SIZE
+#define RCSWITCH_UINT32_ARRAY_SIZE (1)
+#endif
 
 #if DEBUG_RCSWITCH
 #include <assert.h>
@@ -63,7 +69,7 @@ typedef uint32_t receivedValue_t;
  * be stored. If the message packet is bigger, trailing data
  * bits are dropped.
  */
-constexpr size_t MAX_MSG_PACKET_BITS = 8 * sizeof(receivedValue_t);
+constexpr size_t MAX_MSG_PACKET_BITS = 8 * sizeof(receivedValue_t) * RCSWITCH_UINT32_ARRAY_SIZE;
 
 /**
  * The maximum number of protocols that can be collected.
@@ -235,7 +241,9 @@ public:
 	 * For the following methods, refer to corresponding API class RcSwitchReceiver.
 	 */
 	inline bool available() const {return state() == AVAILABLE_STATE;}
-	receivedValue_t receivedValue() const;
+  size_t receivedValuesCount() const;
+	receivedValue_t receivedValueAt(const size_t index) const;
+  inline receivedValue_t receivedValue() const {return receivedValueAt(0);};
 	size_t receivedBitsCount() const;
 	inline size_t receivedProtocolCount() const {return mProtocolCandidates.size();}
 	int receivedProtocol(const size_t index) const;

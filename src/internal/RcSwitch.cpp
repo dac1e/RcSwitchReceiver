@@ -30,6 +30,9 @@
 #include "RcSwitch.inc"
 #endif
 
+#undef min
+#undef max
+
 namespace RcSwitch {
 
 uint32_t micros_() {
@@ -286,11 +289,19 @@ unsigned int Receiver::receivedBitsCount() const {
 	return 0;
 }
 
-receivedValue_t Receiver::receivedValue() const {
+size_t Receiver::receivedValuesCount() const {
+  if(available()) {
+    const size_t receivedCount = (receivedBitsCount() + sizeof(receivedValue_t) - 1) / sizeof(receivedValue_t);
+    return receivedCount < RCSWITCH_UINT32_ARRAY_SIZE ? receivedCount : RCSWITCH_UINT32_ARRAY_SIZE;
+  }
+  return 0;
+};
+
+receivedValue_t Receiver::receivedValueAt(const size_t index) const {
 	receivedValue_t result = 0;
 	if(available()) {
 		const MessagePacket& messagePacket = mReceivedMessagePacket;
-		for(size_t i=0; i < messagePacket.size(); i++) {
+		for(size_t i= index * 8 * sizeof(receivedValue_t); i < messagePacket.size(); i++) {
 			result = result << 1;
 			RCSWITCH_ASSERT(messagePacket.at(i) != DATA_BIT::UNKNOWN);
 			if(messagePacket.at(i) == DATA_BIT::LOGICAL_1) {
