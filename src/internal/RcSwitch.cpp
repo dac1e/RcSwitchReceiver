@@ -284,11 +284,6 @@ void Receiver::reset() {
 unsigned int Receiver::receivedBitsCount() const {
 	if(available()) {
 		const MessagePacket& messagePacket = mReceivedMessagePacket;
-//		Serial.print(__FUNCTION__);
-//		Serial.print(": ");
-//		Serial.print(messagePacket.size());
-//    Serial.print(", ");
-//    Serial.println(messagePacket.overflowCount());
 		return messagePacket.size() + messagePacket.overflowCount();
 	}
 	return 0;
