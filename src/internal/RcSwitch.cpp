@@ -284,6 +284,11 @@ void Receiver::reset() {
 unsigned int Receiver::receivedBitsCount() const {
 	if(available()) {
 		const MessagePacket& messagePacket = mReceivedMessagePacket;
+//		Serial.print(__FUNCTION__);
+//		Serial.print(": ");
+//		Serial.print(messagePacket.size());
+//    Serial.print(", ");
+//    Serial.println(messagePacket.overflowCount());
 		return messagePacket.size() + messagePacket.overflowCount();
 	}
 	return 0;
@@ -291,7 +296,7 @@ unsigned int Receiver::receivedBitsCount() const {
 
 size_t Receiver::receivedValuesCount() const {
   if(available()) {
-    const size_t receivedCount = (receivedBitsCount() + sizeof(receivedValue_t) - 1) / sizeof(receivedValue_t);
+    const size_t receivedCount = (receivedBitsCount() + 8 * sizeof(receivedValue_t) - 1) / (8 * sizeof(receivedValue_t));
     return receivedCount < RCSWITCH_UINT32_ARRAY_SIZE ? receivedCount : RCSWITCH_UINT32_ARRAY_SIZE;
   }
   return 0;
@@ -301,10 +306,17 @@ receivedValue_t Receiver::receivedValueAt(const size_t index) const {
 	receivedValue_t result = 0;
 	if(available()) {
 		const MessagePacket& messagePacket = mReceivedMessagePacket;
-		for(size_t i= index * 8 * sizeof(receivedValue_t); i < messagePacket.size(); i++) {
+
+		const size_t totalBitCount = messagePacket.size();
+    const size_t remainingBits = totalBitCount % (8 * sizeof(result));
+
+    const size_t bitPosEnd = (((index + 1) < receivedValuesCount()) || not remainingBits) ?
+    		(index + 1) * 8 * sizeof(receivedValue_t) : index * 8 * sizeof(receivedValue_t) + remainingBits;
+
+    for(size_t bitPos = index * 8 * sizeof(receivedValue_t); bitPos < bitPosEnd; bitPos++) {
 			result = result << 1;
 			RCSWITCH_ASSERT(messagePacket.at(i) != DATA_BIT::UNKNOWN);
-			if(messagePacket.at(i) == DATA_BIT::LOGICAL_1) {
+			if(messagePacket.at(bitPos) == DATA_BIT::LOGICAL_1) {
 				result |= 1;
 			}
 		}
