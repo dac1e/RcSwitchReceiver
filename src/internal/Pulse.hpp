@@ -33,7 +33,7 @@
 #include "ISR_ATTR.hpp"
 #include "TypeTraits.hpp"
 #include "FormattedPrint.hpp"
-#include "RxDurationType.hpp"
+#include "RxPulseDurationType.hpp"
 
 namespace RcSwitch {
 

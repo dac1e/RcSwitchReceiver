@@ -28,7 +28,7 @@
 #include "ISR_ATTR.hpp"
 #include "RcSwitchContainer.hpp"
 #include "Pulse.hpp"
-#include "RxDurationType.hpp"
+#include "RxPulseDurationType.hpp"
 #include "TypeTraits.hpp"
 
 namespace RcSwitch {

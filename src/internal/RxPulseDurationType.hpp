@@ -31,12 +31,12 @@
 
 namespace RcSwitch {
 
-#if defined RCSWITCH_RECEIVER_DURATION_TYPE
+#if defined RX_PULSE_DURATION_TYPE
   /**
    * set RCSWITCH_RECEIVER_DURATION_TYPE to uint32_t if larger pulse
    * durations than from a typical remote control are expected.
    */
-  using duration_t = RCSWITCH_RECEIVER_DURATION_TYPE;
+  using duration_t = RX_PULSE_DURATION_TYPE;
 #else
   /**
    * unsigned int will be 16 bit on 8 and 16 bit systems and 32 bit

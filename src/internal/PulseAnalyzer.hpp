@@ -34,7 +34,7 @@
 #include "RcSwitchContainer.hpp"
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
-#include "RxDurationType.hpp"
+#include "RxPulseDurationType.hpp"
 
 namespace RcSwitch {
 

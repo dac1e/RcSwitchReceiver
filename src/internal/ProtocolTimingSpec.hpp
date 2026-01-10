@@ -34,7 +34,7 @@
 #include "ISR_ATTR.hpp"
 #include "RxTimingSpecTable.hpp"
 #include "Typeselect.hpp"
-#include "RxDurationType.hpp"
+#include "RxPulseDurationType.hpp"
 
 
 namespace RcSwitch {
