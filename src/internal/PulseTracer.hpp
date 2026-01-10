@@ -28,12 +28,12 @@
 #include "ISR_ATTR.hpp"
 #include "RcSwitchContainer.hpp"
 #include "Pulse.hpp"
+#include "RxDurationType.hpp"
 #include "TypeTraits.hpp"
 
 namespace RcSwitch {
 
 class TraceRecord {
-	using duration_t = Pulse::duration_t;
 
 	/**
 	 * There is a special encoding of Pulse here in order to save static memory.

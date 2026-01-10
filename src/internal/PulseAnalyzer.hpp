@@ -34,6 +34,7 @@
 #include "RcSwitchContainer.hpp"
 #include "Pulse.hpp"
 #include "PulseTracer.hpp"
+#include "RxDurationType.hpp"
 
 namespace RcSwitch {
 
@@ -208,7 +209,7 @@ public:
 	}
 
 	void build(DataPulses& dataPulses, const RingBufferReadAccess<TraceRecord>& input, unsigned percentTolerance
-			,synchPulseCategories_t& synchPulseCategories, unsigned int usecSynchB) {
+			,synchPulseCategories_t& synchPulseCategories, duration_t usecSynchB) {
 
 		assert(capacity == DATA_PULSE_CATEGORIY_COUNT); // // This must be the data pulse category collection
 

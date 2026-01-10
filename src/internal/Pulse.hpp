@@ -33,6 +33,7 @@
 #include "ISR_ATTR.hpp"
 #include "TypeTraits.hpp"
 #include "FormattedPrint.hpp"
+#include "RxDurationType.hpp"
 
 namespace RcSwitch {
 
@@ -73,16 +74,6 @@ struct PulseTypes {
 };
 
 class Pulse {
-public:
-	/**
-	 * unsigned int will be 16 bit on 8 and 16 bit systems and 32 bit
-	 * on 32 bit systems.
-	 * Typical pulse durations from remote controls are in the
-	 * range of 200us .. 15000us. Smaller and longer pulses might
-	 * come form HF noise. Hence 16 bit width is sufficient.
-	 */
-	using duration_t = unsigned int;
-
 private:
 	duration_t mUsecDuration;
 	PULSE_LEVEL mPulseLevel;
@@ -139,7 +130,7 @@ public:
 		return mPulseLevel;
 	}
 
-	bool isDurationInRange(unsigned int value, unsigned percentTolerance) const;
+	bool isDurationInRange(duration_t value, unsigned percentTolerance) const;
 };
 
 class PulseCategory {
@@ -148,9 +139,9 @@ class PulseCategory {
 	 * this category.
 	 */
 	Pulse  mPulse;
-	unsigned int usecMinDuration;
-	unsigned int usecMaxDuration;
-	unsigned int pulseCount;
+	duration_t usecMinDuration;
+	duration_t usecMaxDuration;
+	duration_t pulseCount;
 
 public:
 	PulseCategory();
@@ -164,14 +155,14 @@ public:
 	/**
 	 * Get the average of the duration of all pulses.
 	 */
-	inline unsigned int getWeightedAverage() const {
+	inline duration_t getWeightedAverage() const {
 		return mPulse.getDuration();
 	}
 
 	/**
 	 * Get the average of the minimum and maximum duration.
 	 */
-	inline unsigned int getMinMaxAverage() const {
+	inline duration_t getMinMaxAverage() const {
 		return (usecMaxDuration + usecMinDuration) / 2;
 	}
 

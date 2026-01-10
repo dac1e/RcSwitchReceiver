@@ -12,7 +12,7 @@
 
 namespace {
 
-size_t sprintRange(char *string, const unsigned int begin, const unsigned int end, const size_t width) {
+size_t sprintRange(char *string, const RcSwitch::duration_t begin, const RcSwitch::duration_t end, const size_t width) {
 	size_t i=0;
 	string[i++] = '[';
 	RcSwitch::sprintNumAsDecimal(&string[i], begin, width); // adds a null terminated string

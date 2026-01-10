@@ -30,17 +30,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <Arduino.h>
 #include "ISR_ATTR.hpp"
 #include "RxTimingSpecTable.hpp"
 #include "Typeselect.hpp"
-#include <Arduino.h>
+#include "RxDurationType.hpp"
 
 
 namespace RcSwitch {
 
 struct TimeRange {
-	unsigned int lowerBound;
-	unsigned int upperBound;
+	RcSwitch::duration_t lowerBound;
+	RcSwitch::duration_t upperBound;
 
 	enum COMPARE_RESULT {
 		IS_WITHIN =  0,
@@ -71,8 +72,8 @@ struct RxTimingSpec {
 };
 
 struct TxPulsePairTiming {
-	unsigned int durationA;
-	unsigned int durationB;
+  duration_t durationA;
+  duration_t durationB;
 };
 
 template<typename L, typename R> struct isRxTimingSpecLower {
@@ -92,7 +93,7 @@ namespace Debug {
  */
 template<
 	unsigned int protocolNumber,
-	unsigned int usecClock,
+	uint32_t usecClock,
 	unsigned percentTolerance,
 	unsigned int synchA,  unsigned int synchB,
 	unsigned int data0_A, unsigned int data0_B,
@@ -103,26 +104,26 @@ struct makeTimingSpec { // Calculate the timing specification from the protocol 
 	static constexpr unsigned int PROTOCOL_NUMBER = protocolNumber;
 	static constexpr bool INVERSE_LEVEL = inverseLevel;
 
-	static constexpr unsigned int uSecSynchA = usecClock * synchA;
-	static constexpr unsigned int uSecSynchB = usecClock * synchB;
-	static constexpr unsigned int usecSynchA_lowerBound = static_cast<uint32_t>(uSecSynchA) * (100-percentTolerance) / 100;
-	static constexpr unsigned int usecSynchA_upperBound = static_cast<uint32_t>(uSecSynchA) * (100+percentTolerance) / 100;
-	static constexpr unsigned int usecSynchB_lowerBound = static_cast<uint32_t>(uSecSynchB) * (100-percentTolerance) / 100;
-	static constexpr unsigned int usecSynchB_upperBound = static_cast<uint32_t>(uSecSynchB) * (100+percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecSynchA = usecClock * synchA;
+	static constexpr RcSwitch::duration_t uSecSynchB = usecClock * synchB;
+	static constexpr RcSwitch::duration_t usecSynchA_lowerBound = static_cast<uint32_t>(uSecSynchA) * (100-percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t usecSynchA_upperBound = static_cast<uint32_t>(uSecSynchA) * (100+percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t usecSynchB_lowerBound = static_cast<uint32_t>(uSecSynchB) * (100-percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t usecSynchB_upperBound = static_cast<uint32_t>(uSecSynchB) * (100+percentTolerance) / 100;
 
-	static constexpr unsigned int uSecData0_A = usecClock * data0_A;
-	static constexpr unsigned int uSecData0_B = usecClock * data0_B;
-	static constexpr unsigned int uSecData0_A_lowerBound = static_cast<uint32_t>(uSecData0_A) * (100-percentTolerance) / 100;
-	static constexpr unsigned int uSecData0_A_upperBound = static_cast<uint32_t>(uSecData0_A) * (100+percentTolerance) / 100;
-	static constexpr unsigned int uSecData0_B_lowerBound = static_cast<uint32_t>(uSecData0_B) * (100-percentTolerance) / 100;
-	static constexpr unsigned int uSecData0_B_upperBound = static_cast<uint32_t>(uSecData0_B) * (100+percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData0_A = usecClock * data0_A;
+	static constexpr RcSwitch::duration_t uSecData0_B = usecClock * data0_B;
+	static constexpr RcSwitch::duration_t uSecData0_A_lowerBound = static_cast<uint32_t>(uSecData0_A) * (100-percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData0_A_upperBound = static_cast<uint32_t>(uSecData0_A) * (100+percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData0_B_lowerBound = static_cast<uint32_t>(uSecData0_B) * (100-percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData0_B_upperBound = static_cast<uint32_t>(uSecData0_B) * (100+percentTolerance) / 100;
 
-	static constexpr unsigned int uSecData1_A = usecClock * data1_A;
-	static constexpr unsigned int uSecData1_B = usecClock * data1_B;
-	static constexpr unsigned int uSecData1_A_lowerBound = static_cast<uint32_t>(uSecData1_A) * (100-percentTolerance) / 100;
-	static constexpr unsigned int uSecData1_A_upperBound = static_cast<uint32_t>(uSecData1_A) * (100+percentTolerance) / 100;
-	static constexpr unsigned int uSecData1_B_lowerBound = static_cast<uint32_t>(uSecData1_B) * (100-percentTolerance) / 100;
-	static constexpr unsigned int uSecData1_B_upperBound = static_cast<uint32_t>(uSecData1_B) * (100+percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData1_A = usecClock * data1_A;
+	static constexpr RcSwitch::duration_t uSecData1_B = usecClock * data1_B;
+	static constexpr RcSwitch::duration_t uSecData1_A_lowerBound = static_cast<uint32_t>(uSecData1_A) * (100-percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData1_A_upperBound = static_cast<uint32_t>(uSecData1_A) * (100+percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData1_B_lowerBound = static_cast<uint32_t>(uSecData1_B) * (100-percentTolerance) / 100;
+	static constexpr RcSwitch::duration_t uSecData1_B_upperBound = static_cast<uint32_t>(uSecData1_B) * (100+percentTolerance) / 100;
 
 	typedef RcSwitch::RxTimingSpec rx_spec_t;
 	static constexpr rx_spec_t RX = {PROTOCOL_NUMBER, INVERSE_LEVEL,
